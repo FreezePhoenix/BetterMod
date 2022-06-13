@@ -34,7 +34,6 @@ import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Shader;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -57,7 +56,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ItemEntity
 		if (Blocks.BOOKSHELF instanceof BetterBookshelfBlock) {
 			LOGGER.info("BetterBookshelves was successful!");
 		} else {
