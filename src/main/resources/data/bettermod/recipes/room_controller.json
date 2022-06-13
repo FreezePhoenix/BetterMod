@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"RGR",
+		"GEG",
+		"RGR"
+	],
+	"key": {
+		"R": {
+			"item": "minecraft:redstone"
+		},
+		"E": {
+			"item": "minecraft:ender_pearl"
+		},
+		"G": {
+			"item": "minecraft:gold_ingot"
+		}
+	},
+	"result": {
+		"item": "betterperf:room_controller",
+		"count": 4
+	}
+}

@@ -1,0 +1,28 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.techteam.fabric.bettermod.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MixinArgb",
+    "MixinBlockEntityRenderDispatcher",
+    "MixinBlocks",
+    "MixinClientPlayerEntity",
+    "MixinEntityRenderDispatcher",
+    "MixinLootableContainerBlockEntity",
+    "MixinMobSpawnerLogic",
+    "MixinSodiumWorldRenderer",
+    "MixinWorld",
+    "MixinWorldRenderer",
+    "intrinsics.Matrix3fMixin",
+    "intrinsics.Matrix4fMixin",
+    "intrinsics.MixinMathHelper",
+    "intrinsics.Vec2fMixin",
+    "intrinsics.Vec3dMixin",
+    "intrinsics.Vec3fMixin",
+    "intrinsics.Vector4fMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

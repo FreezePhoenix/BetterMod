@@ -1,0 +1,7 @@
+{
+	"variants": {
+		"": {
+			"model": "bettermod:block/room_controller"
+		}
+	}
+}
