@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.mixin.intrinsics;
 
+import com.ibm.icu.util.CodePointTrie;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Contract;
 import org.spongepowered.asm.mixin.Mixin;
@@ -221,6 +222,9 @@ public abstract class MixinMathHelper {
 	@Contract(pure = true)
 	@Overwrite
 	public static int ceilLog2(int value) {
+		if(value == 0) {
+			return 0;
+		}
 		return 32 - Integer.numberOfLeadingZeros(value - 1);
 	}
 

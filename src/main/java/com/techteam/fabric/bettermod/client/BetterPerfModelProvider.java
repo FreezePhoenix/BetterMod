@@ -21,7 +21,7 @@ public final class BetterPerfModelProvider implements ModelResourceProvider {
 	}
 
 	@Override
-	public @Nullable UnbakedModel loadModelResource(@NotNull Identifier identifier, ModelProviderContext modelProviderContext) throws ModelProviderException {
+	public @Nullable UnbakedModel loadModelResource(@NotNull Identifier identifier, ModelProviderContext modelProviderContext) {
         return identifier.equals(ROOM_CONTROLLER_BLOCK_MODEL_ID) || identifier.equals(ROOM_CONTROLLER_ITEM_MODEL_ID)
                ? ROOM_CONTROLLER_MODEL
                : null;

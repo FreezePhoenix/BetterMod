@@ -15,10 +15,6 @@ import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(Blocks.class)
 public abstract class MixinBlocks {
-    @Shadow
-    private static Block register(String id, Block block) {
-        return null;
-    }
     // Matches the one after TNT, which is Bookshelf
     @Redirect(method = "<clinit>",
               at = @At(value = "NEW",

@@ -23,6 +23,8 @@ dependencies {
 	modImplementation 'link.infra:Indium:1.0.4+mc1.19'
 	modImplementation 'maven.modrinth:starlight:1.1.0+1.19'
 	modImplementation 'maven.modrinth:entityculling:1.5.2-fabric-1.19'
+
+	include "io.github.cottonmc:LibGui:6.0.0-beta.5+1.19-pre1"
 }
 
 processResources {
