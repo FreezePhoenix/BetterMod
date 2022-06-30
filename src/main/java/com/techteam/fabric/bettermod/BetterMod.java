@@ -20,7 +20,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
@@ -32,6 +31,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Shader;
 import net.minecraft.item.BlockItem;
@@ -109,9 +109,9 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public void onInitializeClient() {
 		BlockEntityRendererRegistry.register(ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, RoomControllerEntityRenderer::new);
 		BlockRenderLayerMap.INSTANCE.putBlock(ROOM_CONTROLLER_BLOCK, RenderLayer.getCutoutMipped());
-		ScreenRegistry.register(ROOM_CONTROLLER_SCREEN_HANDLER_TYPE, RoomControllerScreen::new);
+		HandledScreens.register(ROOM_CONTROLLER_SCREEN_HANDLER_TYPE, RoomControllerScreen::new);
+		HandledScreens.register(BOOKSHELF_SCREEN_HANDLER_TYPE, BetterBookshelfScreen::new);
 		ModelLoadingRegistry.INSTANCE.registerResourceProvider(BetterPerfModelProvider::new);
-		ScreenRegistry.register(BOOKSHELF_SCREEN_HANDLER_TYPE, BetterBookshelfScreen::new);
 		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
 			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
 				loadableBlockEntity.onClientLoad();

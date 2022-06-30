@@ -5,7 +5,6 @@ import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-@Environment(EnvType.CLIENT)
 public class WDynamicSlider extends WSlider {
 
     public WDynamicSlider(int min, int max, Axis axis) {

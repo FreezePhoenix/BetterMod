@@ -7,7 +7,6 @@ import net.fabricmc.api.Environment;
 import net.minecraft.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
-@Environment(EnvType.CLIENT)
 public class WSingleItemSlot extends WItemSlot {
     protected int ind;
     @Environment(EnvType.CLIENT)

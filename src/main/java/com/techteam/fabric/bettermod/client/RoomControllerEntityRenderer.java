@@ -20,18 +20,19 @@ public final class RoomControllerEntityRenderer implements BlockEntityRenderer<R
 
     @Override
     public void render(@NotNull RoomControllerBlockEntity blockEntity, float tickDelta, @NotNull MatrixStack matrices, @NotNull VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        if (!blockEntity.disguised()
-                && blockEntity.getBounds() != null) {
-            Box bounds = blockEntity.getRelativeBounds();
+        if (!blockEntity.disguised()) {
+            int offX = blockEntity.getPos().getX();
+            int offY = blockEntity.getPos().getY();
+            int offZ = blockEntity.getPos().getZ();
             WorldRenderer.drawBox(
                     matrices,
                     vertexConsumers.getBuffer(RenderLayer.LINES),
-                    bounds.minX - 0.001,
-                    bounds.minY - 0.001,
-                    bounds.minZ - 0.001,
-                    bounds.maxX + 0.001,
-                    bounds.maxY + 0.001,
-                    bounds.maxZ + 0.001,
+                    (blockEntity.minX - offX) - 0.001,
+                    (blockEntity.minY - offY) - 0.001,
+                    (blockEntity.minZ - offZ) - 0.001,
+                    (blockEntity.maxX - offX) + 0.001,
+                    (blockEntity.maxY - offY) + 0.001,
+                    (blockEntity.maxZ - offZ) + 0.001,
                     1f,
                     1f,
                     1f,

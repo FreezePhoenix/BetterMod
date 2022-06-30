@@ -24,7 +24,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.NotNull;
 
-@Environment(EnvType.CLIENT)
 public final class RoomControllerScreenHandler extends SyncedGuiDescription {
     private static final String[] STRINGS = {"X+", "X-", "Y+", "Y-", "Z+", "Z-"};
 

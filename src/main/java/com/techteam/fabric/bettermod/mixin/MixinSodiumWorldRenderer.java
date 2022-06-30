@@ -19,8 +19,8 @@ public abstract class MixinSodiumWorldRenderer {
                        target = "Ljava/util/Iterator;hasNext()Z"),
               method = "renderTileEntities")
     private boolean hasNextHook(final @NotNull Iterator<BlockEntity> iterator) {
-        Profiler profiler = MinecraftClient.getInstance().getProfiler();
         if (iterator instanceof ListIterator<BlockEntity> listIterator) {
+            Profiler profiler = MinecraftClient.getInstance().getProfiler();
             profiler.push("better_culling");
             while (listIterator.hasNext()) {
                 if (RenderHooks.shouldRenderTileEntity(listIterator.next())) {

@@ -31,9 +31,8 @@ public final class NetworkHandlers {
 		int maxZ = data.readInt();
 		int variant = data.readInt();
 		server.execute(() -> {
-			if (player.getWorld()
-					  .getBlockEntity(pos) instanceof RoomControllerBlockEntity roomController) {
-				roomController.setBounds(new Box(minX, minY, minZ, maxX, maxY, maxZ));
+			if (player.getWorld().getBlockEntity(pos) instanceof RoomControllerBlockEntity roomController) {
+				roomController.setBounds(minX, minY, minZ, maxX, maxY, maxZ);
 				roomController.setVariant(variant);
 				roomController.markDirty();
 			}

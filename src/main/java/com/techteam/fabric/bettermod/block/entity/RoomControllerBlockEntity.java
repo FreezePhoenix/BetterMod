@@ -4,6 +4,7 @@ import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.loadable.IClientLoadableBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.loadable.LoadableBlockEntity;
 import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
+import com.techteam.fabric.bettermod.client.RoomTracker;
 import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
@@ -29,12 +30,18 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.techteam.fabric.bettermod.client.RoomTracker.updateRoom;
 
 public final class RoomControllerBlockEntity extends LoadableBlockEntity implements SidedInventory, PropertyDelegateHolder, RenderAttachmentBlockEntity, IClientLoadableBlockEntity {
 	public static final Identifier ID = new Identifier("betterperf", "room_controller");
 	public static final Box CUBE = new Box(0, 0, 0, 1, 1, 1);
 	private final @NotNull BoxPropertyDelegate delegate;
+
+	public int minX;
+	public int minY;
+	public int minZ;
+	public int maxX;
+	public int maxY;
+	public int maxZ;
 	private Box bounds;
 	private Box relativeBounds;
 	private int variant;
@@ -42,27 +49,32 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	public RoomControllerBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		super(BetterMod.ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, pos, state, 1);
 		delegate = new BoxPropertyDelegate(this);
-		setBounds(CUBE.offset(pos));
+		this.minX = pos.getX();
+		this.minY = pos.getY();
+		this.minZ = pos.getZ();
+		this.maxX = pos.getX() + 1;
+		this.maxY = pos.getY() + 1;
+		this.maxZ = pos.getZ() + 1;
+
 	}
 
-	private static @NotNull Box readFromNBTBB(@NotNull NbtCompound tag) {
-		int nx = tag.getInt("nx");
-		int ny = tag.getInt("ny");
-		int nz = tag.getInt("nz");
-		int px = tag.getInt("px");
-		int py = tag.getInt("py");
-		int pz = tag.getInt("pz");
-		return new Box(nx, ny, nz, px, py, pz);
+	private @NotNull void readFromNBTBB(@NotNull NbtCompound tag) {
+		this.minX = tag.getInt("nx");
+		this.minY = tag.getInt("ny");
+		this.minZ = tag.getInt("nz");
+		this.maxX = tag.getInt("px");
+		this.maxY = tag.getInt("py");
+		this.maxZ = tag.getInt("pz");
 	}
 
-	private static @NotNull NbtCompound writeToNBTBB(@NotNull Box vec) {
+	private @NotNull NbtCompound writeToNBTBB() {
 		NbtCompound tag = new NbtCompound();
-		tag.putInt("nx", (int) vec.minX);
-		tag.putInt("ny", (int) vec.minY);
-		tag.putInt("nz", (int) vec.minZ);
-		tag.putInt("px", (int) vec.maxX);
-		tag.putInt("py", (int) vec.maxY);
-		tag.putInt("pz", (int) vec.maxZ);
+		tag.putInt("nx", this.minX);
+		tag.putInt("ny", this.minY);
+		tag.putInt("nz", this.minZ);
+		tag.putInt("px", this.maxX);
+		tag.putInt("py", this.maxY);
+		tag.putInt("pz", this.maxZ);
 		return tag;
 	}
 
@@ -90,17 +102,13 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 		return new int[]{};
 	}
 
-	public @NotNull Box getBounds() {
-		return bounds;
-	}
-
-	public void setBounds(@NotNull Box bounds) {
-		this.bounds = bounds;
-		this.relativeBounds = bounds.offset(-pos.getX(), -pos.getY(), -pos.getZ());
-	}
-
-	public void setBounds(int x1, int y1, int z1, int x2, int y2, int z2) {
-		setBounds(new Box(x1, y1, z1, x2, y2, z2));
+	public void setBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+		this.minX = minX;
+		this.minY = minY;
+		this.minZ = minZ;
+		this.maxX = maxX;
+		this.maxY = maxY;
+		this.maxZ = maxZ;
 	}
 
 	@Contract(value = " -> !null",
@@ -125,11 +133,6 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	@Override
 	public @NotNull BoxPropertyDelegate getPropertyDelegate() {
 		return delegate;
-	}
-
-	@Contract(pure = true)
-	public @NotNull Box getRelativeBounds() {
-		return relativeBounds;
 	}
 
 	@Override
@@ -175,7 +178,7 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	@Override
 	public void onClientUnload() {
 		if (this.hasWorld()) {
-			updateRoom(this, null);
+			RoomTracker.removeRoom(this);
 		}
 	}
 
@@ -183,14 +186,14 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	public void readNbt(@NotNull NbtCompound NBT) {
 		super.readNbt(NBT);
 		NbtCompound tag = NBT.getCompound("room");
-		setBounds(readFromNBTBB(tag));
+		readFromNBTBB(tag);
 		if (NBT.contains("var")) {
 			variant = NBT.getInt("var");
 		} else {
 			variant = 0;
 		}
 		if (this.hasWorld() && this.getWorld().isClient()) {
-			updateRoom(this, bounds);
+			RoomTracker.addRoom(this.getUUID(), minX, minY, minZ, maxX, maxY, maxZ);
 		}
 	}
 
@@ -210,7 +213,7 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	@Override
 	public void writeNbt(@NotNull NbtCompound NBT) {
 		super.writeNbt(NBT);
-		NBT.put("room", writeToNBTBB(getBounds()));
+		NBT.put("room", writeToNBTBB());
 		NBT.putInt("var", variant);
 	}
 

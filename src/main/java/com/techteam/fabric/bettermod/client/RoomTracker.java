@@ -4,17 +4,11 @@ import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.impl.game.GameProvider;
-import net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.util.ClientPlayerTickable;
 import net.minecraft.entity.Entity;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -84,42 +78,51 @@ public final class RoomTracker {
         return null;
     }
 
-    public static void updateRoom(final @NotNull RoomControllerBlockEntity roomController, final Box bounds) {
+    public static void removeRoom(final @NotNull RoomControllerBlockEntity roomController) {
         ROOM_HASH_MAP_LOCK.writeLock().lock();
-        UUID_ROOM_HASH_MAP.compute(roomController.getUUID(), (final var uuid, final var room) -> {
-            if (bounds == null) {
-                if (room == null) {
-                    BetterMod.LOGGER.warn("Duplicate room removal: " + uuid);
-                    BetterMod.LOGGER.warn("Room count: " + (UUID_ROOM_HASH_MAP.size()));
-                } else {
-                    BetterMod.LOGGER.info("Room removed: " + uuid);
-                    BetterMod.LOGGER.info("Room count: " + (UUID_ROOM_HASH_MAP.size() - 1));
-                }
-                return null;
-            }
-            if (room == null) {
-                BetterMod.LOGGER.info("Room added: " + uuid);
-                BetterMod.LOGGER.info("Room count: " + (UUID_ROOM_HASH_MAP.size() + 1));
-                return new Room(roomController);
-            }
-            BetterMod.LOGGER.info("Room updated: " + uuid);
-            return room.setBounds(bounds);
-        });
+        UUID_ROOM_HASH_MAP.remove(roomController.getUUID());
+        ROOM_HASH_MAP_LOCK.readLock().lock();
         ROOM_HASH_MAP_LOCK.writeLock().unlock();
+        BetterMod.LOGGER.info("Room removed: " + roomController.getUUID());
+        BetterMod.LOGGER.info("Room count: " + UUID_ROOM_HASH_MAP.size());
+        ROOM_HASH_MAP_LOCK.readLock().unlock();
+    }
+
+    public static void addRoom(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        ROOM_HASH_MAP_LOCK.writeLock().lock();
+        UUID_ROOM_HASH_MAP.put(id, new Room(id, minX, minY, minZ, maxX, maxY, maxZ));
+        ROOM_HASH_MAP_LOCK.readLock().lock();
+        ROOM_HASH_MAP_LOCK.writeLock().unlock();
+        BetterMod.LOGGER.info("Room added: " + id);
+        BetterMod.LOGGER.info("Room count: " + UUID_ROOM_HASH_MAP.size());
+        ROOM_HASH_MAP_LOCK.readLock().unlock();
+    }
+
+    public static void updateRoom(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+        ROOM_HASH_MAP_LOCK.readLock().lock();
+        UUID_ROOM_HASH_MAP.get(id).setBounds(minX, minY, minZ, maxX, maxY, maxZ);
+        ROOM_HASH_MAP_LOCK.readLock().unlock();
+        BetterMod.LOGGER.info("Room updated: " + id);
     }
 
     @Environment(EnvType.CLIENT)
     static public final class Room {
         private final UUID id;
-        private Box bounds;
 
-        public Room(@NotNull RoomControllerBlockEntity roomController) {
-            this.id = roomController.getUUID();
-            this.setBounds(roomController.getBounds());
-        }
-
-        public boolean contains(@NotNull Vec3f pos) {
-            return contains(pos.getX(), pos.getY(), pos.getZ());
+        public int minX;
+        public int minY;
+        public int minZ;
+        public int maxX;
+        public int maxY;
+        public int maxZ;
+        public Room(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+            this.id = id;
+            this.minX = minX;
+            this.minY = minY;
+            this.minZ = minZ;
+            this.maxX = maxX;
+            this.maxY = maxY;
+            this.maxZ = maxZ;
         }
 
         public boolean contains(@NotNull Vec3i pos) {
@@ -129,9 +132,11 @@ public final class RoomTracker {
         public boolean contains(@NotNull Vec3d pos) {
             return contains(pos.x, pos.y, pos.z);
         }
-
+        public boolean contains(int x, int y, int z) {
+            return x >= this.minX && x < this.maxX && y >= this.minY && y < this.maxY && z >= this.minZ && z < this.maxZ;
+        }
         public boolean contains(double x, double y, double z) {
-            return bounds.contains(x, y, z);
+            return x >= this.minX && x < this.maxX && y >= this.minY && y < this.maxY && z >= this.minZ && z < this.maxZ;
         }
 
         @Override
@@ -150,16 +155,19 @@ public final class RoomTracker {
             return id.hashCode();
         }
 
-        @Contract(value = "_ -> this",
-                  mutates = "this")
-        public Room setBounds(Box bounds) {
-            this.bounds = bounds;
-            return this;
+        @Contract(mutates = "this")
+        public void setBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+            this.minX = minX;
+            this.minY = minY;
+            this.minZ = minZ;
+            this.maxX = maxX;
+            this.maxY = maxY;
+            this.maxZ = maxZ;
         }
 
         @Override
         public @NotNull String toString() {
-            return id + " = " + bounds;
+            return id.toString();
         }
     }
 
