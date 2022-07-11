@@ -2,17 +2,16 @@ package com.techteam.fabric.bettermod;
 
 import com.techteam.fabric.bettermod.block.BetterBlock;
 import com.techteam.fabric.bettermod.block.BetterBookshelfBlock;
+import com.techteam.fabric.bettermod.block.BitHopperBlock;
 import com.techteam.fabric.bettermod.block.RoomControllerBlock;
 import com.techteam.fabric.bettermod.block.entity.BetterBookshelfBlockEntity;
+import com.techteam.fabric.bettermod.block.entity.BitHopperBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.loadable.IClientLoadableBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.loadable.IServerLoadableBlockEntity;
 import com.techteam.fabric.bettermod.client.BetterPerfModelProvider;
 import com.techteam.fabric.bettermod.client.RoomControllerEntityRenderer;
-import com.techteam.fabric.bettermod.client.gui.BetterBookshelfScreen;
-import com.techteam.fabric.bettermod.client.gui.BetterBookshelfScreenHandler;
-import com.techteam.fabric.bettermod.client.gui.RoomControllerScreen;
-import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
+import com.techteam.fabric.bettermod.client.gui.*;
 import com.techteam.fabric.bettermod.network.NetworkHandlers;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -28,7 +27,9 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -40,6 +41,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.MinecraftDedicatedServer;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,6 +55,9 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static BetterBlock<RoomControllerBlockEntity> ROOM_CONTROLLER_BLOCK;
 	public static BlockEntityType<RoomControllerBlockEntity> ROOM_CONTROLLER_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<RoomControllerScreenHandler> ROOM_CONTROLLER_SCREEN_HANDLER_TYPE;
+	public static BetterBlock<BitHopperBlockEntity> BIT_HOPPER_BLOCK;
+	public static BlockEntityType<BitHopperBlockEntity> BIT_HOPPER_BLOCK_ENTITY_TYPE;
+	public static ScreenHandlerType<BitHopperScreenHandler> BIT_HOPPER_SCREEN_HANDLER_TYPE;
 
 	@Override
 	public void onInitialize() {
@@ -102,6 +107,27 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 				RoomControllerBlock.ID,
 				new BlockItem(ROOM_CONTROLLER_BLOCK, new Item.Settings().group(ItemGroup.MISC))
 		);
+		BIT_HOPPER_BLOCK = Registry.register(
+				Registry.BLOCK,
+				BitHopperBlock.ID,
+				new BitHopperBlock(FabricBlockSettings.of(Material.METAL, MapColor.STONE_GRAY).requiresTool().strength(3.0f, 4.8f).sounds(
+						BlockSoundGroup.METAL).nonOpaque())
+		);
+		BIT_HOPPER_BLOCK_ENTITY_TYPE = Registry.register(
+				Registry.BLOCK_ENTITY_TYPE,
+				BitHopperBlockEntity.ID,
+				FabricBlockEntityTypeBuilder.create(BitHopperBlockEntity::new, BIT_HOPPER_BLOCK).build()
+		);
+		BIT_HOPPER_SCREEN_HANDLER_TYPE = Registry.register(
+				Registry.SCREEN_HANDLER,
+				BitHopperBlock.ID,
+				new ExtendedScreenHandlerType<>(BitHopperScreenHandler::new)
+		);
+		Registry.register(
+				Registry.ITEM,
+				BitHopperBlock.ID,
+				new BlockItem(BIT_HOPPER_BLOCK, new Item.Settings().group(ItemGroup.MISC))
+		);
 	}
 
 	@Override
@@ -111,6 +137,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(ROOM_CONTROLLER_BLOCK, RenderLayer.getCutoutMipped());
 		HandledScreens.register(ROOM_CONTROLLER_SCREEN_HANDLER_TYPE, RoomControllerScreen::new);
 		HandledScreens.register(BOOKSHELF_SCREEN_HANDLER_TYPE, BetterBookshelfScreen::new);
+		HandledScreens.register(BIT_HOPPER_SCREEN_HANDLER_TYPE, BitHopperScreen::new);
 		ModelLoadingRegistry.INSTANCE.registerResourceProvider(BetterPerfModelProvider::new);
 		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
 			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {

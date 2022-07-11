@@ -4,6 +4,9 @@ import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.client.gui.BetterBookshelfScreenHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
@@ -34,5 +37,14 @@ public final class BetterBookshelfBlockEntity extends BetterBlockEntity {
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, @NotNull PacketByteBuf buf) {
         buf.writeBlockPos(pos);
+    }
+
+    @Override
+    public boolean isValid(int slot, ItemStack stack) {
+        Item _item = stack.getItem();
+        if(_item == Items.BOOK || _item == Items.ENCHANTED_BOOK || _item == Items.WRITTEN_BOOK || _item == Items.WRITABLE_BOOK || _item == Items.FILLED_MAP || _item == Items.MAP || _item == Items.PAPER) {
+            return super.isValid(slot, stack);
+        }
+        return false;
     }
 }
