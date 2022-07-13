@@ -9,16 +9,16 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerContext;
 import org.jetbrains.annotations.NotNull;
 
-public final class BitHopperScreenHandler extends SyncedGuiDescription {
+public final class StickHopperScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 5;
 
-	public BitHopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull PacketByteBuf buf) {
+	public StickHopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull PacketByteBuf buf) {
 		this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.world, buf.readBlockPos()));
 	}
 
-	public BitHopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
+	public StickHopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
 		super(
-				BetterMod.BIT_HOPPER_SCREEN_HANDLER_TYPE,
+				BetterMod.STICK_HOPPER_SCREEN_HANDLER_TYPE,
 				syncId,
 				playerInventory,
 				getBlockInventory(context, INVENTORY_SIZE),

@@ -40,7 +40,17 @@ public class InventoryUtil {
 	public static SingleSlotStorage<ItemVariant> getFirstTransferrableSlotCap(InventoryStorage from, InventoryStorage to, TransactionContext transactionContext) {
 		try(Transaction transaction = Transaction.openNested(transactionContext)) {
 			for(SingleSlotStorage<ItemVariant> slot : from.getSlots()) {
-				if(!(slot.getAmount() == 0) && canInsertExtract(from, to, slot, transaction)) {
+				if(!slot.isResourceBlank() && canInsertExtract(from, to, slot, transaction)) {
+					return slot;
+				}
+			}
+		}
+		return null;
+	}
+	public static SingleSlotStorage<ItemVariant> getFirstTransferrableSlotCapSticky(InventoryStorage from, InventoryStorage to, TransactionContext transactionContext) {
+		try(Transaction transaction = Transaction.openNested(transactionContext)) {
+			for(SingleSlotStorage<ItemVariant> slot : from.getSlots()) {
+				if(!slot.isResourceBlank() && slot.getResource().getItem().getMaxCount() > 1 && canInsertExtractSticky(from, to, slot, transaction)) {
 					return slot;
 				}
 			}
@@ -58,9 +68,21 @@ public class InventoryUtil {
 	private static boolean canInsertExtract(InventoryStorage from, InventoryStorage to, SingleSlotStorage<ItemVariant> slot, TransactionContext context) {
 		try(Transaction transaction = Transaction.openNested(context)) {
 			var itemExtract = slot.simulateExtract(slot.getResource(),1,transaction);
-			if(itemExtract > 0) {
-				var insert = to.simulateInsert(slot.getResource(), itemExtract, transaction);
-				if(insert > 0) {
+			if(itemExtract == 1) {
+				var insert = to.simulateInsert(slot.getResource(), 1, transaction);
+				if(insert == 1) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	private static boolean canInsertExtractSticky(InventoryStorage from, InventoryStorage to, SingleSlotStorage<ItemVariant> slot, TransactionContext context) {
+		try(Transaction transaction = Transaction.openNested(context)) {
+			var itemExtract = slot.simulateExtract(slot.getResource(),2,transaction);
+			if(itemExtract == 2) {
+				var insert = to.simulateInsert(slot.getResource(), 1, transaction);
+				if(insert == 1) {
 					return true;
 				}
 			}
@@ -71,6 +93,30 @@ public class InventoryUtil {
 	public static void handleTransfer(InventoryStorage from, InventoryStorage to) {
 		try(Transaction transaction = Transaction.openOuter()) {
 			SingleSlotStorage<ItemVariant> slot = getFirstTransferrableSlotCap(from, to, transaction);
+			if(slot == null) {
+				return;
+			}
+			var resource = slot.getResource();
+			slot.extract(resource, 1, transaction);
+			to.insert(resource, 1, transaction);
+			transaction.commit();
+		}
+	}
+	public static void handleTransferSticky(InventoryStorage from, InventoryStorage to) {
+		try(Transaction transaction = Transaction.openOuter()) {
+			SingleSlotStorage<ItemVariant> slot = getFirstTransferrableSlotCapSticky(from, to, transaction);
+			if(slot == null) {
+				return;
+			}
+			var resource = slot.getResource();
+			slot.extract(resource, 1, transaction);
+			to.insert(resource, 1, transaction);
+			transaction.commit();
+		}
+	}
+	public static void handleTransferStackable(InventoryStorage from, InventoryStorage to) {
+		try(Transaction transaction = Transaction.openOuter()) {
+			SingleSlotStorage<ItemVariant> slot = getFirstTransferrableSlotCapSticky(from, to, transaction);
 			if(slot == null) {
 				return;
 			}

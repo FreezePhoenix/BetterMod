@@ -30,14 +30,14 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 
 		WPlainPanel root = new WPlainPanel();
 		setRootPanel(root);
-		root.setSize(176, 150);
+		root.setSize(176, 149);
 		WItemSlot slot = WItemSlot.of(blockInventory, 0, 8, 2);
 		slot.setFilter((final ItemStack item) -> {
 			Item _item = item.getItem();
 			return _item == Items.BOOK || _item == Items.ENCHANTED_BOOK || _item == Items.WRITTEN_BOOK || _item == Items.WRITABLE_BOOK || _item == Items.FILLED_MAP || _item == Items.MAP || _item == Items.PAPER;
 		});
 		root.add(slot, 16, 17);
-		root.add(this.createPlayerInventoryPanel(), 7, 56);
+		root.add(this.createPlayerInventoryPanel(), 7, 55);
 		root.validate(this);
 	}
 }

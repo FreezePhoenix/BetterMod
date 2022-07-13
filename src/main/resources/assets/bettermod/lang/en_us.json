@@ -1,4 +1,6 @@
 {
 	"block.bettermod.room_controller": "Room Controller",
-	"block.bettermod.bithopper": "Bit Hopper"
+	"block.bettermod.bithopper": "Bit Hopper",
+	"block.bettermod.pullhopper": "Pull Hopper",
+	"block.bettermod.stickhopper": "Stick Hopper"
 }
