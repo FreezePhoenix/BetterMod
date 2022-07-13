@@ -8,6 +8,8 @@ import com.techteam.fabric.bettermod.client.BetterPerfModelProvider;
 import com.techteam.fabric.bettermod.client.RoomControllerEntityRenderer;
 import com.techteam.fabric.bettermod.client.gui.*;
 import com.techteam.fabric.bettermod.network.NetworkHandlers;
+import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
+import io.github.cottonmc.cotton.gui.client.CottonInventoryScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -24,7 +26,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -164,16 +168,21 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 	}
 
+	@Environment(EnvType.CLIENT)
+	private static <T extends SyncedGuiDescription> void registerScreen(ScreenHandlerType<T> screenHandlerType) {
+		HandledScreens.register(screenHandlerType, (HandledScreens.Provider<T, CottonInventoryScreen<T>>) BetterScreen::new);
+	}
+
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void onInitializeClient() {
 		BlockEntityRendererRegistry.register(ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, RoomControllerEntityRenderer::new);
 		BlockRenderLayerMap.INSTANCE.putBlock(ROOM_CONTROLLER_BLOCK, RenderLayer.getCutoutMipped());
-		HandledScreens.register(ROOM_CONTROLLER_SCREEN_HANDLER_TYPE, RoomControllerScreen::new);
-		HandledScreens.register(BOOKSHELF_SCREEN_HANDLER_TYPE, BetterBookshelfScreen::new);
-		HandledScreens.register(BIT_HOPPER_SCREEN_HANDLER_TYPE, BitHopperScreen::new);
-		HandledScreens.register(PULL_HOPPER_SCREEN_HANDLER_TYPE, PullHopperScreen::new);
-		HandledScreens.register(STICK_HOPPER_SCREEN_HANDLER_TYPE, StickHopperScreen::new);
+		registerScreen(BOOKSHELF_SCREEN_HANDLER_TYPE);
+		registerScreen(BIT_HOPPER_SCREEN_HANDLER_TYPE);
+		registerScreen(PULL_HOPPER_SCREEN_HANDLER_TYPE);
+		registerScreen(STICK_HOPPER_SCREEN_HANDLER_TYPE);
+		registerScreen(ROOM_CONTROLLER_SCREEN_HANDLER_TYPE);
 		ModelLoadingRegistry.INSTANCE.registerResourceProvider(BetterPerfModelProvider::new);
 		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
 			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
