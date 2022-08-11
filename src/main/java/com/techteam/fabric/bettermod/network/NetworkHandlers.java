@@ -2,21 +2,18 @@ package com.techteam.fabric.bettermod.network;
 
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.NotNull;
-
-import static com.techteam.fabric.bettermod.network.PacketIdentifiers.BOX_UPDATE_PACKET;
-import static net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.registerGlobalReceiver;
 
 public final class NetworkHandlers {
 	public static void initServerHandlers() {
-		registerGlobalReceiver(
-				BOX_UPDATE_PACKET,
+		ServerPlayNetworking.registerGlobalReceiver(
+				PacketIdentifiers.BOX_UPDATE_PACKET,
 				NetworkHandlers::receive
 		);
 	}

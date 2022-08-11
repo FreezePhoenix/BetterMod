@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.client.gui;
 
+import com.techteam.fabric.bettermod.BetterMod;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public class HopperScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 5;
 	public HopperScreenHandler(ScreenHandlerType<?>type, int syncId, PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
-		super(type, syncId, playerInventory, getBlockInventory(context, INVENTORY_SIZE), getBlockPropertyDelegate(context));
+		super(type, syncId, playerInventory, BetterMod.getBlockInventory(context, INVENTORY_SIZE), getBlockPropertyDelegate(context));
 		WPlainPanel root = new WPlainPanel();
 		setRootPanel(root);
 		root.setSize(176, 131);

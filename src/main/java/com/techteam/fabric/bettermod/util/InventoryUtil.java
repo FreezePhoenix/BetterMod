@@ -1,7 +1,11 @@
 package com.techteam.fabric.bettermod.util;
 
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
@@ -12,22 +16,29 @@ import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class InventoryUtil {
-	public static Inventory getInventoryAt(World world, BlockPos pos) {
-		BlockEntity blockEntity;
+	public static @Nullable Inventory getInventoryAt(@NotNull World world, BlockPos pos) {
 		BlockState blockState = world.getBlockState(pos);
 		Block block = blockState.getBlock();
 		if (block instanceof InventoryProvider inventoryProvider) {
 			return inventoryProvider.getInventory(blockState, world, pos);
 		} else if (blockState.hasBlockEntity()) {
-			blockEntity = world.getBlockEntity(pos);
+			BlockEntity blockEntity = world.getBlockEntity(pos);
 			if (blockEntity instanceof ChestBlockEntity && block instanceof ChestBlock chestBlock) {
 				return ChestBlock.getInventory(chestBlock, blockState, world, pos, true);
 			}
@@ -37,17 +48,31 @@ public class InventoryUtil {
 		}
 		return null;
 	}
-	public static SingleSlotStorage<ItemVariant> getFirstTransferrableSlotCap(InventoryStorage from, InventoryStorage to, TransactionContext transactionContext) {
-		try(Transaction transaction = Transaction.openNested(transactionContext)) {
-			for(SingleSlotStorage<ItemVariant> slot : from.getSlots()) {
-				if(!slot.isResourceBlank() && canInsertExtract(from, to, slot, transaction)) {
-					return slot;
-				}
-			}
+	public static void readNbt(NbtCompound nbt, SimpleInventory stacks) {
+		NbtList nbtList = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
+		for (int i = 0; i < nbtList.size(); ++i) {
+			NbtCompound nbtCompound = nbtList.getCompound(i);
+			int j = nbtCompound.getByte("Slot") & 0xFF;
+			if (j >= stacks.size()) continue;
+			stacks.setStack(j, ItemStack.fromNbt(nbtCompound));
 		}
-		return null;
 	}
-	public static SingleSlotStorage<ItemVariant> getFirstTransferrableSlotCapSticky(InventoryStorage from, InventoryStorage to, TransactionContext transactionContext) {
+	@Contract("_, _ -> param1")
+	public static @NotNull NbtCompound writeNbt(NbtCompound nbt, SimpleInventory stacks) {
+		NbtList nbtList = new NbtList();
+		for (int i = 0; i < stacks.size(); ++i) {
+			ItemStack itemStack = stacks.getStack(i);
+			if (itemStack.isEmpty()) continue;
+			NbtCompound nbtCompound = new NbtCompound();
+			nbtCompound.putByte("Slot", (byte)i);
+			itemStack.writeNbt(nbtCompound);
+			nbtList.add(nbtCompound);
+		}
+		nbt.put("Items", nbtList);
+		return nbt;
+	}
+
+	public static @Nullable SingleSlotStorage<ItemVariant> getFirstTransferrableSlotCapSticky(@NotNull InventoryStorage from, InventoryStorage to, TransactionContext transactionContext) {
 		try(Transaction transaction = Transaction.openNested(transactionContext)) {
 			for(SingleSlotStorage<ItemVariant> slot : from.getSlots()) {
 				if(!slot.isResourceBlank() && slot.getResource().getItem().getMaxCount() > 1 && canInsertExtractSticky(from, to, slot, transaction)) {
@@ -57,73 +82,82 @@ public class InventoryUtil {
 		}
 		return null;
 	}
-
-	/**
-	 * Can we move an item from the inventory {from} at slot {slot} to the inventory {to}?
-	 * @param from
-	 * @param to
-	 * @param slot
-	 * @return
-	 */
-	private static boolean canInsertExtract(InventoryStorage from, InventoryStorage to, SingleSlotStorage<ItemVariant> slot, TransactionContext context) {
+	private static boolean canInsertExtractSticky(InventoryStorage from, InventoryStorage to, @NotNull SingleSlotStorage<ItemVariant> slot, TransactionContext context) {
 		try(Transaction transaction = Transaction.openNested(context)) {
-			var itemExtract = slot.simulateExtract(slot.getResource(),1,transaction);
-			if(itemExtract == 1) {
-				var insert = to.simulateInsert(slot.getResource(), 1, transaction);
-				if(insert == 1) {
-					return true;
+			return slot.simulateExtract(slot.getResource(),2,transaction) == 2 && to.simulateInsert(slot.getResource(), 1, transaction) == 1;
+		}
+	}
+
+	public static boolean handleTransfer(@NotNull Storage<ItemVariant> from, @NotNull Storage<ItemVariant> to) {
+		try (Transaction transaction = Transaction.openOuter()) {
+			for (StorageView<ItemVariant> view : from) {
+				if (view.isResourceBlank()) continue;
+				ItemVariant resource = view.getResource();
+
+				try (Transaction transferTransaction = transaction.openNested()) {
+					// check how much can be inserted
+					if(to.insert(resource, 1, transferTransaction) != 1) {
+						continue;
+					}
+					if(view.extract(resource, 1, transferTransaction) == 1) {
+						transferTransaction.commit();
+						transaction.commit();
+						return true;
+					}
 				}
 			}
 		}
 		return false;
 	}
-	private static boolean canInsertExtractSticky(InventoryStorage from, InventoryStorage to, SingleSlotStorage<ItemVariant> slot, TransactionContext context) {
-		try(Transaction transaction = Transaction.openNested(context)) {
-			var itemExtract = slot.simulateExtract(slot.getResource(),2,transaction);
-			if(itemExtract == 2) {
-				var insert = to.simulateInsert(slot.getResource(), 1, transaction);
-				if(insert == 1) {
-					return true;
+	public static boolean handleTransferSticky(@NotNull Storage<ItemVariant> from, Storage<ItemVariant> to) {
+		try (Transaction transaction = Transaction.openOuter()) {
+			for (StorageView<ItemVariant> view : from) {
+				if (view.isResourceBlank()) {
+					continue;
+				}
+				if(view.getAmount() <= 1) {
+					continue;
+				}
+				ItemVariant resource = view.getResource();
+
+				try (Transaction transferTransaction = transaction.openNested()) {
+					// check how much can be inserted
+					if(to.insert(resource, 1, transferTransaction) != 1) {
+						continue;
+					}
+					if(view.extract(resource, 1, transferTransaction) == 1) {
+						transferTransaction.commit();
+						transaction.commit();
+						return true;
+					}
 				}
 			}
 		}
 		return false;
 	}
+	public static boolean handleTransferStackable(@NotNull Storage<ItemVariant> from, Storage<ItemVariant> to) {
+		try (Transaction transaction = Transaction.openOuter()) {
+			for (StorageView<ItemVariant> view : from) {
+				if (view.isResourceBlank()) {
+					continue;
+				}
+				if(view.getCapacity() <= 1) {
+					continue;
+				}
+				ItemVariant resource = view.getResource();
 
-	public static void handleTransfer(InventoryStorage from, InventoryStorage to) {
-		try(Transaction transaction = Transaction.openOuter()) {
-			SingleSlotStorage<ItemVariant> slot = getFirstTransferrableSlotCap(from, to, transaction);
-			if(slot == null) {
-				return;
+				try (Transaction transferTransaction = transaction.openNested()) {
+					if(to.insert(resource, 1, transferTransaction) != 1) {
+						continue;
+					}
+					if(view.extract(resource, 1, transferTransaction) == 1) {
+						transferTransaction.commit();
+						transaction.commit();
+						return true;
+					}
+				}
 			}
-			var resource = slot.getResource();
-			slot.extract(resource, 1, transaction);
-			to.insert(resource, 1, transaction);
-			transaction.commit();
 		}
-	}
-	public static void handleTransferSticky(InventoryStorage from, InventoryStorage to) {
-		try(Transaction transaction = Transaction.openOuter()) {
-			SingleSlotStorage<ItemVariant> slot = getFirstTransferrableSlotCapSticky(from, to, transaction);
-			if(slot == null) {
-				return;
-			}
-			var resource = slot.getResource();
-			slot.extract(resource, 1, transaction);
-			to.insert(resource, 1, transaction);
-			transaction.commit();
-		}
-	}
-	public static void handleTransferStackable(InventoryStorage from, InventoryStorage to) {
-		try(Transaction transaction = Transaction.openOuter()) {
-			SingleSlotStorage<ItemVariant> slot = getFirstTransferrableSlotCapSticky(from, to, transaction);
-			if(slot == null) {
-				return;
-			}
-			var resource = slot.getResource();
-			slot.extract(resource, 1, transaction);
-			to.insert(resource, 1, transaction);
-			transaction.commit();
-		}
+		return false;
 	}
 }

@@ -20,6 +20,4 @@ public abstract class BetterTickingBlock<E extends BetterBlockEntity & ITickable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 		return ITickable::tick;
 	}
-
-
 }

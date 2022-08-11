@@ -203,15 +203,6 @@ public final class RoomControllerModel implements UnbakedModel, BakedModel, Fabr
         }
 
         @Override
-        public void emitItemQuads(ItemStack itemStack, Supplier<Random> supplier, RenderContext renderContext) {
-            ((FabricBakedModel) wrapped).emitItemQuads(
-                    itemStack,
-                    supplier,
-                    renderContext
-            );
-        }
-
-        @Override
         public List<BakedQuad> getQuads(BlockState blockState, Direction face, Random rand) {
             return wrapped.getQuads(
                     wrapped_state,

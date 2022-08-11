@@ -28,6 +28,7 @@ public final class RoomTracker {
     private static final ReadWriteLock ROOM_HASH_MAP_LOCK = new ReentrantReadWriteLock();
     private static @Nullable Room currentRoom = null;
 
+    @Contract("_ -> new")
     public static @NotNull RoomTrackerTicker bind(@NotNull AbstractClientPlayerEntity clientPlayerEntity) {
         BetterMod.LOGGER.info("Bound new RoomTrackerTicker to player: " + clientPlayerEntity.getEntityName() + "[" + clientPlayerEntity.getUuidAsString() + "]");
         return new RoomTrackerTicker(clientPlayerEntity);
@@ -108,13 +109,13 @@ public final class RoomTracker {
     @Environment(EnvType.CLIENT)
     static public final class Room {
         private final UUID id;
-
         public int minX;
         public int minY;
         public int minZ;
         public int maxX;
         public int maxY;
         public int maxZ;
+        @Contract(pure = true)
         public Room(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
             this.id = id;
             this.minX = minX;
@@ -124,21 +125,25 @@ public final class RoomTracker {
             this.maxY = maxY;
             this.maxZ = maxZ;
         }
-
+        @Contract(pure = true)
         public boolean contains(@NotNull Vec3i pos) {
             return contains(pos.getX(), pos.getY(), pos.getZ());
         }
-
+        @Contract(pure = true)
         public boolean contains(@NotNull Vec3d pos) {
             return contains(pos.x, pos.y, pos.z);
         }
+        @Contract(pure = true)
         public boolean contains(int x, int y, int z) {
             return x >= this.minX && x < this.maxX && y >= this.minY && y < this.maxY && z >= this.minZ && z < this.maxZ;
         }
+        @Contract(pure = true)
         public boolean contains(double x, double y, double z) {
             return x >= this.minX && x < this.maxX && y >= this.minY && y < this.maxY && z >= this.minZ && z < this.maxZ;
         }
 
+        @Contract(value = "null -> false",
+                  pure = true)
         @Override
         public boolean equals(Object o) {
             return o instanceof Room && ((Room) o).id.equals(id);
@@ -165,6 +170,7 @@ public final class RoomTracker {
             this.maxZ = maxZ;
         }
 
+        @Contract(pure = true)
         @Override
         public @NotNull String toString() {
             return id.toString();
@@ -174,6 +180,7 @@ public final class RoomTracker {
     static public final class RoomTrackerTicker implements ClientPlayerTickable {
         private final AbstractClientPlayerEntity clientPlayer;
 
+        @Contract(pure = true)
         RoomTrackerTicker(AbstractClientPlayerEntity player) {
             this.clientPlayer = player;
         }

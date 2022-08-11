@@ -37,7 +37,6 @@ public abstract class BetterBlock<E extends BetterBlockEntity> extends BlockWith
         }
         super.onBreak(worldIn, pos, state, player);
     }
-
     @Override
     public @NotNull ActionResult onUse(BlockState state, @NotNull World world, BlockPos pos, @NotNull PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (world.isClient()) {

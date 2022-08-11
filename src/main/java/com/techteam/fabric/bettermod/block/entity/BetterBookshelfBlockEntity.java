@@ -3,6 +3,7 @@ package com.techteam.fabric.bettermod.block.entity;
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.client.gui.BetterBookshelfScreenHandler;
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,14 +24,14 @@ public final class BetterBookshelfBlockEntity extends BetterBlockEntity {
 
     @Contract("_, _ -> new")
     @Override
-    protected @NotNull ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+    public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         return new BetterBookshelfScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
     }
 
     @Contract(value = " -> !null",
               pure = true)
     @Override
-    protected Text getContainerName() {
+    public Text getDisplayName() {
         return Text.of("Bookshelf");
     }
 

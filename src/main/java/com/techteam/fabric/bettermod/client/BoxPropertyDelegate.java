@@ -11,6 +11,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public final class BoxPropertyDelegate implements PropertyDelegate {
@@ -82,6 +83,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 		}
 	}
 
+	@Contract(pure = true)
 	@Override
 	public int size() {
 		return 0;

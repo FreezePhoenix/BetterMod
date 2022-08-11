@@ -1,11 +1,13 @@
 package com.techteam.fabric.bettermod.mixin;
 
 import net.minecraft.util.math.ColorHelper;
+import org.jetbrains.annotations.Contract;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 @Mixin(ColorHelper.Argb.class)
 public abstract class MixinArgb {
+	@Contract(pure = true)
 	private static int div255(int value) {
 		return (value + 1 + ((value) >>> 8)) >>> 8;
 	}

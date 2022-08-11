@@ -30,6 +30,6 @@ public abstract class MixinWorld {
                      shift = At.Shift.BEFORE),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void beforeTickBlockEntity(CallbackInfo ci, @NotNull Profiler profiler, Iterator<?> iterator, @NotNull BlockEntityTickInvoker blockEntityTickInvoker) {
-        profiler.push(blockEntityTickInvoker.getName());
+        profiler.push(blockEntityTickInvoker::getName);
     }
 }

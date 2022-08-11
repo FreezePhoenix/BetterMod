@@ -22,24 +22,28 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.minecraft.client.gui.screen.ingame.ScreenHandlerProvider;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Contract;
+
+import java.util.function.Supplier;
 
 
 public class BetterMod implements ModInitializer, ClientModInitializer {
@@ -60,6 +64,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<StickHopperScreenHandler> STICK_HOPPER_SCREEN_HANDLER_TYPE;
 
+	@Contract("_, _ -> param2")
 	public static <E extends BetterBlockEntity> BetterBlock<E> registerBlock(Identifier ID, BetterBlock<E> block) {
 		Registry.register(Registry.BLOCK, ID, block);
 		Registry.register(Registry.ITEM, ID, new BlockItem(block, new Item.Settings().group(ItemGroup.MISC)));
@@ -67,27 +72,58 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	}
 
 	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, FabricBlockEntityTypeBuilder.Factory<E> factory, BetterBlock<E> block) {
-		return Registry.register(
+		BlockEntityType<E> blockEntityType = Registry.register(
 				Registry.BLOCK_ENTITY_TYPE,
 				ID,
 				FabricBlockEntityTypeBuilder.create(factory, block).build(null)
 		);
+		ItemStorage.SIDED.registerForBlockEntity(
+				(betterBlockEntity, direction) -> betterBlockEntity.SELF,
+				blockEntityType
+		);
+		return blockEntityType;
 	}
 
+	@Contract("_, _ -> !null")
 	public static <E extends ScreenHandler> ScreenHandlerType<E> registerScreenHandler(Identifier ID, ExtendedScreenHandlerType.ExtendedFactory<E> factory) {
 		return Registry.register(Registry.SCREEN_HANDLER, ID, new ExtendedScreenHandlerType<>(factory));
+	}
+
+	@Environment(EnvType.CLIENT)
+	private static <T extends SyncedGuiDescription> void registerScreen(ScreenHandlerType<T> screenHandlerType) {
+		HandledScreens.register(
+				screenHandlerType,
+				(HandledScreens.Provider<T, CottonInventoryScreen<T>>) BetterScreen::new
+		);
+	}
+
+	public static Inventory getBlockInventory(ScreenHandlerContext ctx, int size) {
+		return getBlockInventory(ctx, () -> new SimpleInventory(size));
+	}
+
+	private static Inventory getBlockInventory(ScreenHandlerContext ctx, Supplier<Inventory> fallback) {
+		return ctx.get((world, pos) -> {
+			BlockState state = world.getBlockState(pos);
+			Block b = state.getBlock();
+			BlockEntity be = world.getBlockEntity(pos);
+			if (be instanceof BetterBlockEntity blockEntity) {
+				return blockEntity.getInventory();
+			}
+
+			return fallback.get();
+		}).orElseGet(fallback);
 	}
 
 	@Override
 	public void onInitialize() {
 		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
 			if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onServerLoad();
+				loadableBlockEntity.onServerLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
 			}
 		});
 		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
 			if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onServerUnload();
+				loadableBlockEntity.onServerUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
 			}
 		});
 		NetworkHandlers.initServerHandlers();
@@ -137,10 +173,10 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		PULL_HOPPER_BLOCK = registerBlock(
 				PullHopperBlock.ID,
 				new PullHopperBlock(FabricBlockSettings.of(Material.METAL, MapColor.STONE_GRAY)
-				                                      .requiresTool()
-				                                      .strength(3.0f, 4.8f)
-				                                      .sounds(BlockSoundGroup.METAL)
-				                                      .nonOpaque())
+				                                       .requiresTool()
+				                                       .strength(3.0f, 4.8f)
+				                                       .sounds(BlockSoundGroup.METAL)
+				                                       .nonOpaque())
 		);
 		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				PullHopperBlockEntity.ID,
@@ -153,10 +189,10 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		STICK_HOPPER_BLOCK = registerBlock(
 				StickHopperBlock.ID,
 				new StickHopperBlock(FabricBlockSettings.of(Material.METAL, MapColor.STONE_GRAY)
-				                                       .requiresTool()
-				                                       .strength(3.0f, 4.8f)
-				                                       .sounds(BlockSoundGroup.METAL)
-				                                       .nonOpaque())
+				                                        .requiresTool()
+				                                        .strength(3.0f, 4.8f)
+				                                        .sounds(BlockSoundGroup.METAL)
+				                                        .nonOpaque())
 		);
 		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				StickHopperBlockEntity.ID,
@@ -168,14 +204,21 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 	}
 
-	@Environment(EnvType.CLIENT)
-	private static <T extends SyncedGuiDescription> void registerScreen(ScreenHandlerType<T> screenHandlerType) {
-		HandledScreens.register(screenHandlerType, (HandledScreens.Provider<T, CottonInventoryScreen<T>>) BetterScreen::new);
-	}
-
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void onInitializeClient() {
+		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
+			// Unfortunately this event is triggered before the block entity actually reads its NBT...
+			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
+				loadableBlockEntity.onClientLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
+			}
+		});
+		ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
+			// Unfortunately this event never triggers when a block entity exits render distance...
+			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
+				loadableBlockEntity.onClientUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
+			}
+		});
 		BlockEntityRendererRegistry.register(ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, RoomControllerEntityRenderer::new);
 		BlockRenderLayerMap.INSTANCE.putBlock(ROOM_CONTROLLER_BLOCK, RenderLayer.getCutoutMipped());
 		registerScreen(BOOKSHELF_SCREEN_HANDLER_TYPE);
@@ -184,15 +227,5 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		registerScreen(STICK_HOPPER_SCREEN_HANDLER_TYPE);
 		registerScreen(ROOM_CONTROLLER_SCREEN_HANDLER_TYPE);
 		ModelLoadingRegistry.INSTANCE.registerResourceProvider(BetterPerfModelProvider::new);
-		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
-			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onClientLoad();
-			}
-		});
-		ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
-			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onClientUnload();
-			}
-		});
 	}
 }

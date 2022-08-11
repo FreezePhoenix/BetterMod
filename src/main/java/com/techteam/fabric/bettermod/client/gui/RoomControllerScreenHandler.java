@@ -25,6 +25,7 @@ import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.NotNull;
 
 public final class RoomControllerScreenHandler extends SyncedGuiDescription {
+    private static final int INVENTORY_SIZE = 1;
     private static final String[] STRINGS = {"X+", "X-", "Y+", "Y-", "Z+", "Z-"};
 
     public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull PacketByteBuf buf) {
@@ -33,14 +34,14 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 
     public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
         super(
-                BetterMod.ROOM_CONTROLLER_SCREEN_HANDLER_TYPE, syncId, playerInventory, EmptyInventory.INSTANCE, getBlockPropertyDelegate(
+                BetterMod.ROOM_CONTROLLER_SCREEN_HANDLER_TYPE, syncId, playerInventory,
+                BetterMod.getBlockInventory(context, INVENTORY_SIZE), getBlockPropertyDelegate(
                         context
                 )
         );
 //		this.updateSyncHandler(null);
         WPlainPanel root = new WPlainPanel();
         root.setInsets(new Insets(2, 7, 0, 7));
-        this.enableSyncing();
         this.titleVisible = false;
         setRootPanel(root);
         root.setSize(176, 168);
@@ -73,7 +74,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
                 root.add(slider, (i % 2) * 85, (i / 2) * 18, 77, 18);
             }
         }
-        WSingleItemSlot slot = WSingleItemSlot.of(getBlockInventory(context), 0);
+        WSingleItemSlot slot = WSingleItemSlot.of(blockInventory, 0);
         root.add(slot, 72, 18);
         slot.setFilter((item) -> {
             Block b = Block.getBlockFromItem(item.getItem());

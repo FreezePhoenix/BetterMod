@@ -2,16 +2,17 @@ package com.techteam.fabric.bettermod.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.loadable.IClientLoadableBlockEntity;
-import com.techteam.fabric.bettermod.block.entity.loadable.LoadableBlockEntity;
 import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
 import com.techteam.fabric.bettermod.client.RoomTracker;
 import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
@@ -25,13 +26,13 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public final class RoomControllerBlockEntity extends LoadableBlockEntity implements SidedInventory, PropertyDelegateHolder, RenderAttachmentBlockEntity, IClientLoadableBlockEntity {
+public final class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, RenderAttachmentBlockEntity, IClientLoadableBlockEntity {
 	public static final Identifier ID = new Identifier("betterperf", "room_controller");
 	public static final Box CUBE = new Box(0, 0, 0, 1, 1, 1);
 	private final @NotNull BoxPropertyDelegate delegate;
@@ -58,6 +59,11 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 
 	}
 
+	@Override
+	public void markDirty() {
+		super.markDirty();
+	}
+
 	private @NotNull void readFromNBTBB(@NotNull NbtCompound tag) {
 		this.minX = tag.getInt("nx");
 		this.minY = tag.getInt("ny");
@@ -79,27 +85,12 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	}
 
 	@Override
-	public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-		return false;
-	}
-
-	@Override
-	public boolean canInsert(int slot, ItemStack stack, Direction dir) {
-		return false;
-	}
-
-	@Override
-	protected @NotNull ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+	public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
 		return new RoomControllerScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
 	}
 
 	public boolean disguised() {
-		return !inventory.get(0).isEmpty();
-	}
-
-	@Override
-	public int @NotNull [] getAvailableSlots(Direction side) {
-		return new int[]{};
+		return !inventory.getStack(0).isEmpty();
 	}
 
 	public void setBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
@@ -114,13 +105,13 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	@Contract(value = " -> !null",
 	          pure = true)
 	@Override
-	protected Text getContainerName() {
+	public Text getDisplayName() {
 		return Text.of("Room Controller");
 	}
 
 	@Contract(pure = true)
 	public @NotNull ItemStack getItem() {
-		return inventory.get(0);
+		return inventory.getStack(0);
 	}
 
 	@Contract(pure = true)
@@ -142,10 +133,10 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	}
 
 	public BlockState getState() {
-		if (inventory.get(0).isEmpty()) {
+		if (inventory.getStack(0).isEmpty()) {
 			return BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
 		} else {
-			return Block.getBlockFromItem(inventory.get(0).getItem()).getStateManager().getStates().get(variant);
+			return Block.getBlockFromItem(inventory.getStack(0).getItem()).getStateManager().getStates().get(variant);
 		}
 	}
 
@@ -160,26 +151,28 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 	}
 
 	public int getVariants() {
-		return Block.getBlockFromItem(inventory.get(0).getItem()).getStateManager().getStates().size();
+		return Block.getBlockFromItem(inventory.getStack(0).getItem()).getStateManager().getStates().size();
 	}
 
 	@Contract(pure = true)
 	@Override
-	public boolean isValid(int slot, ItemStack stack) {
-		return slot == 0;
+	public boolean isValid(int slot, ItemStack item) {
+		Block b = Block.getBlockFromItem(item.getItem());
+		return b != Blocks.AIR
+				&& !(b instanceof BlockEntityProvider)
+				&& b.getDefaultState()
+				    .isOpaque();
 	}
 
 	@Contract(pure = true)
 	@Override
-	public void onClientLoad() {
-
+	public void onClientLoad(World world, BlockPos pos, BlockState state) {
+		RoomTracker.addRoom(this.getUUID(), minX, minY, minZ, maxX, maxY, maxZ);
 	}
 
 	@Override
-	public void onClientUnload() {
-		if (this.hasWorld()) {
-			RoomTracker.removeRoom(this);
-		}
+	public void onClientUnload(World world, BlockPos pos, BlockState state) {
+		RoomTracker.removeRoom(this);
 	}
 
 	@Override
@@ -191,9 +184,6 @@ public final class RoomControllerBlockEntity extends LoadableBlockEntity impleme
 			variant = NBT.getInt("var");
 		} else {
 			variant = 0;
-		}
-		if (this.hasWorld() && this.getWorld().isClient()) {
-			RoomTracker.addRoom(this.getUUID(), minX, minY, minZ, maxX, maxY, maxZ);
 		}
 	}
 

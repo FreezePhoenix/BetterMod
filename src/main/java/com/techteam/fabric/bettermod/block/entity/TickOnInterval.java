@@ -7,12 +7,14 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class TickOnInterval extends BetterBlockEntity implements ITickable {
-	private int cooldown = 0;
 	private final int MAX_COOLDOWN;
+	private int cooldown = 0;
+
 	public TickOnInterval(BlockEntityType<?> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int MAX_COOLDOWN) {
 		super(blockEntityType, blockPos, blockState);
 		this.MAX_COOLDOWN = MAX_COOLDOWN;
 	}
+
 	public TickOnInterval(BlockEntityType<?> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size, int MAX_COOLDOWN) {
 		super(blockEntityType, blockPos, blockState, size);
 		this.MAX_COOLDOWN = MAX_COOLDOWN;
@@ -22,7 +24,7 @@ public abstract class TickOnInterval extends BetterBlockEntity implements ITicka
 
 	@Override
 	public void tick(World world, BlockPos pos, BlockState blockState) {
-		if(!world.isClient()) {
+		if (!world.isClient()) {
 			if (cooldown > 0) {
 				cooldown--;
 				return;

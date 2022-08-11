@@ -9,11 +9,12 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Box;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 @Environment(EnvType.CLIENT)
 public final class RoomControllerEntityRenderer implements BlockEntityRenderer<RoomControllerBlockEntity> {
+    @Contract(pure = true)
     public RoomControllerEntityRenderer(BlockEntityRendererFactory.Context ctx) {
         super();
     }

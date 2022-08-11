@@ -1,23 +1,32 @@
 package com.techteam.fabric.bettermod.block.entity;
 
+import com.techteam.fabric.bettermod.util.InventoryUtil;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.Nameable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public abstract class BetterBlockEntity extends LootableContainerBlockEntity implements ExtendedScreenHandlerFactory {
-	protected DefaultedList<ItemStack> inventory;
+public abstract class BetterBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ExtendedScreenHandlerFactory {
+	public final SimpleInventory inventory;
+	public final InventoryStorage SELF;
 	protected int size;
+	// Unused for most.
 	private UUID uuid = UUID.randomUUID();
 
 	public BetterBlockEntity(BlockEntityType<?> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState) {
@@ -27,21 +36,35 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity imp
 	public BetterBlockEntity(BlockEntityType<?> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState);
 		this.size = size;
-		this.inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
+		this.inventory = new SimpleInventory(size) {
+			@Override
+			public boolean isValid(int slot, ItemStack stack) {
+				return BetterBlockEntity.this.isValid(slot, stack) && super.isValid(slot, stack);
+			}
+
+			@Override
+			public int getMaxCountPerStack() {
+				int max = BetterBlockEntity.this.getMaxCountPerStack();
+				if(max == -1) {
+					return super.getMaxCountPerStack();
+				} else {
+					return max;
+				}
+			}
+
+			@Override
+			public void markDirty() {
+				var a = new Error();
+				a.printStackTrace();
+				System.out.println("Ha");
+				BetterBlockEntity.this.markDirty();
+			}
+		};
+		this.SELF = InventoryStorage.of(this.inventory, null);
 	}
 
 	public void dropItems() {
 		ItemScatterer.spawn(world, pos, inventory);
-	}
-
-	@Override
-	protected DefaultedList<ItemStack> getInvStackList() {
-		return this.inventory;
-	}
-
-	@Override
-	protected void setInvStackList(DefaultedList<ItemStack> new_inv) {
-		this.inventory = new_inv;
 	}
 
 	public UUID getUUID() {
@@ -55,28 +78,23 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity imp
 	@Override
 	public void readNbt(@NotNull NbtCompound tag) {
 		super.readNbt(tag);
-		if (tag.containsUuid("uuid")) {
-			setUUID(tag.getUuid("uuid"));
-		} else if (tag.contains("uuid", NbtElement.STRING_TYPE)) {
-			setUUID(UUID.fromString(tag.getString("uuid")));
-		}
-		if (!this.deserializeLootTable(tag)) {
-			Inventories.readNbt(tag, this.inventory);
-		}
-	}
-
-	@Override
-	public int size() {
-		return this.size;
+		InventoryUtil.readNbt(tag, this.inventory);
 	}
 
 	@Override
 	public void writeNbt(@NotNull NbtCompound tag) {
 		super.writeNbt(tag);
-		tag.putUuid("uuid", this.getUUID());
-		if (!this.serializeLootTable(tag)) {
-			Inventories.writeNbt(tag, this.inventory);
-		}
+		InventoryUtil.writeNbt(tag, this.inventory);
 	}
 
+	public boolean isValid(int slot, ItemStack stack) {
+		return true;
+	}
+	public int getMaxCountPerStack() {
+		return -1;
+	}
+
+	public Inventory getInventory() {
+		return this.inventory;
+	}
 }

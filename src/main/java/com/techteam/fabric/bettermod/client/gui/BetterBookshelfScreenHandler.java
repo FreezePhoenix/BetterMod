@@ -4,6 +4,7 @@ import com.techteam.fabric.bettermod.BetterMod;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,7 +25,7 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 				BetterMod.BOOKSHELF_SCREEN_HANDLER_TYPE,
 				syncId,
 				playerInventory,
-				getBlockInventory(context, INVENTORY_SIZE),
+				BetterMod.getBlockInventory(context, INVENTORY_SIZE),
 				getBlockPropertyDelegate(context)
 		);
 
@@ -33,6 +34,7 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 		root.setSize(176, 149);
 		WItemSlot slot = WItemSlot.of(blockInventory, 0, 8, 2);
 		slot.setFilter((final ItemStack item) -> {
+
 			Item _item = item.getItem();
 			return _item == Items.BOOK || _item == Items.ENCHANTED_BOOK || _item == Items.WRITTEN_BOOK || _item == Items.WRITABLE_BOOK || _item == Items.FILLED_MAP || _item == Items.MAP || _item == Items.PAPER;
 		});
