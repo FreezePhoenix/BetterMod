@@ -2,7 +2,6 @@ package com.techteam.fabric.bettermod.client.gui;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
-import com.techteam.fabric.bettermod.util.InventoryUtil;
 import io.github.cottonmc.cotton.gui.EmptyInventory;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.TooltipBuilder;
@@ -36,7 +35,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
     public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
         super(
                 BetterMod.ROOM_CONTROLLER_SCREEN_HANDLER_TYPE, syncId, playerInventory,
-                InventoryUtil.getBlockInventory(context, INVENTORY_SIZE), getBlockPropertyDelegate(
+                BetterMod.getBlockInventory(context, INVENTORY_SIZE), getBlockPropertyDelegate(
                         context
                 )
         );

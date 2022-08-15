@@ -1,7 +1,6 @@
 package com.techteam.fabric.bettermod.client.gui;
 
 import com.techteam.fabric.bettermod.BetterMod;
-import com.techteam.fabric.bettermod.util.InventoryUtil;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
@@ -26,7 +25,7 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 				BetterMod.BOOKSHELF_SCREEN_HANDLER_TYPE,
 				syncId,
 				playerInventory,
-				InventoryUtil.getBlockInventory(context, INVENTORY_SIZE),
+				BetterMod.getBlockInventory(context, INVENTORY_SIZE),
 				getBlockPropertyDelegate(context)
 		);
 

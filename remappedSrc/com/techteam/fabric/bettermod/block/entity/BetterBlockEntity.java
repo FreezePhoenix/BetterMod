@@ -54,6 +54,9 @@ public abstract class BetterBlockEntity extends BlockEntity implements NamedScre
 
 			@Override
 			public void markDirty() {
+				var a = new Error();
+				a.printStackTrace();
+				System.out.println("Ha");
 				BetterBlockEntity.this.markDirty();
 			}
 		};
