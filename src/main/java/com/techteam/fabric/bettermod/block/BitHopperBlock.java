@@ -22,7 +22,7 @@ public final class BitHopperBlock extends BetterTickingBlock<BitHopperBlockEntit
 		super(settings);
 	}
 
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void appendProperties(@NotNull StateManager.Builder<Block, BlockState> builder) {
 		builder.add(HopperBlock.FACING);
 	}
 
@@ -43,6 +43,4 @@ public final class BitHopperBlock extends BetterTickingBlock<BitHopperBlockEntit
 				: direction
 		);
 	}
-
-
 }

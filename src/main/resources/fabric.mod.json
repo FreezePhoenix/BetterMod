@@ -3,7 +3,7 @@
 	"id": "bettermod",
 	"version": "1.4.0",
 
-	"name": "Better Perf",
+	"name": "BetterMod",
 	"description": "Improve your MC world! Put items in Bookshelves! Use Room Controllers!",
 	"authors": [
 		"Tech Team"
@@ -19,6 +19,9 @@
 		],
 		"client": [
 			"com.techteam.fabric.bettermod.BetterMod"
+		],
+		"modmenu": [
+			"com.techteam.fabric.bettermod.BetterModModMenu"
 		]
 	},
 	"mixins": [

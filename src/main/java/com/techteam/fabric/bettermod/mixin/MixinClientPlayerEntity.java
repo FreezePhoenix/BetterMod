@@ -10,6 +10,7 @@ import net.minecraft.client.recipebook.ClientRecipeBook;
 import net.minecraft.client.util.ClientPlayerTickable;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.encryption.PlayerPublicKey;
 import net.minecraft.stat.StatHandler;
 import net.minecraft.util.math.Vec3d;
@@ -37,7 +38,7 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
 
     @Inject(at = @At(value = "TAIL"),
             method = "<init>(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/ClientPlayNetworkHandler;Lnet/minecraft/stat/StatHandler;Lnet/minecraft/client/recipebook/ClientRecipeBook;ZZ)V")
-    private void addTickHook(MinecraftClient client, ClientWorld world, ClientPlayNetworkHandler networkHandler, StatHandler stats, ClientRecipeBook recipeBook, boolean lastSneaking, boolean lastSprinting, CallbackInfo info) {
+    private void addTickHooks(MinecraftClient client, ClientWorld world, ClientPlayNetworkHandler networkHandler, StatHandler stats, ClientRecipeBook recipeBook, boolean lastSneaking, boolean lastSprinting, CallbackInfo info) {
         tickables.add(RoomTracker.bind(this));
     }
 }

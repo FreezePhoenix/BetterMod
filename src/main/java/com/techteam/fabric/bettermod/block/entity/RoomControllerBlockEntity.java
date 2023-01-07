@@ -13,6 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
@@ -43,9 +44,8 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	public int maxX;
 	public int maxY;
 	public int maxZ;
-	private Box bounds;
-	private Box relativeBounds;
-	private int variant;
+	private int variantIndex;
+	private BlockState variantState;
 
 	public RoomControllerBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		super(BetterMod.ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, pos, state, 1);
@@ -110,7 +110,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	@Contract(pure = true)
-	public @NotNull ItemStack getItem() {
+	public @NotNull ItemStack getItemStack() {
 		return inventory.getStack(0);
 	}
 
@@ -133,25 +133,27 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	public BlockState getState() {
-		if (inventory.getStack(0).isEmpty()) {
+		ItemStack stack = inventory.getStack(0);
+		if (stack.isEmpty()) {
 			return BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
 		} else {
-			return Block.getBlockFromItem(inventory.getStack(0).getItem()).getStateManager().getStates().get(variant);
+			return variantState;
 		}
 	}
 
 	@Contract(pure = true)
-	public int getVariant() {
-		return variant;
+	public int getVariantIndex() {
+		return variantIndex;
 	}
 
 	@Contract(mutates = "this")
-	public void setVariant(int var) {
-		this.variant = var;
+	public void setVariantIndex(int var) {
+		this.variantIndex = var;
+		this.variantState = Block.getBlockFromItem(getItemStack().getItem()).getStateManager().getStates().get(variantIndex);
 	}
 
 	public int getVariants() {
-		return Block.getBlockFromItem(inventory.getStack(0).getItem()).getStateManager().getStates().size();
+		return Block.getBlockFromItem(getItemStack().getItem()).getStateManager().getStates().size();
 	}
 
 	@Contract(pure = true)
@@ -182,18 +184,21 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 		NbtCompound tag = NBT.getCompound("room");
 		readFromNBTBB(tag);
 		if (NBT.contains("var")) {
-			variant = NBT.getInt("var");
+			setVariantIndex(NBT.getInt("var"));
 		} else {
-			variant = 0;
+			setVariantIndex(0);
+		}
+		if (world != null && world.isClient()) {
+			RoomTracker.updateRoom(this.getUUID(), minX, minY, minZ, maxX, maxY, maxZ);
 		}
 	}
 
 	@Override
 	public NbtCompound toInitialChunkDataNbt() {
-		NbtCompound comp = super.toInitialChunkDataNbt();
-		writeNbt(comp);
-		return comp;
+		return createNbt();
 	}
+
+
 
 	@Contract(" -> new")
 	@Override
@@ -205,7 +210,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	public void writeNbt(@NotNull NbtCompound NBT) {
 		super.writeNbt(NBT);
 		NBT.put("room", writeToNBTBB());
-		NBT.putInt("var", variant);
+		NBT.putInt("var", variantIndex);
 	}
 
 	@Override

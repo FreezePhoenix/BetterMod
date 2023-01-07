@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,9 +22,7 @@ public abstract class MixinBlockEntityRenderDispatcher {
             at = @At("TAIL")
     )
     private static <T extends BlockEntity> void afterRender(BlockEntityRenderer<T> renderer, T blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        MinecraftClient.getInstance()
-                .getProfiler()
-                .pop();
+        MinecraftClient.getInstance().getProfiler().pop();
     }
 
     @Inject(
@@ -31,8 +30,6 @@ public abstract class MixinBlockEntityRenderDispatcher {
             at = @At("HEAD")
     )
     private static <T extends BlockEntity> void beforeRender(BlockEntityRenderer<T> renderer, T blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        MinecraftClient.getInstance()
-                .getProfiler()
-                .push(BlockEntityType.getId(blockEntity.getType()).toString());
+        blockEntity.getWorld().getProfiler().push(BlockEntityType.getId(blockEntity.getType()).toString());
     }
 }

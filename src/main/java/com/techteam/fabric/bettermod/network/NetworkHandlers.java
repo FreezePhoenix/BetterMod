@@ -28,9 +28,10 @@ public final class NetworkHandlers {
 		int maxZ = data.readInt();
 		int variant = data.readInt();
 		server.execute(() -> {
+			// TODO: Use GlobalPos instead of BlockPos?
 			if (player.getWorld().getBlockEntity(pos) instanceof RoomControllerBlockEntity roomController) {
 				roomController.setBounds(minX, minY, minZ, maxX, maxY, maxZ);
-				roomController.setVariant(variant);
+				roomController.setVariantIndex(variant);
 				roomController.markDirty();
 			}
 		});

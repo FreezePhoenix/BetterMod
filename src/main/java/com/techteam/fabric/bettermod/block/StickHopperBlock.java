@@ -48,19 +48,19 @@ public final class StickHopperBlock extends BetterTickingBlock<StickHopperBlockE
 	@Override
 	public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
 		switch (state.get(HopperBlock.FACING)) {
-			case DOWN: {
+			case DOWN -> {
 				return DOWN_SHAPE;
 			}
-			case NORTH: {
+			case NORTH -> {
 				return NORTH_SHAPE;
 			}
-			case SOUTH: {
+			case SOUTH -> {
 				return SOUTH_SHAPE;
 			}
-			case WEST: {
+			case WEST -> {
 				return WEST_SHAPE;
 			}
-			case EAST: {
+			case EAST -> {
 				return EAST_SHAPE;
 			}
 		}
@@ -70,23 +70,25 @@ public final class StickHopperBlock extends BetterTickingBlock<StickHopperBlockE
 	@Override
 	public VoxelShape getRaycastShape(BlockState state, BlockView world, BlockPos pos) {
 		switch (state.get(HopperBlock.FACING)) {
-			case DOWN: {
+			case DOWN -> {
 				return DOWN_RAYCAST_SHAPE;
 			}
-			case NORTH: {
+			case NORTH -> {
 				return NORTH_RAYCAST_SHAPE;
 			}
-			case SOUTH: {
+			case SOUTH -> {
 				return SOUTH_RAYCAST_SHAPE;
 			}
-			case WEST: {
+			case WEST -> {
 				return WEST_RAYCAST_SHAPE;
 			}
-			case EAST: {
+			case EAST -> {
 				return EAST_RAYCAST_SHAPE;
 			}
+			default -> {
+				return Hopper.INSIDE_SHAPE;
+			}
 		}
-		return Hopper.INSIDE_SHAPE;
 	}
 
 	@Contract("_, _ -> new")
