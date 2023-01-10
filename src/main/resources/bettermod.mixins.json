@@ -11,10 +11,12 @@
   ],
   "client": [
     "MixinBlockEntityRenderDispatcher",
-    "MixinWorldRenderer",
-    "MixinSodiumWorldRenderer",
     "MixinClientPlayerEntity",
-    "MixinEntityRenderDispatcher"
+    "MixinEntity",
+    "MixinBlockEntity",
+    "MixinEntityRenderDispatcher",
+    "MixinSodiumWorldRenderer",
+    "MixinWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

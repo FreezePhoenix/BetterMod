@@ -2,7 +2,7 @@
   "credit": "Made with Blockbench",
   "ambientocclusion": false,
   "textures": {
-    "top": "bettermod:blocks/bithop_top",
+    "top": "bettermod:block/bithop_top",
     "particle": "block/hopper_outside",
     "side": "block/hopper_outside"
   },

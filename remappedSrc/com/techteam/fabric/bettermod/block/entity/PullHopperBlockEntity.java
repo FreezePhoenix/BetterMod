@@ -71,13 +71,13 @@ public class PullHopperBlockEntity extends TickOnInterval implements IServerLoad
 	}
 
 	@Override
-	public void onServerLoad(World world, BlockPos pos, BlockState state) {
+	public void onServerLoad(ServerWorld world, BlockPos pos, BlockState state) {
 		PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos.offset(state.get(HopperBlock.FACING)));
 		PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos.offset(Direction.UP));
 	}
 
 	@Override
-	public void onServerUnload(World world, BlockPos pos, BlockState state) {
+	public void onServerUnload(ServerWorld world, BlockPos pos, BlockState state) {
 		PUSH_TARGET_CACHE = null;
 		PULL_TARGET_CACHE = null;
 	}

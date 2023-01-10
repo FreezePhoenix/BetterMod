@@ -41,7 +41,7 @@ public final class BetterBookshelfBlockEntity extends BetterBlockEntity {
     }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean isValid(int slot, @NotNull ItemStack stack) {
         Item _item = stack.getItem();
         if(_item == Items.BOOK || _item == Items.ENCHANTED_BOOK || _item == Items.WRITTEN_BOOK || _item == Items.WRITABLE_BOOK || _item == Items.FILLED_MAP || _item == Items.MAP || _item == Items.PAPER) {
             return super.isValid(slot, stack);

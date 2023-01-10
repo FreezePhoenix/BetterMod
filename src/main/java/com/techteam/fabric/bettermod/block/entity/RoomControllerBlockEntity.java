@@ -62,6 +62,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	@Override
 	public void markDirty() {
 		super.markDirty();
+		this.setVariantIndex(this.variantIndex);
 	}
 
 	private @NotNull void readFromNBTBB(@NotNull NbtCompound tag) {
@@ -133,12 +134,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	public BlockState getState() {
-		ItemStack stack = inventory.getStack(0);
-		if (stack.isEmpty()) {
-			return BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
-		} else {
-			return variantState;
-		}
+		return variantState;
 	}
 
 	@Contract(pure = true)
@@ -149,7 +145,12 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	@Contract(mutates = "this")
 	public void setVariantIndex(int var) {
 		this.variantIndex = var;
-		this.variantState = Block.getBlockFromItem(getItemStack().getItem()).getStateManager().getStates().get(variantIndex);
+		ItemStack stack = inventory.getStack(0);
+		if (stack.isEmpty()) {
+			variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
+		} else {
+			variantState = Block.getBlockFromItem(getItemStack().getItem()).getStateManager().getStates().get(variantIndex);
+		}
 	}
 
 	public int getVariants() {

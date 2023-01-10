@@ -6,8 +6,5 @@ import net.fabricmc.api.Environment;
 
 @Environment(EnvType.CLIENT)
 public interface IRoomCaching {
-	int getStamp();
-	void setStamp(int stamp);
-	void setRoom(RoomTracker.Room room);
 	RoomTracker.Room getRoom();
 }

@@ -108,8 +108,7 @@ public final class RoomControllerModel implements UnbakedModel, BakedModel, Fabr
     }
     @Override
     public void emitItemQuads(ItemStack itemStack, Supplier<Random> supplier, @NotNull RenderContext renderContext) {
-        renderContext.meshConsumer()
-                     .accept(mesh);
+        renderContext.meshConsumer().accept(mesh);
     }
 
     @Contract(value = " -> new",

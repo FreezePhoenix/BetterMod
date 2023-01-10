@@ -9,6 +9,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
+import net.minecraft.util.math.GlobalPos;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -90,7 +91,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	public void sync() {
 		if (entity.getWorld().isClient()) {
 			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-			data.writeBlockPos(pos);
+			data.writeGlobalPos(GlobalPos.create(entity.getWorld().getRegistryKey(), entity.getPos()));
 			data.writeInt(entity.minX);
 			data.writeInt(entity.minY);
 			data.writeInt(entity.minZ);

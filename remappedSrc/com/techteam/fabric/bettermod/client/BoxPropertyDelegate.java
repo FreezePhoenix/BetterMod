@@ -3,8 +3,6 @@ package com.techteam.fabric.bettermod.client;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import com.techteam.fabric.bettermod.network.PacketIdentifiers;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.PacketByteBuf;
@@ -32,7 +30,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 			case 3 -> (pos.getY() - entity.minY);
 			case 4 -> (entity.maxZ - pos.getZ() - 1);
 			case 5 -> (pos.getZ() - entity.minZ);
-			case 6 -> entity.getVariant();
+			case 6 -> entity.getVariantIndex();
 			case 7 -> entity.getVariants();
 			default -> 0;
 		};
@@ -75,7 +73,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 				updateBounds();
 				break;
 			case 6:
-				entity.setVariant(value);
+				entity.setVariantIndex(value);
 				rerender();
 				break;
 			case 7:
@@ -99,7 +97,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 			data.writeInt(entity.maxX);
 			data.writeInt(entity.maxY);
 			data.writeInt(entity.maxZ);
-			data.writeInt(entity.getVariant());
+			data.writeInt(entity.getVariantIndex());
 			ClientPlayNetworking.send(PacketIdentifiers.BOX_UPDATE_PACKET, data);
 		}
 	}

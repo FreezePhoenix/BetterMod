@@ -22,10 +22,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public abstract class BetterBlockEntity extends BlockEntity implements NamedScreenHandlerFactory, ExtendedScreenHandlerFactory {
+public abstract class BetterBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
 	public final SimpleInventory inventory;
 	public final InventoryStorage SELF;
-	protected int size;
+	protected final int size;
 	// Unused for most.
 	private UUID uuid = UUID.randomUUID();
 
@@ -54,9 +54,6 @@ public abstract class BetterBlockEntity extends BlockEntity implements NamedScre
 
 			@Override
 			public void markDirty() {
-				var a = new Error();
-				a.printStackTrace();
-				System.out.println("Ha");
 				BetterBlockEntity.this.markDirty();
 			}
 		};
@@ -77,14 +74,14 @@ public abstract class BetterBlockEntity extends BlockEntity implements NamedScre
 
 	@Override
 	public void readNbt(@NotNull NbtCompound tag) {
-		super.readNbt(tag);
 		InventoryUtil.readNbt(tag, this.inventory);
+		super.readNbt(tag);
 	}
 
 	@Override
 	public void writeNbt(@NotNull NbtCompound tag) {
-		super.writeNbt(tag);
 		InventoryUtil.writeNbt(tag, this.inventory);
+		super.writeNbt(tag);
 	}
 
 	public boolean isValid(int slot, ItemStack stack) {

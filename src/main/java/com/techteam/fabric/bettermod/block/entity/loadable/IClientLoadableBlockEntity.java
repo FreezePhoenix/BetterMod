@@ -7,7 +7,6 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
 public interface IClientLoadableBlockEntity {
     @Environment(EnvType.CLIENT)
     void onClientLoad(World world, BlockPos pos, BlockState state);

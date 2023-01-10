@@ -32,8 +32,8 @@ public abstract class MixinClientPlayerEntity extends AbstractClientPlayerEntity
     @Final
     private List<ClientPlayerTickable> tickables;
 
-    public MixinClientPlayerEntity(ClientWorld world, GameProfile profile, @Nullable PlayerPublicKey publicKey) {
-        super(world, profile, publicKey);
+    public MixinClientPlayerEntity(ClientWorld world, GameProfile profile) {
+        super(world, profile);
     }
 
     @Inject(at = @At(value = "TAIL"),

@@ -2,9 +2,9 @@
   "credit": "Made with Blockbench",
   "ambientocclusion": false,
   "textures": {
-    "top": "bettermod:blocks/stickhop_top",
-    "particle": "bettermod:blocks/stickhop_outside",
-    "side": "bettermod:blocks/stickhop_outside",
+    "top": "bettermod:block/stickhop_top",
+    "particle": "bettermod:block/stickhop_outside",
+    "side": "bettermod:block/stickhop_outside",
     "inside": "block/hopper_inside",
     "outside": "block/hopper_outside",
     "slime": "block/slime_block"

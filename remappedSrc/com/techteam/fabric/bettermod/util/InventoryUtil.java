@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.util;
 
+import com.techteam.fabric.bettermod.block.entity.BetterBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -21,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -30,8 +32,24 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class InventoryUtil {
+	public static Inventory getBlockInventory(ScreenHandlerContext ctx, int size) {
+		return getBlockInventory(ctx, () -> new SimpleInventory(size));
+	}
+	private static Inventory getBlockInventory(ScreenHandlerContext ctx, Supplier<Inventory> fallback) {
+		return ctx.get((world, pos) -> {
+			BlockState state = world.getBlockState(pos);
+			Block b = state.getBlock();
+			BlockEntity be = world.getBlockEntity(pos);
+			if (be instanceof BetterBlockEntity blockEntity) {
+				return blockEntity.getInventory();
+			}
+
+			return fallback.get();
+		}).orElseGet(fallback);
+	}
 	public static @Nullable Inventory getInventoryAt(@NotNull World world, BlockPos pos) {
 		BlockState blockState = world.getBlockState(pos);
 		Block block = blockState.getBlock();

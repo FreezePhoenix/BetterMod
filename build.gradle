@@ -17,16 +17,16 @@ dependencies {
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation "io.github.cottonmc:LibGui:6.0.0-beta.5+1.19-pre1"
-	modImplementation 'maven.modrinth:sodium:mc1.19-0.4.2'
-	modImplementation 'maven.modrinth:indium:1.0.7+mc1.19'
-	modImplementation 'maven.modrinth:starlight:1.1.0+1.19'
-	modImplementation 'maven.modrinth:entityculling:1.5.2-fabric-1.19'
-	modApi "me.shedaniel.cloth:cloth-config-fabric:8.2.88"
-	modApi "maven.modrinth:modmenu:4.1.2"
+	modImplementation "io.github.cottonmc:LibGui:6.5.1+1.19.3"
+	modImplementation 'maven.modrinth:sodium:mc1.19.3-0.4.8'
+	modImplementation 'maven.modrinth:indium:1.0.12+mc1.19.3'
+	modImplementation 'maven.modrinth:starlight:1.1.1+1.19'
+	modImplementation 'maven.modrinth:entityculling:1.5.2-1.19.3'
+	modApi "me.shedaniel.cloth:cloth-config-fabric:9.0.94"
+	modApi "maven.modrinth:modmenu:5.0.2"
 
 	implementation "org.joml:joml:1.10.4"
-	include "io.github.cottonmc:LibGui:6.0.0+1.19"
+	include "io.github.cottonmc:LibGui:6.5.1+1.19.3"
 }
 
 processResources {

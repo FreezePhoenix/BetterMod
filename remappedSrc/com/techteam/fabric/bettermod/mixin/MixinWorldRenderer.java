@@ -4,9 +4,12 @@ import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.profiler.Profiler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
@@ -17,16 +20,18 @@ import java.util.ListIterator;
 
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
+	@Shadow private @Nullable ClientWorld world;
+
 	@Redirect(slice = @Slice(from = @At(value = "INVOKE_STRING",
-										target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-										args = "ldc=blockentities"),
-							 to = @At(value = "INVOKE_STRING",
+	                                    target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+	                                    args = "ldc=blockentities"),
+	                         to = @At(value = "INVOKE_STRING",
 									  target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 									  args = "ldc=destroyProgress")),
-			  at = @At(ordinal = 0,
+	          at = @At(ordinal = 0,
 					   value = "INVOKE",
 					   target = "Ljava/util/List;iterator()Ljava/util/Iterator;"),
-			  method = "render")
+	          method = "render")
 	private @NotNull Iterator<BlockEntity> iteratorIntercept(final @NotNull List<BlockEntity> list) {
 		return list.listIterator();
 	}
@@ -43,8 +48,7 @@ public abstract class MixinWorldRenderer {
 			  method = "render")
 	private boolean nextHook(final @NotNull Iterator<BlockEntity> iterator) {
 		if (iterator instanceof ListIterator<BlockEntity> listIterator) {
-			Profiler profiler = MinecraftClient.getInstance()
-											   .getProfiler();
+			Profiler profiler = this.world.getProfiler();
 			profiler.push("better_culling");
 			while (listIterator.hasNext()) {
 				if (RenderHooks.shouldRenderTileEntity(listIterator.next())) {

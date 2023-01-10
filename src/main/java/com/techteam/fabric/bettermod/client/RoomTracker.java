@@ -2,6 +2,7 @@ package com.techteam.fabric.bettermod.client;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
+import com.techteam.fabric.bettermod.hooks.IRoomCaching;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BlockEntity;
@@ -25,6 +26,7 @@ public final class RoomTracker {
 	private static final Collection<Room> ROOM_COLLECTION = UUID_ROOM_HASH_MAP.values();
 	private static final ReadWriteLock ROOM_HASH_MAP_LOCK = new ReentrantReadWriteLock();
 	private static @Nullable Room currentRoom = null;
+	private static int nullRoomStamp = 0;
 
 	@Environment(EnvType.CLIENT)
 	@Contract("_ -> new")
@@ -35,26 +37,97 @@ public final class RoomTracker {
 		return new RoomTrackerTicker(playerEntity);
 	}
 
+	public static int getNullRoomStamp() {
+		return nullRoomStamp;
+	}
+
 	@Contract(pure = true)
 	public static @Nullable Room getActiveRoom() {
 		return currentRoom;
 	}
 
 	public static Room getRoomForBlockEntity(@NotNull BlockEntity blockEntity) {
-		if (blockEntity instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
-			ROOM_HASH_MAP_LOCK.readLock().lock();
-			Room room = UUID_ROOM_HASH_MAP.get(roomControllerBlockEntity.getUUID());
-			ROOM_HASH_MAP_LOCK.readLock().unlock();
-			return room;
+		IRoomCaching roomCache = (IRoomCaching) blockEntity;
+		Room blockEntityRoom = roomCache.getRoom();
+		if(blockEntityRoom == null) {
+			if(roomCache.getStamp() == nullRoomStamp) {
+				// null room cannot be removed.
+				return null;
+			} else {
+				blockEntityRoom = getRoomForPos(blockEntity.getPos());
+				roomCache.setRoom(blockEntityRoom);
+				if(blockEntityRoom == null) {
+					roomCache.setStamp(nullRoomStamp);
+				} else {
+					roomCache.setStamp(blockEntityRoom.modificationStamp);
+				}
+			}
+		}  else {
+			if(roomCache.getStamp() == blockEntityRoom.modificationStamp) {
+				// Even if the entity is still in the room, the room may be removed. If it is removed, recalculate which room they should be in.
+				if(blockEntityRoom.removed) {
+					blockEntityRoom = getRoomForPos(blockEntity.getPos());
+					roomCache.setRoom(blockEntityRoom);
+					if(blockEntityRoom == null) {
+						roomCache.setStamp(nullRoomStamp);
+					} else {
+						roomCache.setStamp(blockEntityRoom.modificationStamp);
+					}
+				}
+			} else {
+				blockEntityRoom = getRoomForPos(blockEntity.getPos());
+				roomCache.setRoom(blockEntityRoom);
+				if(blockEntityRoom == null) {
+					roomCache.setStamp(nullRoomStamp);
+				} else {
+					roomCache.setStamp(blockEntityRoom.modificationStamp);
+				}
+			}
 		}
-		return getRoomForPos(blockEntity.getPos());
+		return blockEntityRoom;
 	}
 
 	public static Room getRoomForEntity(@NotNull Entity entity) {
-		return getRoomForPos(entity.getPos());
+		IRoomCaching roomCache = (IRoomCaching) entity;
+		Room entityRoom = roomCache.getRoom();
+		if(entityRoom == null) {
+			if(roomCache.getStamp() == nullRoomStamp) {
+				// null room cannot be removed.
+				return null;
+			} else {
+				entityRoom = getRoomForPos(entity.getBlockPos());
+				roomCache.setRoom(entityRoom);
+				if(entityRoom == null) {
+					roomCache.setStamp(nullRoomStamp);
+				} else {
+					roomCache.setStamp(entityRoom.modificationStamp);
+				}
+			}
+		} else {
+			if(roomCache.getStamp() == entityRoom.modificationStamp) {
+				if(entityRoom.removed) {
+					entityRoom = getRoomForPos(entity.getBlockPos());
+					roomCache.setRoom(entityRoom);
+					if(entityRoom == null) {
+						roomCache.setStamp(nullRoomStamp);
+					} else {
+						roomCache.setStamp(entityRoom.modificationStamp);
+					}
+				}
+			} else {
+				entityRoom = getRoomForPos(entity.getBlockPos());
+				roomCache.setRoom(entityRoom);
+				if(entityRoom == null) {
+					roomCache.setStamp(nullRoomStamp);
+				} else {
+					roomCache.setStamp(entityRoom.modificationStamp);
+				}
+			}
+		}
+		return entityRoom;
 	}
 
-	private static @Nullable Room getRoomForPos(@NotNull Vec3d pos) {
+	public static @Nullable Room getRoomForPos(@NotNull Vec3d pos) {
 		final double x = pos.getX(), y = pos.getY(), z = pos.getZ();
 		ROOM_HASH_MAP_LOCK.readLock().lock();
 		for (final Room room : ROOM_COLLECTION) {
@@ -66,9 +139,20 @@ public final class RoomTracker {
 		ROOM_HASH_MAP_LOCK.readLock().unlock();
 		return null;
 	}
+	public static @Nullable Room getRoomForPos(double x, double y, double z) {
+		ROOM_HASH_MAP_LOCK.readLock().lock();
+		for (final Room room : ROOM_COLLECTION) {
+			if (room.contains(x, y, z)) {
+				ROOM_HASH_MAP_LOCK.readLock().unlock();
+				return room;
+			}
+		}
+		ROOM_HASH_MAP_LOCK.readLock().unlock();
+		return null;
+	}
 
-	private static @Nullable Room getRoomForPos(@NotNull Vec3i pos) {
-		final double x = pos.getX(), y = pos.getY(), z = pos.getZ();
+	public static @Nullable Room getRoomForPos(@NotNull Vec3i pos) {
+		final int x = pos.getX(), y = pos.getY(), z = pos.getZ();
 		ROOM_HASH_MAP_LOCK.readLock().lock();
 		for (final Room room : ROOM_COLLECTION) {
 			if (room.contains(x, y, z)) {
@@ -82,7 +166,7 @@ public final class RoomTracker {
 
 	public static void removeRoom(final @NotNull RoomControllerBlockEntity roomController) {
 		ROOM_HASH_MAP_LOCK.writeLock().lock();
-		UUID_ROOM_HASH_MAP.remove(roomController.getUUID());
+		UUID_ROOM_HASH_MAP.remove(roomController.getUUID()).markRemoved();
 		ROOM_HASH_MAP_LOCK.readLock().lock();
 		ROOM_HASH_MAP_LOCK.writeLock().unlock();
 		if (BetterMod.CONFIG.LogRoomAllocations) {
@@ -122,16 +206,16 @@ public final class RoomTracker {
 		public int maxX;
 		public int maxY;
 		public int maxZ;
+		private int modificationStamp = 0;
+		public boolean removed = false;
+		public int getVersion() {
+			return modificationStamp;
+		}
 
 		@Contract(pure = true)
 		public Room(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
 			this.id = id;
-			this.minX = minX;
-			this.minY = minY;
-			this.minZ = minZ;
-			this.maxX = maxX;
-			this.maxY = maxY;
-			this.maxZ = maxZ;
+			this.setBounds(minX, minY, minZ, maxX, maxY, maxZ);
 		}
 
 		@Contract(pure = true)
@@ -174,12 +258,18 @@ public final class RoomTracker {
 
 		@Contract(mutates = "this")
 		public void setBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+			this.modificationStamp++;
+			nullRoomStamp++;
 			this.minX = minX;
 			this.minY = minY;
 			this.minZ = minZ;
 			this.maxX = maxX;
 			this.maxY = maxY;
 			this.maxZ = maxZ;
+		}
+		public void markRemoved() {
+			this.modificationStamp++;
+			this.removed = true;
 		}
 
 		@Contract(pure = true)
@@ -200,24 +290,7 @@ public final class RoomTracker {
 
 		@Override
 		public void tick() {
-			if (currentRoom == null) {
-				Room room = RoomTracker.getRoomForEntity(clientPlayer);
-				if (room != null) {
-					if (BetterMod.CONFIG.LogRoomTransitions) {
-						BetterMod.LOGGER.info("Entering room: " + room.getUUID());
-					}
-					currentRoom = room;
-				}
-			} else if (!currentRoom.contains(clientPlayer.getPos())) {
-				Room room = RoomTracker.getRoomForEntity(clientPlayer);
-				if (BetterMod.CONFIG.LogRoomTransitions) {
-					BetterMod.LOGGER.info("Exiting room: " + currentRoom.getUUID());
-					if (room != null) {
-						BetterMod.LOGGER.info("Entering room: " + room.getUUID());
-					}
-				}
-				currentRoom = room;
-			}
+			currentRoom = getRoomForEntity(clientPlayer);
 		}
 	}
 }

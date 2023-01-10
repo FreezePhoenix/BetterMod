@@ -59,16 +59,16 @@ public class BitHopperBlockEntity extends TickOnInterval implements IServerLoada
 	}
 
 	@Override
-	public void onServerLoad(World world, BlockPos pos, BlockState state) {
+	public void onServerLoad(ServerWorld world, BlockPos pos, BlockState state) {
 		PUSH_TARGET_CACHE = BlockApiCache.create(
 				ItemStorage.SIDED,
-				(ServerWorld) world,
+				 world,
 				pos.offset(state.get(HopperBlock.FACING))
 		);
 	}
 
 	@Override
-	public void onServerUnload(World world, BlockPos pos, BlockState state) {
+	public void onServerUnload(ServerWorld world, BlockPos pos, BlockState state) {
 		PUSH_TARGET_CACHE = null;
 	}
 }

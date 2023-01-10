@@ -10,6 +10,8 @@ import com.techteam.fabric.bettermod.client.gui.*;
 import com.techteam.fabric.bettermod.network.NetworkHandlers;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.client.CottonInventoryScreen;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -26,8 +28,10 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.BlockItem;
@@ -42,11 +46,13 @@ import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
+import org.joml.Matrix4f;
 
 import java.util.function.Supplier;
 
 
 public class BetterMod implements ModInitializer, ClientModInitializer {
+	public static BetterModConfig CONFIG;
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static BlockEntityType<BetterBookshelfBlockEntity> BOOKSHELF_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
@@ -91,31 +97,14 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 	@Environment(EnvType.CLIENT)
 	private static <T extends SyncedGuiDescription> void registerScreen(ScreenHandlerType<T> screenHandlerType) {
-		HandledScreens.register(
-				screenHandlerType,
-				(HandledScreens.Provider<T, CottonInventoryScreen<T>>) BetterScreen::new
-		);
-	}
-
-	public static Inventory getBlockInventory(ScreenHandlerContext ctx, int size) {
-		return getBlockInventory(ctx, () -> new SimpleInventory(size));
-	}
-
-	private static Inventory getBlockInventory(ScreenHandlerContext ctx, Supplier<Inventory> fallback) {
-		return ctx.get((world, pos) -> {
-			BlockState state = world.getBlockState(pos);
-			Block b = state.getBlock();
-			BlockEntity be = world.getBlockEntity(pos);
-			if (be instanceof BetterBlockEntity blockEntity) {
-				return blockEntity.getInventory();
-			}
-
-			return fallback.get();
-		}).orElseGet(fallback);
+		HandledScreens.register(screenHandlerType, BetterScreen<T>::new);
 	}
 
 	@Override
 	public void onInitialize() {
+		AutoConfig.register(BetterModConfig.class, GsonConfigSerializer::new);
+		CONFIG = AutoConfig.getConfigHolder(BetterModConfig.class).getConfig();
+
 		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
 			if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
 				loadableBlockEntity.onServerLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
@@ -207,18 +196,8 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void onInitializeClient() {
-		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
-			// Unfortunately this event is triggered before the block entity actually reads its NBT...
-			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onClientLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
-			}
-		});
-		ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
-			// Unfortunately this event never triggers when a block entity exits render distance...
-			if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onClientUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
-			}
-		});
+		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register(IClientLoadableBlockEntity::onLoad);
+		ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(IClientLoadableBlockEntity::onUnload);
 		BlockEntityRendererRegistry.register(ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, RoomControllerEntityRenderer::new);
 		BlockRenderLayerMap.INSTANCE.putBlock(ROOM_CONTROLLER_BLOCK, RenderLayer.getCutoutMipped());
 		registerScreen(BOOKSHELF_SCREEN_HANDLER_TYPE);
