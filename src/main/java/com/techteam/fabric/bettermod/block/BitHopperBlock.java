@@ -17,21 +17,17 @@ import org.jetbrains.annotations.Nullable;
 
 public final class BitHopperBlock extends BetterTickingBlock<BitHopperBlockEntity> {
 	public static final Identifier ID = new Identifier("bettermod", "bithopper");
-
 	public BitHopperBlock(@NotNull Settings settings) {
 		super(settings);
 	}
-
 	protected void appendProperties(@NotNull StateManager.Builder<Block, BlockState> builder) {
 		builder.add(HopperBlock.FACING);
 	}
-
 	@Contract("_, _ -> new")
 	@Override
 	public @NotNull BitHopperBlockEntity createBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		return new BitHopperBlockEntity(pos, state);
 	}
-
 	@Nullable
 	@Override
 	public BlockState getPlacementState(ItemPlacementContext ctx) {

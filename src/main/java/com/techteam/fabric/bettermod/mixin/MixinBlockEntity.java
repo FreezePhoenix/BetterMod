@@ -1,13 +1,16 @@
 package com.techteam.fabric.bettermod.mixin;
 
 import com.techteam.fabric.bettermod.client.RoomTracker;
-import com.techteam.fabric.bettermod.hooks.IRoomCaching;
+import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(BlockEntity.class)
-public class MixinBlockEntity implements IRoomCaching {
+public abstract class MixinBlockEntity implements RenderHooks.IRoomCaching {
+	@Shadow public abstract BlockPos getPos();
 	@Unique
 	private RoomTracker.Room CURRENT_ROOM;
 	@Unique
@@ -35,5 +38,10 @@ public class MixinBlockEntity implements IRoomCaching {
 	@Override
 	public void setRoom(RoomTracker.Room room) {
 		this.CURRENT_ROOM = room;
+	}
+	@Unique
+	@Override
+	public BlockPos blockPos() {
+		return this.getPos();
 	}
 }

@@ -22,7 +22,7 @@ public abstract class MixinBlockEntityRenderDispatcher {
             at = @At("TAIL")
     )
     private static <T extends BlockEntity> void afterRender(BlockEntityRenderer<T> renderer, T blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        MinecraftClient.getInstance().getProfiler().pop();
+        blockEntity.getWorld().getProfiler().pop();
     }
 
     @Inject(

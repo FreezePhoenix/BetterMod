@@ -39,7 +39,7 @@ public abstract class BetterBlockEntity extends BlockEntity implements ExtendedS
 		this.inventory = new SimpleInventory(size) {
 			@Override
 			public boolean isValid(int slot, ItemStack stack) {
-				return BetterBlockEntity.this.isValid(slot, stack) && super.isValid(slot, stack);
+				return super.isValid(slot, stack) && BetterBlockEntity.this.isValid(slot, stack);
 			}
 
 			@Override
@@ -64,14 +64,9 @@ public abstract class BetterBlockEntity extends BlockEntity implements ExtendedS
 		ItemScatterer.spawn(world, pos, inventory);
 	}
 
-	public UUID getUUID() {
+	public final UUID getUUID() {
 		return uuid;
 	}
-
-	public void setUUID(UUID uuid) {
-		this.uuid = uuid;
-	}
-
 	@Override
 	public void readNbt(@NotNull NbtCompound tag) {
 		InventoryUtil.readNbt(tag, this.inventory);
@@ -90,7 +85,6 @@ public abstract class BetterBlockEntity extends BlockEntity implements ExtendedS
 	public int getMaxCountPerStack() {
 		return -1;
 	}
-
 	public Inventory getInventory() {
 		return this.inventory;
 	}

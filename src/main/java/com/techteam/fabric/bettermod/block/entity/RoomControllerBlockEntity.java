@@ -5,15 +5,16 @@ import com.techteam.fabric.bettermod.block.entity.loadable.IClientLoadableBlockE
 import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
 import com.techteam.fabric.bettermod.client.RoomTracker;
 import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
+import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
@@ -27,13 +28,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public final class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, RenderAttachmentBlockEntity, IClientLoadableBlockEntity {
+public final class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, RenderAttachmentBlockEntity, IClientLoadableBlockEntity, RenderHooks.IForceRender {
 	public static final Identifier ID = new Identifier("betterperf", "room_controller");
 	public static final Box CUBE = new Box(0, 0, 0, 1, 1, 1);
 	private final @NotNull BoxPropertyDelegate delegate;
@@ -65,7 +67,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 		this.setVariantIndex(this.variantIndex);
 	}
 
-	private @NotNull void readFromNBTBB(@NotNull NbtCompound tag) {
+	private void readFromNBTBB(@NotNull NbtCompound tag) {
 		this.minX = tag.getInt("nx");
 		this.minY = tag.getInt("ny");
 		this.minZ = tag.getInt("nz");
@@ -133,6 +135,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 		return this.getState();
 	}
 
+	@Contract(pure = true)
 	public BlockState getState() {
 		return variantState;
 	}
@@ -144,12 +147,17 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 
 	@Contract(mutates = "this")
 	public void setVariantIndex(int var) {
+		var = MathHelper.clamp(var, 0, this.getVariants() - 1);
 		this.variantIndex = var;
+
 		ItemStack stack = inventory.getStack(0);
 		if (stack.isEmpty()) {
 			variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
 		} else {
-			variantState = Block.getBlockFromItem(getItemStack().getItem()).getStateManager().getStates().get(variantIndex);
+			variantState = Block.getBlockFromItem(getItemStack().getItem())
+			                    .getStateManager()
+			                    .getStates()
+			                    .get(variantIndex);
 		}
 	}
 
@@ -161,8 +169,8 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	@Override
 	public boolean isValid(int slot, ItemStack item) {
 		Block b = Block.getBlockFromItem(item.getItem());
-		if(b == Blocks.AIR || b instanceof BlockEntityProvider || !b.getDefaultState()
-		                                                           .isOpaque()) {
+		if (b == Blocks.AIR || b instanceof BlockEntityProvider || !b.getDefaultState()
+		                                                             .isOpaque()) {
 			return false;
 		}
 		return super.isValid(slot, item);
@@ -200,7 +208,6 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 
-
 	@Contract(" -> new")
 	@Override
 	public @NotNull Packet<ClientPlayPacketListener> toUpdatePacket() {
@@ -217,5 +224,10 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	@Override
 	public void writeScreenOpeningData(ServerPlayerEntity player, @NotNull PacketByteBuf buf) {
 		buf.writeBlockPos(pos);
+	}
+
+	@Override
+	public boolean forceRender() {
+		return true;
 	}
 }

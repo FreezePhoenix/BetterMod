@@ -2,13 +2,10 @@ package com.techteam.fabric.bettermod.client;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
-import com.techteam.fabric.bettermod.hooks.IRoomCaching;
+import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.util.ClientPlayerTickable;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Contract;
@@ -30,9 +27,9 @@ public final class RoomTracker {
 
 	@Environment(EnvType.CLIENT)
 	@Contract("_ -> new")
-	public static @NotNull RoomTrackerTicker bind(@NotNull PlayerEntity playerEntity) {
+	public static @NotNull RoomTrackerTicker bind(@NotNull RenderHooks.IRoomCaching playerEntity) {
 		if (BetterMod.CONFIG.LogRoomAllocations) {
-			BetterMod.LOGGER.info("Bound new RoomTrackerTicker to player: " + playerEntity.getEntityName() + "[" + playerEntity.getUuidAsString() + "]");
+			BetterMod.LOGGER.info("Bound new RoomTrackerTicker to player.");
 		}
 		return new RoomTrackerTicker(playerEntity);
 	}
@@ -46,111 +43,45 @@ public final class RoomTracker {
 		return currentRoom;
 	}
 
-	public static Room getRoomForBlockEntity(@NotNull BlockEntity blockEntity) {
-		IRoomCaching roomCache = (IRoomCaching) blockEntity;
-		Room blockEntityRoom = roomCache.getRoom();
-		if(blockEntityRoom == null) {
-			if(roomCache.getStamp() == nullRoomStamp) {
+	public static Room getRoom(@NotNull RenderHooks.IRoomCaching roomCaching) {
+		Room cachedRoom = roomCaching.getRoom();
+		if(cachedRoom == null) {
+			if(roomCaching.getStamp() == nullRoomStamp) {
 				// null room cannot be removed.
 				return null;
 			} else {
-				blockEntityRoom = getRoomForPos(blockEntity.getPos());
-				roomCache.setRoom(blockEntityRoom);
-				if(blockEntityRoom == null) {
-					roomCache.setStamp(nullRoomStamp);
+				cachedRoom = getRoomForPos(roomCaching.blockPos());
+				roomCaching.setRoom(cachedRoom);
+				if(cachedRoom == null) {
+					roomCaching.setStamp(nullRoomStamp);
 				} else {
-					roomCache.setStamp(blockEntityRoom.modificationStamp);
+					roomCaching.setStamp(cachedRoom.modificationStamp);
 				}
 			}
 		}  else {
-			if(roomCache.getStamp() == blockEntityRoom.modificationStamp) {
+			if(roomCaching.getStamp() == cachedRoom.modificationStamp) {
 				// Even if the entity is still in the room, the room may be removed. If it is removed, recalculate which room they should be in.
-				if(blockEntityRoom.removed) {
-					blockEntityRoom = getRoomForPos(blockEntity.getPos());
-					roomCache.setRoom(blockEntityRoom);
-					if(blockEntityRoom == null) {
-						roomCache.setStamp(nullRoomStamp);
+				if(cachedRoom.removed) {
+					cachedRoom = getRoomForPos(roomCaching.blockPos());
+					roomCaching.setRoom(cachedRoom);
+					if(cachedRoom == null) {
+						roomCaching.setStamp(nullRoomStamp);
 					} else {
-						roomCache.setStamp(blockEntityRoom.modificationStamp);
+						roomCaching.setStamp(cachedRoom.modificationStamp);
 					}
 				}
 			} else {
-				blockEntityRoom = getRoomForPos(blockEntity.getPos());
-				roomCache.setRoom(blockEntityRoom);
-				if(blockEntityRoom == null) {
-					roomCache.setStamp(nullRoomStamp);
+				cachedRoom = getRoomForPos(roomCaching.blockPos());
+				roomCaching.setRoom(cachedRoom);
+				if(cachedRoom == null) {
+					roomCaching.setStamp(nullRoomStamp);
 				} else {
-					roomCache.setStamp(blockEntityRoom.modificationStamp);
+					roomCaching.setStamp(cachedRoom.modificationStamp);
 				}
 			}
 		}
-		return blockEntityRoom;
+		return cachedRoom;
 	}
-
-	public static Room getRoomForEntity(@NotNull Entity entity) {
-		IRoomCaching roomCache = (IRoomCaching) entity;
-		Room entityRoom = roomCache.getRoom();
-		if(entityRoom == null) {
-			if(roomCache.getStamp() == nullRoomStamp) {
-				// null room cannot be removed.
-				return null;
-			} else {
-				entityRoom = getRoomForPos(entity.getBlockPos());
-				roomCache.setRoom(entityRoom);
-				if(entityRoom == null) {
-					roomCache.setStamp(nullRoomStamp);
-				} else {
-					roomCache.setStamp(entityRoom.modificationStamp);
-				}
-			}
-		} else {
-			if(roomCache.getStamp() == entityRoom.modificationStamp) {
-				if(entityRoom.removed) {
-					entityRoom = getRoomForPos(entity.getBlockPos());
-					roomCache.setRoom(entityRoom);
-					if(entityRoom == null) {
-						roomCache.setStamp(nullRoomStamp);
-					} else {
-						roomCache.setStamp(entityRoom.modificationStamp);
-					}
-				}
-			} else {
-				entityRoom = getRoomForPos(entity.getBlockPos());
-				roomCache.setRoom(entityRoom);
-				if(entityRoom == null) {
-					roomCache.setStamp(nullRoomStamp);
-				} else {
-					roomCache.setStamp(entityRoom.modificationStamp);
-				}
-			}
-		}
-		return entityRoom;
-	}
-
-	public static @Nullable Room getRoomForPos(@NotNull Vec3d pos) {
-		final double x = pos.getX(), y = pos.getY(), z = pos.getZ();
-		ROOM_HASH_MAP_LOCK.readLock().lock();
-		for (final Room room : ROOM_COLLECTION) {
-			if (room.contains(x, y, z)) {
-				ROOM_HASH_MAP_LOCK.readLock().unlock();
-				return room;
-			}
-		}
-		ROOM_HASH_MAP_LOCK.readLock().unlock();
-		return null;
-	}
-	public static @Nullable Room getRoomForPos(double x, double y, double z) {
-		ROOM_HASH_MAP_LOCK.readLock().lock();
-		for (final Room room : ROOM_COLLECTION) {
-			if (room.contains(x, y, z)) {
-				ROOM_HASH_MAP_LOCK.readLock().unlock();
-				return room;
-			}
-		}
-		ROOM_HASH_MAP_LOCK.readLock().unlock();
-		return null;
-	}
-
 	public static @Nullable Room getRoomForPos(@NotNull Vec3i pos) {
 		final int x = pos.getX(), y = pos.getY(), z = pos.getZ();
 		ROOM_HASH_MAP_LOCK.readLock().lock();
@@ -208,7 +139,7 @@ public final class RoomTracker {
 		public int maxZ;
 		private int modificationStamp = 0;
 		public boolean removed = false;
-		public int getVersion() {
+		public int getStamp() {
 			return modificationStamp;
 		}
 
@@ -258,7 +189,9 @@ public final class RoomTracker {
 
 		@Contract(mutates = "this")
 		public void setBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+			// When the room's bounds are changed, we need to increment the stamps for this room.
 			this.modificationStamp++;
+			// We also need to increment the stamp for the null (global) room, so that all IRoomCache not in a room also check for their new room.
 			nullRoomStamp++;
 			this.minX = minX;
 			this.minY = minY;
@@ -268,7 +201,10 @@ public final class RoomTracker {
 			this.maxZ = maxZ;
 		}
 		public void markRemoved() {
+			// When the room's bounds are changed, we need to increment the stamps for this room.
 			this.modificationStamp++;
+			// We also need to increment the stamp for the null (global) room, so that all IRoomCache not in a room also check for their new room.
+			nullRoomStamp++;
 			this.removed = true;
 		}
 
@@ -281,16 +217,16 @@ public final class RoomTracker {
 
 	@Environment(EnvType.CLIENT)
 	static public final class RoomTrackerTicker implements ClientPlayerTickable {
-		private final PlayerEntity clientPlayer;
+		private final RenderHooks.IRoomCaching clientPlayer;
 
 		@Contract(pure = true)
-		RoomTrackerTicker(PlayerEntity player) {
+		RoomTrackerTicker(RenderHooks.IRoomCaching player) {
 			this.clientPlayer = player;
 		}
 
 		@Override
 		public void tick() {
-			currentRoom = getRoomForEntity(clientPlayer);
+			currentRoom = getRoom(clientPlayer);
 		}
 	}
 }

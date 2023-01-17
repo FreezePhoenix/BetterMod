@@ -23,7 +23,15 @@ public abstract class TickOnInterval extends BetterBlockEntity implements ITicka
 		this.MAX_COOLDOWN = MAX_COOLDOWN;
 	}
 
-	public abstract void update(World world, BlockPos pos, BlockState blockState);
+	/**
+	 * Update the block entity.
+	 * @param world The world the block entity is in.
+	 * @param pos The block pos.
+	 * @param blockState  The block state.
+	 * @return Whether the BE should go back on cooldown.
+	 */
+
+	public abstract boolean scheduledTick(World world, BlockPos pos, BlockState blockState);
 
 	@Override
 	public void writeNbt(@NotNull NbtCompound tag) {
@@ -46,8 +54,9 @@ public abstract class TickOnInterval extends BetterBlockEntity implements ITicka
 				cooldown--;
 				return;
 			}
-			update(world, pos, blockState);
-			cooldown = MAX_COOLDOWN;
+			if(scheduledTick(world, pos, blockState)) {
+				cooldown = MAX_COOLDOWN;
+			}
 		}
 	}
 }

@@ -18,12 +18,16 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "io.github.cottonmc:LibGui:6.5.1+1.19.3"
+	// When these things change, we want to recompile our mod, and others that depend on it.
+	modImplementation "me.shedaniel.cloth:cloth-config-fabric:9.0.94"
+	modApi "maven.modrinth:modmenu:5.0.2"
 	modImplementation 'maven.modrinth:sodium:mc1.19.3-0.4.8'
 	modImplementation 'maven.modrinth:indium:1.0.12+mc1.19.3'
 	modImplementation 'maven.modrinth:starlight:1.1.1+1.19'
 	modImplementation 'maven.modrinth:entityculling:1.5.2-1.19.3'
-	modApi "me.shedaniel.cloth:cloth-config-fabric:9.0.94"
-	modApi "maven.modrinth:modmenu:5.0.2"
+	modImplementation 'maven.modrinth:spark:1.10.17-fabric'
+	implementation "com.github.LlamaLad7:MixinExtras:0.1.1"
+	annotationProcessor "com.github.LlamaLad7:MixinExtras:0.1.1"
 
 	implementation "org.joml:joml:1.10.4"
 	include "io.github.cottonmc:LibGui:6.5.1+1.19.3"

@@ -18,6 +18,11 @@ public abstract class BetterTickingBlock<E extends BetterBlockEntity & ITickable
 	@Nullable
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-		return ITickable::tick;
+		return BetterTickingBlock::tick;
+	}
+	static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T blockEntity) {
+		if(blockEntity instanceof ITickable tickable) {
+			tickable.tick(world, pos, state);
+		}
 	}
 }

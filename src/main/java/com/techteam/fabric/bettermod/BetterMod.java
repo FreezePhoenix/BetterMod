@@ -34,6 +34,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.texture.SpriteLoader;
+import net.minecraft.fluid.WaterFluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
@@ -107,16 +108,8 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		AutoConfig.register(BetterModConfig.class, GsonConfigSerializer::new);
 		CONFIG = AutoConfig.getConfigHolder(BetterModConfig.class).getConfig();
 
-		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
-			if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onServerLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
-			}
-		});
-		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
-			if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onServerUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
-			}
-		});
+		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register(IServerLoadableBlockEntity::onLoad);
+		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(IServerLoadableBlockEntity::onUnLoad);
 		NetworkHandlers.initServerHandlers();
 		if (Blocks.BOOKSHELF instanceof BetterBookshelfBlock betterBookshelfBlock) {
 			LOGGER.info("BetterBookshelves was successful!");
