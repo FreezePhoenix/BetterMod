@@ -18,7 +18,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
-import net.fabricmc.fabric.api.client.particle.v1.FabricSpriteProvider;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -33,8 +32,6 @@ import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.texture.SpriteLoader;
-import net.minecraft.fluid.WaterFluid;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
@@ -46,6 +43,8 @@ import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
+
+import java.util.Set;
 
 
 public class BetterMod implements ModInitializer, ClientModInitializer {
@@ -80,11 +79,11 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		return block;
 	}
 
-	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, FabricBlockEntityTypeBuilder.Factory<E> factory, BetterBlock<E> block) {
+	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block) {
 		BlockEntityType<E> blockEntityType = Registry.register(
 				Registries.BLOCK_ENTITY_TYPE,
 				ID,
-				FabricBlockEntityTypeBuilder.create(factory, block).build(null)
+				new BlockEntityType<>(block::createBlockEntity, Set.of(block), null)
 		);
 		ItemStorage.SIDED.registerForBlockEntity(
 				(betterBlockEntity, direction) -> betterBlockEntity.SELF,
@@ -115,7 +114,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 			LOGGER.info("BetterBookshelves was successful!");
 			BOOKSHELF_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 					BetterBookshelfBlock.ID,
-					BetterBookshelfBlockEntity::new,
 					betterBookshelfBlock
 			);
 		} else {
@@ -131,7 +129,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		ROOM_CONTROLLER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				RoomControllerBlock.ID,
-				RoomControllerBlockEntity::new,
 				ROOM_CONTROLLER_BLOCK
 		);
 		ROOM_CONTROLLER_SCREEN_HANDLER_TYPE = registerScreenHandler(
@@ -148,7 +145,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				BitHopperBlockEntity.ID,
-				BitHopperBlockEntity::new,
 				BIT_HOPPER_BLOCK
 		);
 		BIT_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
@@ -164,7 +160,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				PullHopperBlockEntity.ID,
-				PullHopperBlockEntity::new,
 				PULL_HOPPER_BLOCK
 		);
 		PULL_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
@@ -180,7 +175,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				StickHopperBlockEntity.ID,
-				StickHopperBlockEntity::new,
 				STICK_HOPPER_BLOCK
 		);
 		STICK_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(

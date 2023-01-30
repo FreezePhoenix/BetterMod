@@ -15,9 +15,9 @@ public abstract class BetterTickingBlock<E extends BetterBlockEntity & ITickable
 	public BetterTickingBlock(@NotNull Settings settings) {
 		super(settings);
 	}
-	@Nullable
+	@NotNull
 	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+	public final <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 		return BetterTickingBlock::tick;
 	}
 	static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T blockEntity) {

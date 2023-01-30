@@ -26,15 +26,14 @@ public final class NetworkHandlers {
 		GlobalPos pos = data.readGlobalPos();
 		RegistryKey<World> dimensionKey = pos.getDimension();
 		BlockPos blockPos = pos.getPos();
-		int minX = data.readInt();
-		int minY = data.readInt();
-		int minZ = data.readInt();
-		int maxX = data.readInt();
-		int maxY = data.readInt();
-		int maxZ = data.readInt();
+		byte minX = data.readByte();
+		byte minY = data.readByte();
+		byte minZ = data.readByte();
+		byte maxX = data.readByte();
+		byte maxY = data.readByte();
+		byte maxZ = data.readByte();
 		int variant = data.readInt();
 		server.execute(() -> {
-			// TODO: Use GlobalPos instead of BlockPos?
 			ServerWorld world = server.getWorld(dimensionKey);
 			if(world != null) {
 				if(world.getBlockEntity(blockPos) instanceof RoomControllerBlockEntity roomController) {

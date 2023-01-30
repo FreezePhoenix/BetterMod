@@ -14,17 +14,11 @@ import net.minecraft.util.math.BlockPos;
 public final class RenderHooks {
 	public static boolean shouldRenderEntity(final Entity entity) {
 		IRoomCaching cache = (IRoomCaching) entity;
-		if(cache.forceRender()) {
-			return true;
-		}
 		RoomTracker.Room currentRoom = RoomTracker.getActiveRoom();
-		if(cache instanceof ItemFrameEntity) {
-			if(currentRoom == null) {
-				return RoomTracker.getRoom(cache) == null;
-			}
-			return currentRoom.contains(cache.blockPos());
-		}
-		return currentRoom == null || currentRoom.contains(cache.blockPos()) || RoomTracker.getRoom(cache) == null;
+		return cache.forceRender() || (cache instanceof ItemFrameEntity && (currentRoom == null && RoomTracker.getRoom(
+				cache) == null || currentRoom != null && currentRoom.contains(cache.blockPos())) || !(cache instanceof ItemFrameEntity) && (currentRoom == null || currentRoom.contains(
+				cache.blockPos()) || RoomTracker.getRoom(
+				cache) == null));
 	}
 
 	public static boolean shouldRenderTileEntity(final BlockEntity blockEntity) {

@@ -12,11 +12,11 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
@@ -40,24 +40,24 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	public static final Box CUBE = new Box(0, 0, 0, 1, 1, 1);
 	private final @NotNull BoxPropertyDelegate delegate;
 
-	public int minX;
-	public int minY;
-	public int minZ;
-	public int maxX;
-	public int maxY;
-	public int maxZ;
+	public byte minX;
+	public byte minY;
+	public byte minZ;
+	public byte maxX;
+	public byte maxY;
+	public byte maxZ;
 	private int variantIndex;
 	private BlockState variantState;
 
 	public RoomControllerBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		super(BetterMod.ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, pos, state, 1);
-		delegate = new BoxPropertyDelegate(this);
-		this.minX = pos.getX();
-		this.minY = pos.getY();
-		this.minZ = pos.getZ();
-		this.maxX = pos.getX() + 1;
-		this.maxY = pos.getY() + 1;
-		this.maxZ = pos.getZ() + 1;
+		delegate = new BoxPropertyDelegate(this, pos);
+		this.minX = 0;
+		this.minY = 0;
+		this.minZ = 0;
+		this.maxX = 1;
+		this.maxY = 1;
+		this.maxZ = 1;
 
 	}
 
@@ -68,22 +68,32 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	private void readFromNBTBB(@NotNull NbtCompound tag) {
-		this.minX = tag.getInt("nx");
-		this.minY = tag.getInt("ny");
-		this.minZ = tag.getInt("nz");
-		this.maxX = tag.getInt("px");
-		this.maxY = tag.getInt("py");
-		this.maxZ = tag.getInt("pz");
+		if (tag.getType("nx") == NbtElement.INT_TYPE) {
+			this.minX = (byte) (tag.getInt("nx") - pos.getX());
+			this.minY = (byte) (tag.getInt("ny") - pos.getY());
+			this.minZ = (byte) (tag.getInt("nz") - pos.getZ());
+			this.maxX = (byte) (tag.getInt("px") - pos.getX());
+			this.maxY = (byte) (tag.getInt("py") - pos.getY());
+			this.maxZ = (byte) (tag.getInt("pz") - pos.getZ());
+		} else {
+
+			this.minX = tag.getByte("nx");
+			this.minY = tag.getByte("ny");
+			this.minZ = tag.getByte("nz");
+			this.maxX = tag.getByte("px");
+			this.maxY = tag.getByte("py");
+			this.maxZ = tag.getByte("pz");
+		}
 	}
 
 	private @NotNull NbtCompound writeToNBTBB() {
 		NbtCompound tag = new NbtCompound();
-		tag.putInt("nx", this.minX);
-		tag.putInt("ny", this.minY);
-		tag.putInt("nz", this.minZ);
-		tag.putInt("px", this.maxX);
-		tag.putInt("py", this.maxY);
-		tag.putInt("pz", this.maxZ);
+		tag.putByte("nx", this.minX);
+		tag.putByte("ny", this.minY);
+		tag.putByte("nz", this.minZ);
+		tag.putByte("px", this.maxX);
+		tag.putByte("py", this.maxY);
+		tag.putByte("pz", this.maxZ);
 		return tag;
 	}
 
@@ -96,7 +106,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 		return !inventory.getStack(0).isEmpty();
 	}
 
-	public void setBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+	public void setBounds(byte minX, byte minY, byte minZ, byte maxX, byte maxY, byte maxZ) {
 		this.minX = minX;
 		this.minY = minY;
 		this.minZ = minZ;
@@ -169,8 +179,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	@Override
 	public boolean isValid(int slot, ItemStack item) {
 		Block b = Block.getBlockFromItem(item.getItem());
-		if (b == Blocks.AIR || b instanceof BlockEntityProvider || !b.getDefaultState()
-		                                                             .isOpaque()) {
+		if (b == Blocks.AIR || b instanceof BlockEntityProvider || !b.getDefaultState().isOpaque()) {
 			return false;
 		}
 		return super.isValid(slot, item);
@@ -179,7 +188,15 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	@Contract(pure = true)
 	@Override
 	public void onClientLoad(World world, BlockPos pos, BlockState state) {
-		RoomTracker.addRoom(this.getUUID(), minX, minY, minZ, maxX, maxY, maxZ);
+		RoomTracker.addRoom(
+				this.getUUID(),
+				minX + pos.getX(),
+				minY + pos.getY(),
+				minZ + pos.getZ(),
+				maxX + pos.getX(),
+				maxY + pos.getY(),
+				maxZ + pos.getZ()
+		);
 	}
 
 	@Override
@@ -198,7 +215,15 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 			setVariantIndex(0);
 		}
 		if (world != null && world.isClient()) {
-			RoomTracker.updateRoom(this.getUUID(), minX, minY, minZ, maxX, maxY, maxZ);
+			RoomTracker.updateRoom(
+					this.getUUID(),
+					minX + pos.getX(),
+					minY + pos.getY(),
+					minZ + pos.getZ(),
+					maxX + pos.getX(),
+					maxY + pos.getY(),
+					maxZ + pos.getZ()
+			);
 		}
 	}
 
