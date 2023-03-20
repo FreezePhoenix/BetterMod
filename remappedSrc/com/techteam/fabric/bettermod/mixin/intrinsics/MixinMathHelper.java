@@ -1,6 +1,8 @@
 package com.techteam.fabric.bettermod.mixin.intrinsics;
 
 import com.ibm.icu.util.CodePointTrie;
+import com.techteam.fabric.bettermod.util.MathUtil;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Contract;
 import org.spongepowered.asm.mixin.Mixin;
@@ -8,6 +10,20 @@ import org.spongepowered.asm.mixin.Overwrite;
 
 @Mixin(MathHelper.class)
 public abstract class MixinMathHelper {
+	/**
+	 * @author Aria
+	 * @reason Use Intrinsics
+	 */
+	@Contract(pure = true)
+	@Overwrite
+	public static int multiplyColors(int first, int second) {
+		return ColorHelper.Argb.getArgb(
+				ColorHelper.Argb.getAlpha(first),
+				MathUtil.div255(ColorHelper.Argb.getRed(first) * ColorHelper.Argb.getRed(second)),
+				MathUtil.div255(ColorHelper.Argb.getGreen(first) * ColorHelper.Argb.getGreen(second)),
+				MathUtil.div255(ColorHelper.Argb.getBlue(first) * ColorHelper.Argb.getBlue(second))
+		);
+	}
 	/**
 	 * @author Aria
 	 * @reason Use Intrinsics
@@ -173,7 +189,7 @@ public abstract class MixinMathHelper {
 	 */
 	@Overwrite
 	public static float clampedLerp(float start, float end, float delta) {
-		return MathHelper.clamp(MathHelper.lerp(delta, start, end), start, end);
+		return MathHelper.lerp(MathHelper.clamp(delta, -1.0f, 1.0f), start, end);
 	}
 
 	/**
@@ -182,7 +198,7 @@ public abstract class MixinMathHelper {
 	 */
 	@Overwrite
 	public static double clampedLerp(double start, double end, double delta) {
-		return MathHelper.clamp(MathHelper.lerp(delta, start, end), start, end);
+		return MathHelper.lerp(MathHelper.clamp(delta, -1.0d, 1.0d), start, end);
 	}
 
 	/**

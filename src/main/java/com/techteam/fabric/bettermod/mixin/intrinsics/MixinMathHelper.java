@@ -1,6 +1,8 @@
 package com.techteam.fabric.bettermod.mixin.intrinsics;
 
 import com.ibm.icu.util.CodePointTrie;
+import com.techteam.fabric.bettermod.util.MathUtil;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Contract;
 import org.spongepowered.asm.mixin.Mixin;
@@ -89,16 +91,6 @@ public abstract class MixinMathHelper {
 	 */
 	@Contract(pure = true)
 	@Overwrite
-	public static int absFloor(double value) {
-		return MathHelper.abs(MathHelper.floor(value));
-	}
-
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Contract(pure = true)
-	@Overwrite
 	public static int ceil(float value) {
 		return (int) Math.ceil(value);
 	}
@@ -118,27 +110,16 @@ public abstract class MixinMathHelper {
 	 * @reason Use Intrinsics
 	 */
 	@Overwrite
-	public static byte clamp(byte value, byte min, byte max) {
-		return (byte) Math.min(Math.max(value, min), max);
-	}
-
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Overwrite
 	public static int clamp(int value, int min, int max) {
-		return Math.max(min, Math.min(max, value));
+		if(value < min) {
+			return min;
+		}
+		if(value > max) {
+			return max;
+		}
+		return value;
 	}
 
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Overwrite
-	public static long clamp(long value, long min, long max) {
-		return Math.min(Math.max(value, min), max);
-	}
 
 	/**
 	 * @author Aria
@@ -146,7 +127,13 @@ public abstract class MixinMathHelper {
 	 */
 	@Overwrite
 	public static float clamp(float value, float min, float max) {
-		return Math.min(Math.max(value, min), max);
+		if(value < min) {
+			return min;
+		}
+		if(value > max) {
+			return max;
+		}
+		return value;
 	}
 
 	/**
@@ -155,7 +142,13 @@ public abstract class MixinMathHelper {
 	 */
 	@Overwrite
 	public static double clamp(double value, double min, double max) {
-		return Math.max(min, Math.min(max, value));
+		if(value < min) {
+			return min;
+		}
+		if(value > max) {
+			return max;
+		}
+		return value;
 	}
 
 	/**
@@ -173,7 +166,7 @@ public abstract class MixinMathHelper {
 	 */
 	@Overwrite
 	public static float clampedLerp(float start, float end, float delta) {
-		return MathHelper.clamp(MathHelper.lerp(delta, start, end), start, end);
+		return MathHelper.lerp(MathHelper.clamp(delta, -1.0f, 1.0f), start, end);
 	}
 
 	/**
@@ -182,7 +175,7 @@ public abstract class MixinMathHelper {
 	 */
 	@Overwrite
 	public static double clampedLerp(double start, double end, double delta) {
-		return MathHelper.clamp(MathHelper.lerp(delta, start, end), start, end);
+		return MathHelper.lerp(MathHelper.clamp(delta, -1.0d, 1.0d), start, end);
 	}
 
 	/**
@@ -236,16 +229,6 @@ public abstract class MixinMathHelper {
 	@Overwrite
 	public static int floorLog2(int value) {
 		return 31 - Integer.numberOfLeadingZeros(value);
-	}
-
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Contract(pure = true)
-	@Overwrite
-	public static int packRgb(int r, int g, int b) {
-		return (((r << 8) | g) << 8) | b;
 	}
 
 	/**

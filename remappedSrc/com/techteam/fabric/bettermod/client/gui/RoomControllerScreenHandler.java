@@ -22,7 +22,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Matrix4f;
 import org.jetbrains.annotations.NotNull;
 
 public final class RoomControllerScreenHandler extends SyncedGuiDescription {
@@ -107,6 +106,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
             if (current == slider.getValue()) {
                 ((BoxPropertyDelegate) propertyDelegate).rerender();
             }
+            inventory.markDirty();
         });
         root.add(slider, 0, 54, 176 - 14, 18);
         root.validate(this);

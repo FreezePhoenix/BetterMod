@@ -89,13 +89,15 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 		return super.isShapeFullCube(state, world, pos);
 	}
 
+
+
 	@Override
-	public boolean isTranslucent(BlockState state, @NotNull BlockView world, BlockPos pos) {
+	public boolean isTransparent(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().isTranslucent(world, pos);
+				return roomControllerBlockEntity.getState().isTransparent(world, pos);
 			}
 		}
-		return super.isTranslucent(state, world, pos);
+		return super.isTransparent(state, world, pos);
 	}
 }

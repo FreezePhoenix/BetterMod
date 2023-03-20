@@ -46,14 +46,13 @@ public final class RoomControllerModel implements UnbakedModel, BakedModel, Fabr
     private static final Identifier DEFAULT_BLOCK_MODEL = new Identifier("minecraft:block/block");
     private static final SpriteIdentifier SPRITE_ID = new SpriteIdentifier(
             PlayerScreenHandler.BLOCK_ATLAS_TEXTURE,
-            new Identifier("betterperf:blocks/room_controller")
+            new Identifier("betterperf:block/room_controller")
     );
     private Mesh mesh;
     private Sprite SPRITE;
     private ModelTransformation transformation;
-
     @Override
-    public BakedModel bake(@NotNull ModelLoader loader, @NotNull Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
+    public BakedModel bake(@NotNull Baker loader, @NotNull Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
         // Load the default block model
         JsonUnbakedModel defaultBlockModel = (JsonUnbakedModel) loader.getOrLoadModel(DEFAULT_BLOCK_MODEL);
         // Get its ModelTransformation
@@ -119,6 +118,11 @@ public final class RoomControllerModel implements UnbakedModel, BakedModel, Fabr
     }
 
     @Override
+    public void setParents(Function<Identifier, UnbakedModel> modelLoader) {
+
+    }
+
+    @Override
     public @NotNull ModelOverrideList getOverrides() {
         return ModelOverrideList.EMPTY;
     }
@@ -132,13 +136,6 @@ public final class RoomControllerModel implements UnbakedModel, BakedModel, Fabr
     @Override
     public @NotNull @Unmodifiable List<BakedQuad> getQuads(BlockState state, Direction face, Random random) {
         return Collections.emptyList();
-    }
-
-    @Contract(value = "_, _ -> new",
-              pure = true)
-    @Override
-    public @NotNull @Unmodifiable Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences) {
-        return Collections.singletonList(SPRITE_ID);
     }
 
     @Override

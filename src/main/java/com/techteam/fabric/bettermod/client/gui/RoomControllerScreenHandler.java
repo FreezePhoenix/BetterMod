@@ -113,8 +113,8 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         ((BoxPropertyDelegate) propertyDelegate).sync();
     }
 }

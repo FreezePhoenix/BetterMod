@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
@@ -17,12 +18,13 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
-	@Shadow private @Nullable ClientWorld world;
+	@Shadow private ClientWorld world;
 
-	@Redirect(slice = @Slice(from = @At(value = "INVOKE_STRING",
+	@ModifyExpressionValue(slice = @Slice(from = @At(value = "INVOKE_STRING",
 	                                    target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
 	                                    args = "ldc=blockentities"),
 	                         to = @At(value = "INVOKE_STRING",
@@ -32,34 +34,37 @@ public abstract class MixinWorldRenderer {
 					   value = "INVOKE",
 					   target = "Ljava/util/List;iterator()Ljava/util/Iterator;"),
 	          method = "render")
-	private @NotNull Iterator<BlockEntity> iteratorIntercept(final @NotNull List<BlockEntity> list) {
-		return list.listIterator();
-	}
-
-	@Redirect(slice = @Slice(from = @At(value = "INVOKE_STRING",
-										target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-										args = "ldc=blockentities"),
-							 to = @At(value = "INVOKE_STRING",
-									  target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-									  args = "ldc=destroyProgress")),
-			  at = @At(ordinal = 1,
-					   value = "INVOKE",
-					   target = "Ljava/util/Iterator;hasNext()Z"),
-			  method = "render")
-	private boolean nextHook(final @NotNull Iterator<BlockEntity> iterator) {
-		if (iterator instanceof ListIterator<BlockEntity> listIterator) {
-			Profiler profiler = this.world.getProfiler();
-			profiler.push("better_culling");
-			while (listIterator.hasNext()) {
-				if (RenderHooks.shouldRenderTileEntity(listIterator.next())) {
-					listIterator.previous();
-					profiler.pop();
+	private @NotNull Iterator<BlockEntity> iteratorIntercept(final @NotNull Iterator<BlockEntity> iterator) {
+		final Profiler profiler = this.world.getProfiler();
+		return new Iterator<>() {
+			private BlockEntity next = null;
+			@Override
+			public boolean hasNext() {
+				if(next != null) {
 					return true;
 				}
+				profiler.push("better_culling");
+				while (iterator.hasNext()) {
+					BlockEntity possibleNext = iterator.next();
+					if (RenderHooks.shouldRenderTileEntity(possibleNext)) {
+						profiler.pop();
+						next = possibleNext;
+						return true;
+					}
+				}
+				profiler.pop();
+				return false;
 			}
-			profiler.pop();
-			return false;
-		}
-		return iterator.hasNext();
+
+			@Override
+			public BlockEntity next() {
+				if(!hasNext()) {
+					throw new NoSuchElementException();
+				}
+				BlockEntity toReturn = next;
+				next = null;
+				return toReturn;
+			}
+		};
 	}
 }

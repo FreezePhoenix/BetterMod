@@ -4,11 +4,16 @@ import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.GlobalPos;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector2f;
 
 public final class NetworkHandlers {
 	public static void initServerHandlers() {
@@ -19,20 +24,24 @@ public final class NetworkHandlers {
 	}
 
 	private static void receive(@NotNull MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, @NotNull PacketByteBuf data, PacketSender sender) {
-		BlockPos pos = data.readBlockPos();
-		int minX = data.readInt();
-		int minY = data.readInt();
-		int minZ = data.readInt();
-		int maxX = data.readInt();
-		int maxY = data.readInt();
-		int maxZ = data.readInt();
+		GlobalPos pos = data.readGlobalPos();
+		RegistryKey<World> dimensionKey = pos.getDimension();
+		BlockPos blockPos = pos.getPos();
+		byte minX = data.readByte();
+		byte minY = data.readByte();
+		byte minZ = data.readByte();
+		byte maxX = data.readByte();
+		byte maxY = data.readByte();
+		byte maxZ = data.readByte();
 		int variant = data.readInt();
 		server.execute(() -> {
-			// TODO: Use GlobalPos instead of BlockPos?
-			if (player.getWorld().getBlockEntity(pos) instanceof RoomControllerBlockEntity roomController) {
-				roomController.setBounds(minX, minY, minZ, maxX, maxY, maxZ);
-				roomController.setVariantIndex(variant);
-				roomController.markDirty();
+			ServerWorld world = server.getWorld(dimensionKey);
+			if(world != null) {
+				if(world.getBlockEntity(blockPos) instanceof RoomControllerBlockEntity roomController) {
+					roomController.setBounds(minX, minY, minZ, maxX, maxY, maxZ);
+					roomController.setVariantIndex(variant);
+					roomController.markDirty();
+				}
 			}
 		});
 	}

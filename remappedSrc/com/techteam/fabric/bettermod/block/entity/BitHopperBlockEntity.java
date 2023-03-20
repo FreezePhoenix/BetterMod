@@ -36,11 +36,12 @@ public class BitHopperBlockEntity extends TickOnInterval implements IServerLoada
 	}
 
 	@Override
-	public void update(World world, BlockPos pos, BlockState blockState) {
+	public boolean scheduledTick(World world, BlockPos pos, BlockState blockState) {
 		Storage<ItemVariant> PUSH_TARGET = PUSH_TARGET_CACHE.find(blockState.get(HopperBlock.FACING).getOpposite());
 		if (PUSH_TARGET != null) {
-			InventoryUtil.handleTransfer(SELF, PUSH_TARGET);
+			return InventoryUtil.handleTransfer(SELF, PUSH_TARGET);
 		}
+		return false;
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.processing.Generated;
-
 public abstract class BetterBlock<E extends BetterBlockEntity> extends BlockWithEntity {
 
     public BetterBlock(@NotNull Settings settings) {

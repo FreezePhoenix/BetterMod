@@ -9,7 +9,6 @@ import com.techteam.fabric.bettermod.client.RoomControllerEntityRenderer;
 import com.techteam.fabric.bettermod.client.gui.*;
 import com.techteam.fabric.bettermod.network.NetworkHandlers;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
-import io.github.cottonmc.cotton.gui.client.CottonInventoryScreen;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
@@ -21,39 +20,36 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.MapColor;
+import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
-import org.joml.Matrix4f;
 
-import java.util.function.Supplier;
+import java.util.Set;
 
 
 public class BetterMod implements ModInitializer, ClientModInitializer {
-	public static BetterModConfig CONFIG;
 	public static final Logger LOGGER = LogManager.getLogger();
+	public static BetterModConfig CONFIG;
 	public static BlockEntityType<BetterBookshelfBlockEntity> BOOKSHELF_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
 	public static BetterBlock<RoomControllerBlockEntity> ROOM_CONTROLLER_BLOCK;
@@ -65,23 +61,29 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static BetterBlock<PullHopperBlockEntity> PULL_HOPPER_BLOCK;
 	public static BlockEntityType<PullHopperBlockEntity> PULL_HOPPER_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<PullHopperScreenHandler> PULL_HOPPER_SCREEN_HANDLER_TYPE;
-
 	public static BetterBlock<StickHopperBlockEntity> STICK_HOPPER_BLOCK;
 	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<StickHopperScreenHandler> STICK_HOPPER_SCREEN_HANDLER_TYPE;
 
 	@Contract("_, _ -> param2")
 	public static <E extends BetterBlockEntity> BetterBlock<E> registerBlock(Identifier ID, BetterBlock<E> block) {
-		Registry.register(Registry.BLOCK, ID, block);
-		Registry.register(Registry.ITEM, ID, new BlockItem(block, new Item.Settings().group(ItemGroup.MISC)));
+		Registry.register(Registries.BLOCK, ID, block);
+		final BlockItem blockItem = Registry.register(
+				Registries.ITEM,
+				ID,
+				new BlockItem(block, new FabricItemSettings())
+		);
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.getDefaultTab()).register(content -> {
+			content.add(blockItem);
+		});
 		return block;
 	}
 
-	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, FabricBlockEntityTypeBuilder.Factory<E> factory, BetterBlock<E> block) {
+	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block) {
 		BlockEntityType<E> blockEntityType = Registry.register(
-				Registry.BLOCK_ENTITY_TYPE,
+				Registries.BLOCK_ENTITY_TYPE,
 				ID,
-				FabricBlockEntityTypeBuilder.create(factory, block).build(null)
+				new BlockEntityType<>(block::createBlockEntity, Set.of(block), null)
 		);
 		ItemStorage.SIDED.registerForBlockEntity(
 				(betterBlockEntity, direction) -> betterBlockEntity.SELF,
@@ -92,7 +94,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 	@Contract("_, _ -> !null")
 	public static <E extends ScreenHandler> ScreenHandlerType<E> registerScreenHandler(Identifier ID, ExtendedScreenHandlerType.ExtendedFactory<E> factory) {
-		return Registry.register(Registry.SCREEN_HANDLER, ID, new ExtendedScreenHandlerType<>(factory));
+		return Registry.register(Registries.SCREEN_HANDLER, ID, new ExtendedScreenHandlerType<>(factory));
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -105,22 +107,13 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		AutoConfig.register(BetterModConfig.class, GsonConfigSerializer::new);
 		CONFIG = AutoConfig.getConfigHolder(BetterModConfig.class).getConfig();
 
-		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((blockEntity, world) -> {
-			if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onServerLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
-			}
-		});
-		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
-			if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
-				loadableBlockEntity.onServerUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
-			}
-		});
+		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register(IServerLoadableBlockEntity::onLoad);
+		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(IServerLoadableBlockEntity::onUnLoad);
 		NetworkHandlers.initServerHandlers();
 		if (Blocks.BOOKSHELF instanceof BetterBookshelfBlock betterBookshelfBlock) {
 			LOGGER.info("BetterBookshelves was successful!");
 			BOOKSHELF_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 					BetterBookshelfBlock.ID,
-					BetterBookshelfBlockEntity::new,
 					betterBookshelfBlock
 			);
 		} else {
@@ -136,7 +129,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		ROOM_CONTROLLER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				RoomControllerBlock.ID,
-				RoomControllerBlockEntity::new,
 				ROOM_CONTROLLER_BLOCK
 		);
 		ROOM_CONTROLLER_SCREEN_HANDLER_TYPE = registerScreenHandler(
@@ -153,7 +145,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				BitHopperBlockEntity.ID,
-				BitHopperBlockEntity::new,
 				BIT_HOPPER_BLOCK
 		);
 		BIT_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
@@ -169,7 +160,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				PullHopperBlockEntity.ID,
-				PullHopperBlockEntity::new,
 				PULL_HOPPER_BLOCK
 		);
 		PULL_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
@@ -185,7 +175,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				StickHopperBlockEntity.ID,
-				StickHopperBlockEntity::new,
 				STICK_HOPPER_BLOCK
 		);
 		STICK_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(

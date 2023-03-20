@@ -36,21 +36,23 @@ public class StickHopperBlockEntity extends TickOnInterval implements IServerLoa
 	}
 
 	@Override
-	public void update(World world, BlockPos pos, BlockState blockState) {
+	public boolean scheduledTick(World world, BlockPos pos, BlockState blockState) {
+		boolean activated = false;
 		// Push
 		{
 			Storage<ItemVariant> PUSH_TARGET = PUSH_TARGET_CACHE.find(blockState.get(HopperBlock.FACING).getOpposite());
 			if(PUSH_TARGET != null) {
-				InventoryUtil.handleTransferSticky(SELF, PUSH_TARGET);
+				activated = InventoryUtil.handleTransferSticky(SELF, PUSH_TARGET);
 			}
 		}
 		// Pull
 		{
 			Storage<ItemVariant> PULL_TARGET = PULL_TARGET_CACHE.find(Direction.DOWN);
 			if(PULL_TARGET != null) {
-				InventoryUtil.handleTransferStackable(PULL_TARGET, SELF);
+				activated = activated || InventoryUtil.handleTransferStackable(PULL_TARGET, SELF);
 			}
 		}
+		return activated;
 	}
 
 	@Override

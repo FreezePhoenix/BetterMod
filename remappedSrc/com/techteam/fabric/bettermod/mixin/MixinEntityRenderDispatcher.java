@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.minecraft.block.entity.Hopper;
 import net.minecraft.client.MinecraftClient;
@@ -27,7 +28,7 @@ public abstract class MixinEntityRenderDispatcher {
     @Shadow private World world;
 
     @Inject(method = "render",
-            at = @At("TAIL"))
+            at = @At("RETURN"))
     private <E extends Entity> void afterRender(E entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo info) {
         this.world.getProfiler().pop();
     }
@@ -38,13 +39,9 @@ public abstract class MixinEntityRenderDispatcher {
         this.world.getProfiler().push(EntityType.getId(entity.getType()).toString());
     }
 
-    @Inject(method = "shouldRender",
-            at = @At("RETURN"),
-            cancellable = true)
-    private void shouldRenderHook(final Entity entity, final Frustum frustum, final double x, final double y, final double z, @NotNull CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValueZ()) {
-            // if it's true, set our fallback value as the return
-            cir.setReturnValue(RenderHooks.shouldRenderEntity(entity));
-        }
+    @ModifyReturnValue(method = "shouldRender",
+                       at = @At("RETURN"))
+    private boolean shouldRenderHook(boolean returnValue, final Entity entity) {
+        return returnValue && RenderHooks.shouldRenderEntity(entity);
     }
 }

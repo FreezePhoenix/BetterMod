@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector2f;
 
 public final class NetworkHandlers {
 	public static void initServerHandlers() {

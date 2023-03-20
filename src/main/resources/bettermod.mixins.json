@@ -7,13 +7,14 @@
     "MixinArgb",
     "MixinBlocks",
     "MixinMobSpawnerLogic",
-    "MixinWorld"
+    "MixinWorld",
+    "intrinsics.MixinMathHelper"
   ],
   "client": [
+    "MixinBlockEntity",
     "MixinBlockEntityRenderDispatcher",
     "MixinClientPlayerEntity",
     "MixinEntity",
-    "MixinBlockEntity",
     "MixinEntityRenderDispatcher",
     "MixinSodiumWorldRenderer",
     "MixinWorldRenderer"
