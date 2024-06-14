@@ -3,6 +3,8 @@ package com.techteam.fabric.bettermod.network;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.MinecraftServer;
@@ -33,13 +35,13 @@ public final class NetworkHandlers {
 		byte maxX = data.readByte();
 		byte maxY = data.readByte();
 		byte maxZ = data.readByte();
-		int variant = data.readInt();
+		BlockState state = data.readRegistryValue(Block.STATE_IDS);
 		server.execute(() -> {
 			ServerWorld world = server.getWorld(dimensionKey);
 			if(world != null) {
 				if(world.getBlockEntity(blockPos) instanceof RoomControllerBlockEntity roomController) {
 					roomController.setBounds(minX, minY, minZ, maxX, maxY, maxZ);
-					roomController.setVariantIndex(variant);
+					roomController.setVariantState(state);
 					roomController.markDirty();
 				}
 			}

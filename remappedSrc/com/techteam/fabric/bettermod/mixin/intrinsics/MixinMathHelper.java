@@ -16,20 +16,6 @@ public abstract class MixinMathHelper {
 	 */
 	@Contract(pure = true)
 	@Overwrite
-	public static int multiplyColors(int first, int second) {
-		return ColorHelper.Argb.getArgb(
-				ColorHelper.Argb.getAlpha(first),
-				MathUtil.div255(ColorHelper.Argb.getRed(first) * ColorHelper.Argb.getRed(second)),
-				MathUtil.div255(ColorHelper.Argb.getGreen(first) * ColorHelper.Argb.getGreen(second)),
-				MathUtil.div255(ColorHelper.Argb.getBlue(first) * ColorHelper.Argb.getBlue(second))
-		);
-	}
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Contract(pure = true)
-	@Overwrite
 	public static double squaredMagnitude(double x, double y, double z) {
 		/*
 		But Aria! Why not do Math.fma(x, x, Math.fma(y, y, z * z))?
@@ -105,16 +91,6 @@ public abstract class MixinMathHelper {
 	 */
 	@Contract(pure = true)
 	@Overwrite
-	public static int absFloor(double value) {
-		return MathHelper.abs(MathHelper.floor(value));
-	}
-
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Contract(pure = true)
-	@Overwrite
 	public static int ceil(float value) {
 		return (int) Math.ceil(value);
 	}
@@ -134,27 +110,16 @@ public abstract class MixinMathHelper {
 	 * @reason Use Intrinsics
 	 */
 	@Overwrite
-	public static byte clamp(byte value, byte min, byte max) {
-		return (byte) Math.min(Math.max(value, min), max);
-	}
-
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Overwrite
 	public static int clamp(int value, int min, int max) {
-		return Math.max(min, Math.min(max, value));
+		if(value < min) {
+			return min;
+		}
+		if(value > max) {
+			return max;
+		}
+		return value;
 	}
 
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Overwrite
-	public static long clamp(long value, long min, long max) {
-		return Math.min(Math.max(value, min), max);
-	}
 
 	/**
 	 * @author Aria
@@ -162,7 +127,13 @@ public abstract class MixinMathHelper {
 	 */
 	@Overwrite
 	public static float clamp(float value, float min, float max) {
-		return Math.min(Math.max(value, min), max);
+		if(value < min) {
+			return min;
+		}
+		if(value > max) {
+			return max;
+		}
+		return value;
 	}
 
 	/**
@@ -171,7 +142,13 @@ public abstract class MixinMathHelper {
 	 */
 	@Overwrite
 	public static double clamp(double value, double min, double max) {
-		return Math.max(min, Math.min(max, value));
+		if(value < min) {
+			return min;
+		}
+		if(value > max) {
+			return max;
+		}
+		return value;
 	}
 
 	/**
@@ -252,16 +229,6 @@ public abstract class MixinMathHelper {
 	@Overwrite
 	public static int floorLog2(int value) {
 		return 31 - Integer.numberOfLeadingZeros(value);
-	}
-
-	/**
-	 * @author Aria
-	 * @reason Use Intrinsics
-	 */
-	@Contract(pure = true)
-	@Overwrite
-	public static int packRgb(int r, int g, int b) {
-		return (((r << 8) | g) << 8) | b;
 	}
 
 	/**

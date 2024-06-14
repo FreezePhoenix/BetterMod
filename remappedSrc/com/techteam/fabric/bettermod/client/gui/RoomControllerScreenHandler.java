@@ -5,10 +5,8 @@ import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
 import com.techteam.fabric.bettermod.util.InventoryUtil;
 import io.github.cottonmc.cotton.gui.EmptyInventory;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
-import io.github.cottonmc.cotton.gui.widget.TooltipBuilder;
-import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
-import io.github.cottonmc.cotton.gui.widget.WPlayerInvPanel;
-import io.github.cottonmc.cotton.gui.widget.WSlider;
+import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
+import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
 import net.fabricmc.api.EnvType;
@@ -17,10 +15,13 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.DebugStickItem;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +33,8 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
         this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.world, buf.readBlockPos()));
     }
 
+    private Property<?> selectedProperty = null;
+
     public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
         super(
                 BetterMod.ROOM_CONTROLLER_SCREEN_HANDLER_TYPE, syncId, playerInventory,
@@ -39,6 +42,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
                         context
                 )
         );
+        BoxPropertyDelegate boxPropertyDelegate = (BoxPropertyDelegate) propertyDelegate;
 //		this.updateSyncHandler(null);
         WPlainPanel root = new WPlainPanel();
         root.setInsets(new Insets(2, 7, 0, 7));
@@ -85,36 +89,47 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
         });
         WPlayerInvPanel panel = this.createPlayerInventoryPanel();
         root.add(panel, 0, 72);
-        WSlider slider = new WSlider(0, propertyDelegate.get(7), Axis.HORIZONTAL) {
-            @Override
-            public void addTooltip(@NotNull TooltipBuilder tooltip) {
-                tooltip.add(Text.of("VARIANT: " + propertyDelegate.get(6)));
-            }
-        };
-        slider.setValue(propertyDelegate.get(6));
-        slider.setValueChangeListener((value) -> {
-            propertyDelegate.set(6, value);
-            ((BoxPropertyDelegate) propertyDelegate).sync();
-        });
+        WCardPanel cards = new WCardPanel();
+        cards.add(
+          new WDynamicLabel(() -> {
+              if(selectedProperty == null) {
+                  return "AA";
+              }
+              return selectedProperty.getName();
+          }) {
+              @Override
+              public void paint(MatrixStack matrices, int x, int y, int mouseX, int mouseY) {
+                  int borderColor = 0xFFA0A0A0;
+                  ScreenDrawing.coloredRect(matrices, x - 1, y - 1, width + 2, height + 2, borderColor);
+                  ScreenDrawing.coloredRect(matrices, x, y, width, height, 0xFF000000);
+                  super.paint(matrices, x, y, mouseX, mouseY);
+              }
+          }
+        );
+        //        WSlider slider = new WSlider(0, propertyDelegate.get(7), Axis.HORIZONTAL) {
+        //            @Override
+        //            public void addTooltip(@NotNull TooltipBuilder tooltip) {
+        //                tooltip.add(Text.of("VARIANT: " + propertyDelegate.get(6)));
+        //            }
+        //        };
+        //        slider.setValue(propertyDelegate.get(6));
+        //        slider.setValueChangeListener((value) -> {
+        //            propertyDelegate.set(6, value);
+        //            ((BoxPropertyDelegate) propertyDelegate).sync();
+        //        });
         slot.addChangeListener((__, inventory, index, stack) -> {
-            int current = slider.getValue();
-            if (stack.isEmpty()) {
-                slider.setMaxValue(0);
-            } else {
-                slider.setMaxValue(propertyDelegate.get(7) - 1);
-            }
-            if (current == slider.getValue()) {
-                ((BoxPropertyDelegate) propertyDelegate).rerender();
-            }
+            boxPropertyDelegate.set(Block.getBlockFromItem(stack.getItem()).getDefaultState());
+            selectedProperty = boxPropertyDelegate.getProperty(0);
+            boxPropertyDelegate.rerender();
             inventory.markDirty();
         });
-        root.add(slider, 0, 54, 176 - 14, 18);
+        root.add(cards, 0, 54, 176 - 14, 18);
         root.validate(this);
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         ((BoxPropertyDelegate) propertyDelegate).sync();
     }
 }

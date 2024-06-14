@@ -125,7 +125,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		ROOM_CONTROLLER_BLOCK = registerBlock(
 				RoomControllerBlock.ID,
-				new RoomControllerBlock(FabricBlockSettings.of(Material.GLASS))
+				new RoomControllerBlock(FabricBlockSettings.create(Material.GLASS))
 		);
 		ROOM_CONTROLLER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				RoomControllerBlock.ID,

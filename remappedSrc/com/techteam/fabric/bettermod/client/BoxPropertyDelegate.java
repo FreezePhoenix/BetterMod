@@ -4,14 +4,20 @@ import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import com.techteam.fabric.bettermod.network.PacketIdentifiers;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.GlobalPos;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class BoxPropertyDelegate implements PropertyDelegate {
 	final RoomControllerBlockEntity entity;
@@ -19,11 +25,25 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	private final int y;
 	private final int z;
 
+	private List<Property<?>> properties;
+
 	public BoxPropertyDelegate(@NotNull RoomControllerBlockEntity roomController, BlockPos pos) {
 		this.entity = roomController;
 		this.x = pos.getX();
 		this.y = pos.getY();
 		this.z = pos.getZ();
+		properties = new ArrayList<>();
+		properties.addAll(this.get().getProperties());
+	}
+
+	public Property<?> getProperty(int index) {
+		if(index >= properties()) {
+			return null;
+		}
+		return properties.get(index);
+	}
+	public int properties() {
+		return properties.size();
 	}
 
 	@Override
@@ -35,10 +55,18 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 			case 3 -> -entity.minY;
 			case 4 -> entity.maxZ - 1;
 			case 5 -> -entity.minZ;
-			case 6 -> entity.getVariantIndex();
-			case 7 -> entity.getVariants();
-			default -> 0;
+			default -> throw new IllegalStateException("Unexpected value: " + index);
 		};
+	}
+	public BlockState get() {
+		return entity.getVariantState();
+	}
+
+	public void set(BlockState state) {
+		entity.setVariantState(state);
+		properties = new ArrayList<>();
+		properties.addAll(this.get().getProperties());
+		rerender();
 	}
 
 	public void rerender() {
@@ -77,12 +105,6 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 				entity.minZ = (byte) -value;
 				updateBounds();
 				break;
-			case 6:
-				entity.setVariantIndex(value);
-				rerender();
-				break;
-			case 7:
-				break; // Cannot set number of variants.
 		}
 	}
 
@@ -104,7 +126,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 			data.writeByte(entity.maxX);
 			data.writeByte(entity.maxY);
 			data.writeByte(entity.maxZ);
-			data.writeInt(entity.getVariantIndex());
+			data.writeRegistryValue(Block.STATE_IDS,entity.getVariantState());
 			ClientPlayNetworking.send(PacketIdentifiers.BOX_UPDATE_PACKET, data);
 		}
 	}

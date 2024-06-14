@@ -29,7 +29,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public float getAmbientOcclusionLightLevel(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getAmbientOcclusionLightLevel(world, pos);
+				return roomControllerBlockEntity.getVariantState().getAmbientOcclusionLightLevel(world, pos);
 			}
 		}
 		return super.getAmbientOcclusionLightLevel(state, world, pos);
@@ -40,7 +40,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public VoxelShape getCollisionShape(BlockState state, @NotNull BlockView world, BlockPos pos, ShapeContext context) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity)
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getCollisionShape(world, pos);
+				return roomControllerBlockEntity.getVariantState().getCollisionShape(world, pos);
 			}
 		return super.getCollisionShape(state, world, pos, context);
 	}
@@ -50,7 +50,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public VoxelShape getCullingShape(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getCullingShape(world, pos);
+				return roomControllerBlockEntity.getVariantState().getCullingShape(world, pos);
 			}
 		}
 		return super.getCullingShape(state, world, pos);
@@ -61,7 +61,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public int getOpacity(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getOpacity(world, pos);
+				return roomControllerBlockEntity.getVariantState().getOpacity(world, pos);
 			}
 		}
 		return super.getOpacity(state, world, pos);
@@ -72,7 +72,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public VoxelShape getOutlineShape(BlockState state, @NotNull BlockView world, BlockPos pos, ShapeContext context) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getOutlineShape(world, pos);
+				return roomControllerBlockEntity.getVariantState().getOutlineShape(world, pos);
 			}
 		}
 		return super.getOutlineShape(state, world, pos, context);
@@ -83,19 +83,21 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public boolean isShapeFullCube(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().isFullCube(world, pos);
+				return roomControllerBlockEntity.getVariantState().isFullCube(world, pos);
 			}
 		}
 		return super.isShapeFullCube(state, world, pos);
 	}
 
+
+
 	@Override
-	public boolean isTranslucent(BlockState state, @NotNull BlockView world, BlockPos pos) {
+	public boolean isTransparent(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().isTranslucent(world, pos);
+				return roomControllerBlockEntity.getVariantState().isTransparent(world, pos);
 			}
 		}
-		return super.isTranslucent(state, world, pos);
+		return super.isTransparent(state, world, pos);
 	}
 }

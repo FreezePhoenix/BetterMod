@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * @param <B> The base class shared between possible union inputs. You should make this as specific as possible.
  * @param <T> A common class shared between possible union outputs. You should make this as specific as possible.
  */
-public final class TypeFilterUnion<B, T extends B> implements TypeFilter<B, T> {
+public final class  TypeFilterUnion<B, T extends B> implements TypeFilter<B, T> {
 	private final TypeFilter<B, ? extends T>[] filters;
 	private final Class<B> klass;
 	private final int size;

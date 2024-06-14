@@ -96,7 +96,7 @@ public final class RoomControllerModel implements UnbakedModel, BakedModel, Fabr
             Object attachedData = extendedView.getBlockEntityRenderAttachment(blockPos);
             if (attachedData instanceof BlockState mimicState) {
                 if (mimicState.getBlock() != BetterMod.ROOM_CONTROLLER_BLOCK) {
-                    renderContext.fallbackConsumer()
+                    renderContext.bakedModelConsumer()
                                  .accept(RoomControllerModelWrapper.modelFor(mimicState));
                     return;
                 }

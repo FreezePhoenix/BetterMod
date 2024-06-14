@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.block;
 
+import com.mojang.serialization.MapCodec;
 import com.techteam.fabric.bettermod.block.entity.BitHopperBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.PullHopperBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.StickHopperBlockEntity;
@@ -17,6 +18,11 @@ import org.jetbrains.annotations.Nullable;
 
 public final class PullHopperBlock extends BetterTickingBlock<PullHopperBlockEntity> {
 	public static final Identifier ID = new Identifier("bettermod", "pullhopper");
+	public static final MapCodec<PullHopperBlock> CODEC = PullHopperBlock.createCodec(PullHopperBlock::new);
+	@Override
+	protected MapCodec<PullHopperBlock> getCodec() {
+		return CODEC;
+	}
 
 	public PullHopperBlock(@NotNull Settings settings) {
 		super(settings);

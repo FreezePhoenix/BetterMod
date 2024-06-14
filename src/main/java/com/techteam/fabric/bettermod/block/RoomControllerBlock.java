@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.block;
 
+import com.mojang.serialization.MapCodec;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -13,6 +14,11 @@ import org.jetbrains.annotations.NotNull;
 
 public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEntity> {
 	public static final Identifier ID = new Identifier("betterperf", "room_controller");
+	public static final MapCodec<RoomControllerBlock> CODEC = RoomControllerBlock.createCodec(RoomControllerBlock::new);
+	@Override
+	protected MapCodec<RoomControllerBlock> getCodec() {
+		return CODEC;
+	}
 
 	public RoomControllerBlock(@NotNull Settings settings) {
 		super(settings.dynamicBounds().hardness(4.0f).nonOpaque());
@@ -29,7 +35,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public float getAmbientOcclusionLightLevel(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getAmbientOcclusionLightLevel(world, pos);
+				return roomControllerBlockEntity.getVariantState().getAmbientOcclusionLightLevel(world, pos);
 			}
 		}
 		return super.getAmbientOcclusionLightLevel(state, world, pos);
@@ -40,7 +46,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public VoxelShape getCollisionShape(BlockState state, @NotNull BlockView world, BlockPos pos, ShapeContext context) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity)
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getCollisionShape(world, pos);
+				return roomControllerBlockEntity.getVariantState().getCollisionShape(world, pos);
 			}
 		return super.getCollisionShape(state, world, pos, context);
 	}
@@ -50,7 +56,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public VoxelShape getCullingShape(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getCullingShape(world, pos);
+				return roomControllerBlockEntity.getVariantState().getCullingShape(world, pos);
 			}
 		}
 		return super.getCullingShape(state, world, pos);
@@ -61,7 +67,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public int getOpacity(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getOpacity(world, pos);
+				return roomControllerBlockEntity.getVariantState().getOpacity(world, pos);
 			}
 		}
 		return super.getOpacity(state, world, pos);
@@ -72,7 +78,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public VoxelShape getOutlineShape(BlockState state, @NotNull BlockView world, BlockPos pos, ShapeContext context) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().getOutlineShape(world, pos);
+				return roomControllerBlockEntity.getVariantState().getOutlineShape(world, pos);
 			}
 		}
 		return super.getOutlineShape(state, world, pos, context);
@@ -83,7 +89,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public boolean isShapeFullCube(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().isFullCube(world, pos);
+				return roomControllerBlockEntity.getVariantState().isFullCube(world, pos);
 			}
 		}
 		return super.isShapeFullCube(state, world, pos);
@@ -95,7 +101,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public boolean isTransparent(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getState().isTransparent(world, pos);
+				return roomControllerBlockEntity.getVariantState().isTransparent(world, pos);
 			}
 		}
 		return super.isTransparent(state, world, pos);

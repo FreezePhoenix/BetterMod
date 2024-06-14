@@ -16,7 +16,6 @@
     "MixinClientPlayerEntity",
     "MixinEntity",
     "MixinEntityRenderDispatcher",
-    "MixinSodiumWorldRenderer",
     "MixinWorldRenderer"
   ],
   "injectors": {

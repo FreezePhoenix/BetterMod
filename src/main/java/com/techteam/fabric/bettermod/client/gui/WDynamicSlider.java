@@ -4,6 +4,7 @@ import io.github.cottonmc.cotton.gui.widget.WSlider;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.StairsBlock;
 
 public class WDynamicSlider extends WSlider {
 

@@ -17,10 +17,14 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -46,8 +50,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	public byte maxX;
 	public byte maxY;
 	public byte maxZ;
-	private int variantIndex;
-	private BlockState variantState;
+	private BlockState variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
 
 	public RoomControllerBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		super(BetterMod.ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, pos, state, 1);
@@ -64,7 +67,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	@Override
 	public void markDirty() {
 		super.markDirty();
-		this.setVariantIndex(this.variantIndex);
+		this.setVariantState(getVariantState());
 	}
 
 	private void readFromNBTBB(@NotNull NbtCompound tag) {
@@ -103,7 +106,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	public boolean disguised() {
-		return !inventory.getStack(0).isEmpty();
+		return !getVariantState().isOf(BetterMod.ROOM_CONTROLLER_BLOCK);
 	}
 
 	public void setBounds(byte minX, byte minY, byte minZ, byte maxX, byte maxY, byte maxZ) {
@@ -142,24 +145,26 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	@Override
 	@Nullable
 	public Object getRenderAttachmentData() {
-		return this.getState();
+		return this.getVariantState();
 	}
 
 	@Contract(pure = true)
-	public BlockState getState() {
+	public BlockState getVariantState() {
 		return variantState;
 	}
 
-	@Contract(pure = true)
-	public int getVariantIndex() {
-		return variantIndex;
+	public void setVariantState(BlockState state) {
+		if(state.isAir()) {
+			this.variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
+		} else {
+			this.variantState = state;
+		}
 	}
 
+	@Deprecated
 	@Contract(mutates = "this")
 	public void setVariantIndex(int var) {
 		var = MathHelper.clamp(var, 0, this.getVariants() - 1);
-		this.variantIndex = var;
-
 		ItemStack stack = inventory.getStack(0);
 		if (stack.isEmpty()) {
 			variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
@@ -167,10 +172,11 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 			variantState = Block.getBlockFromItem(getItemStack().getItem())
 			                    .getStateManager()
 			                    .getStates()
-			                    .get(variantIndex);
+			                    .get(var);
 		}
 	}
 
+	@Deprecated
 	public int getVariants() {
 		return Block.getBlockFromItem(getItemStack().getItem()).getStateManager().getStates().size();
 	}
@@ -209,7 +215,10 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 		super.readNbt(NBT);
 		NbtCompound tag = NBT.getCompound("room");
 		readFromNBTBB(tag);
-		if (NBT.contains("var")) {
+		if (NBT.contains("state")) {
+			RegistryWrapper<Block> registryEntryLookup = this.world != null ? this.world.createCommandRegistryWrapper(RegistryKeys.BLOCK) : Registries.BLOCK.getReadOnlyWrapper();
+			setVariantState(NbtHelper.toBlockState(registryEntryLookup, NBT.getCompound("state")));
+		} else if (NBT.contains("var")) {
 			setVariantIndex(NBT.getInt("var"));
 		} else {
 			setVariantIndex(0);
@@ -243,7 +252,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	public void writeNbt(@NotNull NbtCompound NBT) {
 		super.writeNbt(NBT);
 		NBT.put("room", writeToNBTBB());
-		NBT.putInt("var", variantIndex);
+		NBT.put("state", NbtHelper.fromBlockState(variantState));
 	}
 
 	@Override

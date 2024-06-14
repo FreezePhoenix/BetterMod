@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.block;
 
+import com.mojang.serialization.MapCodec;
 import com.techteam.fabric.bettermod.block.entity.PullHopperBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.StickHopperBlockEntity;
 import net.minecraft.block.Block;
@@ -22,6 +23,12 @@ import org.jetbrains.annotations.Nullable;
 
 public final class StickHopperBlock extends BetterTickingBlock<StickHopperBlockEntity> {
 	public static final Identifier ID = new Identifier("bettermod", "stickhopper");
+	public static final MapCodec<StickHopperBlock> CODEC = StickHopperBlock.createCodec(StickHopperBlock::new);
+	@Override
+	protected MapCodec<StickHopperBlock> getCodec() {
+		return CODEC;
+	}
+
 	private static final VoxelShape TOP_SHAPE = Block.createCuboidShape(0.0, 10.0, 0.0, 16.0, 16.0, 16.0);
 	private static final VoxelShape MIDDLE_SHAPE = Block.createCuboidShape(4.0, 4.0, 4.0, 12.0, 10.0, 12.0);
 	private static final VoxelShape OUTSIDE_SHAPE = VoxelShapes.union(MIDDLE_SHAPE, TOP_SHAPE);

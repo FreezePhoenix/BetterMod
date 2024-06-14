@@ -18,7 +18,7 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 16;
 
 	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull PacketByteBuf buf) {
-		this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.world, buf.readBlockPos()));
+		this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), buf.readBlockPos()));
 	}
 
 	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
@@ -34,7 +34,7 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 		setRootPanel(root);
 		root.setSize(176, 149);
 		WItemSlot slot = WItemSlot.of(blockInventory, 0, 8, 2);
-		slot.setFilter((final ItemStack item) -> {
+		slot.setInputFilter((final ItemStack item) -> {
 
 			Item _item = item.getItem();
 			return _item == Items.BOOK || _item == Items.ENCHANTED_BOOK || _item == Items.WRITTEN_BOOK || _item == Items.WRITABLE_BOOK || _item == Items.FILLED_MAP || _item == Items.MAP || _item == Items.PAPER;
