@@ -3,39 +3,30 @@ package com.techteam.fabric.bettermod.client.gui;
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
 import com.techteam.fabric.bettermod.util.InventoryUtil;
-import io.github.cottonmc.cotton.gui.EmptyInventory;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
-import io.github.cottonmc.cotton.gui.client.ScreenDrawing;
-import io.github.cottonmc.cotton.gui.widget.*;
+import io.github.cottonmc.cotton.gui.widget.TooltipBuilder;
+import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
+import io.github.cottonmc.cotton.gui.widget.WPlayerInvPanel;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.enums.RailShape;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.DebugStickItem;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.state.property.*;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 public final class RoomControllerScreenHandler extends SyncedGuiDescription {
     private static final int INVENTORY_SIZE = 1;
     private static final String[] STRINGS = {"X+", "X-", "Y+", "Y-", "Z+", "Z-"};
 
-    public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull PacketByteBuf buf) {
-        this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), buf.readBlockPos()));
+    public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull BlockPos pos) {
+        this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), pos));
     }
 
     private Property selectedProperty = null;

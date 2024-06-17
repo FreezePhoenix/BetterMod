@@ -29,7 +29,7 @@ public abstract class MixinWorld {
                      target = "Lnet/minecraft/world/chunk/BlockEntityTickInvoker;tick()V",
                      shift = At.Shift.BEFORE),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void beforeTickBlockEntity(CallbackInfo ci, @NotNull Profiler profiler, Iterator<?> iterator, @NotNull BlockEntityTickInvoker blockEntityTickInvoker) {
+    private void beforeTickBlockEntity(CallbackInfo ci, @NotNull Profiler profiler, Iterator<?> iterator, boolean bl, @NotNull BlockEntityTickInvoker blockEntityTickInvoker) {
         profiler.push(blockEntityTickInvoker.getName());
     }
 }

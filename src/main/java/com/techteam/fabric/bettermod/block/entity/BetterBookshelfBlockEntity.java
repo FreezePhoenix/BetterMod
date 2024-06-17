@@ -8,16 +8,14 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public final class BetterBookshelfBlockEntity extends BetterBlockEntity {
+public class BetterBookshelfBlockEntity extends BetterBlockEntity {
     public BetterBookshelfBlockEntity(@NotNull BlockPos pos, BlockState state) {
         super(BetterMod.BOOKSHELF_BLOCK_ENTITY_TYPE, pos, state, 16);
     }
@@ -32,12 +30,7 @@ public final class BetterBookshelfBlockEntity extends BetterBlockEntity {
               pure = true)
     @Override
     public Text getDisplayName() {
-        return Text.of("Bookshelf");
-    }
-
-    @Override
-    public void writeScreenOpeningData(ServerPlayerEntity player, @NotNull PacketByteBuf buf) {
-        buf.writeBlockPos(pos);
+        return Text.translatable("block.minecraft.bookshelf");
     }
 
     @Override

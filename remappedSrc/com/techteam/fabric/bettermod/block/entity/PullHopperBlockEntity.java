@@ -33,6 +33,10 @@ public class PullHopperBlockEntity extends TickOnInterval implements IServerLoad
 	public final InventoryStorage SELF = InventoryStorage.of(this.inventory, null);
 	private BlockApiCache<Storage<ItemVariant>, Direction> PULL_TARGET_CACHE;
 	private BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
+
+	private Storage<ItemVariant> LAST_PUSH_TARGET = null;
+	long LAST_PUSH_VERSION = -1;
+
 	public PullHopperBlockEntity(@NotNull BlockPos blockPos, BlockState blockState) {
 		super(BetterMod.PULL_HOPPER_BLOCK_ENTITY_TYPE, blockPos, blockState, 5, 8);
 	}
@@ -44,14 +48,20 @@ public class PullHopperBlockEntity extends TickOnInterval implements IServerLoad
 		{
 			Storage<ItemVariant> PUSH_TARGET = PUSH_TARGET_CACHE.find(blockState.get(HopperBlock.FACING).getOpposite());
 			if(PUSH_TARGET != null) {
-				activated = InventoryUtil.handleTransfer(SELF, PUSH_TARGET);
+				if(PUSH_TARGET != LAST_PUSH_TARGET || PUSH_TARGET.getVersion() != LAST_PUSH_VERSION) {
+					LAST_PUSH_VERSION = PUSH_TARGET.getVersion();
+					activated = InventoryUtil.handleTransfer(SELF, PUSH_TARGET);
+				}
+			}
+			if(LAST_PUSH_TARGET != PUSH_TARGET) {
+				LAST_PUSH_TARGET = PUSH_TARGET;
 			}
 		}
 		// Pull
 		{
 			Storage<ItemVariant> PULL_TARGET = PULL_TARGET_CACHE.find(Direction.DOWN);
 			if(PULL_TARGET != null) {
-				activated = activated || InventoryUtil.handleTransfer(PULL_TARGET, SELF);
+				activated = InventoryUtil.handleTransfer(PULL_TARGET, SELF) || activated;
 			}
 		}
 		return activated;

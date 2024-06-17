@@ -5,23 +5,16 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.InventoryProvider;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -41,24 +34,24 @@ public class InventoryUtil {
 		}).orElseGet(fallback);
 	}
 
-	public static void readNbt(@NotNull NbtCompound nbt, @NotNull SimpleInventory stacks) {
+	public static void readNbt(@NotNull NbtCompound nbt, @NotNull SimpleInventory stacks, RegistryWrapper.WrapperLookup registryLookup) {
 		NbtList nbtList = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
 		for (int i = 0; i < nbtList.size(); ++i) {
 			NbtCompound nbtCompound = nbtList.getCompound(i);
 			int j = nbtCompound.getByte("Slot") & 0xFF;
 			if (j >= stacks.size()) continue;
-			stacks.setStack(j, ItemStack.fromNbt(nbtCompound));
+			stacks.setStack(j, ItemStack.fromNbt(registryLookup, nbtCompound).orElse(ItemStack.EMPTY));
 		}
 	}
 
-	public static void writeNbt(@NotNull NbtCompound nbt, @NotNull SimpleInventory stacks) {
+	public static void writeNbt(@NotNull NbtCompound nbt, @NotNull SimpleInventory stacks, RegistryWrapper.WrapperLookup registryLookup) {
 		NbtList nbtList = new NbtList();
 		for (int i = 0; i < stacks.size(); ++i) {
 			ItemStack itemStack = stacks.getStack(i);
 			if (itemStack.isEmpty()) continue;
 			NbtCompound nbtCompound = new NbtCompound();
 			nbtCompound.putByte("Slot", (byte) i);
-			itemStack.writeNbt(nbtCompound);
+			itemStack.encode(registryLookup, nbtCompound);
 			nbtList.add(nbtCompound);
 		}
 		nbt.put("Items", nbtList);

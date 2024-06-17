@@ -2,7 +2,6 @@ package com.techteam.fabric.bettermod;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import io.github.cottonmc.cotton.gui.impl.modmenu.ModMenuSupport;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

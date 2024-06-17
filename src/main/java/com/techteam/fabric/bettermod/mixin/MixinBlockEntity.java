@@ -18,30 +18,30 @@ public abstract class MixinBlockEntity implements RenderHooks.IRoomCaching {
 
 	@Unique
 	@Override
-	public int getStamp() {
+	public int betterMod$getStamp() {
 		return stamp;
 	}
 
 	@Unique
 	@Override
-	public void setStamp(int stamp) {
+	public void betterMod$setStamp(int stamp) {
 		this.stamp = stamp;
 	}
 
 	@Unique
 	@Override
-	public RoomTracker.Room getRoom() {
+	public RoomTracker.Room betterMod$getRoom() {
 		return CURRENT_ROOM;
 	}
 
 	@Unique
 	@Override
-	public void setRoom(RoomTracker.Room room) {
+	public void betterMod$setRoom(RoomTracker.Room room) {
 		this.CURRENT_ROOM = room;
 	}
 	@Unique
 	@Override
-	public BlockPos blockPos() {
+	public BlockPos betterMod$blockPos() {
 		return this.getPos();
 	}
 }

@@ -15,16 +15,11 @@ import org.jetbrains.annotations.NotNull;
 @Environment(EnvType.CLIENT)
 public final class RoomControllerEntityRenderer implements BlockEntityRenderer<RoomControllerBlockEntity> {
     @Contract(pure = true)
-    public RoomControllerEntityRenderer(BlockEntityRendererFactory.Context ctx) {
-        super();
-    }
+    public RoomControllerEntityRenderer(BlockEntityRendererFactory.Context ignoredContext) {}
 
     @Override
     public void render(@NotNull RoomControllerBlockEntity blockEntity, float tickDelta, @NotNull MatrixStack matrices, @NotNull VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if (!blockEntity.disguised()) {
-            int offX = blockEntity.getPos().getX();
-            int offY = blockEntity.getPos().getY();
-            int offZ = blockEntity.getPos().getZ();
             WorldRenderer.drawBox(
                     matrices,
                     vertexConsumers.getBuffer(RenderLayer.LINES),

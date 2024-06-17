@@ -18,13 +18,14 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
+// TODO: FIX
 @Mixin(SodiumWorldRenderer.class)
 public abstract class MixinSodiumWorldRenderer {
     @Shadow private ClientWorld world;
 
     @ModifyExpressionValue(at = @At(value = "INVOKE",
-                                    target = "Ljava/util/Collection;iterator()Ljava/util/Iterator;"),
-                           method = "renderTileEntities")
+                                    target = "Lme/jellysquid/mods/sodium/client/render/chunk/lists/SortedRenderLists;iterator()Ljava/util/Iterator;"),
+                           method = "Lme/jellysquid/mods/sodium/client/render/SodiumWorldRenderer;renderBlockEntities(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/BufferBuilderStorage;Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;FLnet/minecraft/client/render/VertexConsumerProvider$Immediate;DDDLnet/minecraft/client/render/block/entity/BlockEntityRenderDispatcher;)V")
     private Iterator<BlockEntity> hasNextHook(final @NotNull Iterator<BlockEntity> iterator) {
         final Profiler profiler = this.world.getProfiler();
         return new Iterator<>() {

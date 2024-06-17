@@ -31,6 +31,8 @@ public final class RoomTracker {
 		if (BetterMod.CONFIG.LogRoomAllocations) {
 			BetterMod.LOGGER.info("Bound new RoomTrackerTicker to player.");
 		}
+		currentRoom = null;
+		nullRoomStamp = 0;
 		return new RoomTrackerTicker(playerEntity);
 	}
 
@@ -43,40 +45,40 @@ public final class RoomTracker {
 		return currentRoom;
 	}
 
-	public static Room getRoom(@NotNull RenderHooks.IRoomCaching roomCaching) {
-		Room cachedRoom = roomCaching.getRoom();
+	public static @Nullable Room getOrUpdateRoom(@NotNull RenderHooks.IRoomCaching roomCaching) {
+		Room cachedRoom = roomCaching.betterMod$getRoom();
 		if(cachedRoom == null) {
-			if(roomCaching.getStamp() == nullRoomStamp) {
+			if(roomCaching.betterMod$getStamp() == nullRoomStamp) {
 				// null room cannot be removed.
 				return null;
 			} else {
-				cachedRoom = getRoomForPos(roomCaching.blockPos());
-				roomCaching.setRoom(cachedRoom);
+				cachedRoom = getRoomForPos(roomCaching.betterMod$blockPos());
+				roomCaching.betterMod$setRoom(cachedRoom);
 				if(cachedRoom == null) {
-					roomCaching.setStamp(nullRoomStamp);
+					roomCaching.betterMod$setStamp(nullRoomStamp);
 				} else {
-					roomCaching.setStamp(cachedRoom.modificationStamp);
+					roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
 				}
 			}
 		}  else {
-			if(roomCaching.getStamp() == cachedRoom.modificationStamp) {
+			if(roomCaching.betterMod$getStamp() == cachedRoom.modificationStamp) {
 				// Even if the entity is still in the room, the room may be removed. If it is removed, recalculate which room they should be in.
 				if(cachedRoom.removed) {
-					cachedRoom = getRoomForPos(roomCaching.blockPos());
-					roomCaching.setRoom(cachedRoom);
+					cachedRoom = getRoomForPos(roomCaching.betterMod$blockPos());
+					roomCaching.betterMod$setRoom(cachedRoom);
 					if(cachedRoom == null) {
-						roomCaching.setStamp(nullRoomStamp);
+						roomCaching.betterMod$setStamp(nullRoomStamp);
 					} else {
-						roomCaching.setStamp(cachedRoom.modificationStamp);
+						roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
 					}
 				}
 			} else {
-				cachedRoom = getRoomForPos(roomCaching.blockPos());
-				roomCaching.setRoom(cachedRoom);
+				cachedRoom = getRoomForPos(roomCaching.betterMod$blockPos());
+				roomCaching.betterMod$setRoom(cachedRoom);
 				if(cachedRoom == null) {
-					roomCaching.setStamp(nullRoomStamp);
+					roomCaching.betterMod$setStamp(nullRoomStamp);
 				} else {
-					roomCaching.setStamp(cachedRoom.modificationStamp);
+					roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
 				}
 			}
 		}
@@ -101,8 +103,7 @@ public final class RoomTracker {
 		ROOM_HASH_MAP_LOCK.readLock().lock();
 		ROOM_HASH_MAP_LOCK.writeLock().unlock();
 		if (BetterMod.CONFIG.LogRoomAllocations) {
-			BetterMod.LOGGER.info("Room removed: " + roomController.getUUID());
-			BetterMod.LOGGER.info("Room count: " + UUID_ROOM_HASH_MAP.size());
+			BetterMod.LOGGER.info("Room removed: {}. New room count: {}", roomController.getUUID(), UUID_ROOM_HASH_MAP.size());
 		}
 		ROOM_HASH_MAP_LOCK.readLock().unlock();
 	}
@@ -113,8 +114,8 @@ public final class RoomTracker {
 		ROOM_HASH_MAP_LOCK.readLock().lock();
 		ROOM_HASH_MAP_LOCK.writeLock().unlock();
 		if (BetterMod.CONFIG.LogRoomAllocations) {
-			BetterMod.LOGGER.info("Room added: " + id);
-			BetterMod.LOGGER.info("Room count: " + UUID_ROOM_HASH_MAP.size());
+			BetterMod.LOGGER.info("Room added: {}", id);
+			BetterMod.LOGGER.info("Room count: {}", UUID_ROOM_HASH_MAP.size());
 		}
 		ROOM_HASH_MAP_LOCK.readLock().unlock();
 	}
@@ -124,7 +125,7 @@ public final class RoomTracker {
 		UUID_ROOM_HASH_MAP.get(id).setBounds(minX, minY, minZ, maxX, maxY, maxZ);
 		ROOM_HASH_MAP_LOCK.readLock().unlock();
 		if (BetterMod.CONFIG.LogRoomAllocations) {
-			BetterMod.LOGGER.info("Room updated: " + id);
+			BetterMod.LOGGER.info("Room updated: {}", id);
 		}
 	}
 
@@ -187,7 +188,6 @@ public final class RoomTracker {
 			return id.hashCode();
 		}
 
-		@Contract(mutates = "this")
 		public void setBounds(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
 			// When the room's bounds are changed, we need to increment the stamps for this room.
 			this.modificationStamp++;
@@ -226,7 +226,7 @@ public final class RoomTracker {
 
 		@Override
 		public void tick() {
-			currentRoom = getRoom(clientPlayer);
+			currentRoom = getOrUpdateRoom(clientPlayer);
 		}
 	}
 }

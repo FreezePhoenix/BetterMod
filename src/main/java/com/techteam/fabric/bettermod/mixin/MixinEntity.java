@@ -18,7 +18,7 @@ import java.util.UUID;
 @Mixin(Entity.class)
 public abstract class MixinEntity implements RenderHooks.IRoomCaching {
 	@Shadow
-	public World world;
+	private World world;
 
 	@Shadow public abstract UUID getUuid();
 
@@ -38,26 +38,26 @@ public abstract class MixinEntity implements RenderHooks.IRoomCaching {
 		}
 		if (this.world.isClient()) {
 			if (CURRENT_ROOM == null) {
-				CURRENT_ROOM = RoomTracker.getRoomForPos(this.blockPos());
+				CURRENT_ROOM = RoomTracker.getRoomForPos(this.betterMod$blockPos());
 				if (CURRENT_ROOM != null) {
 					if (BetterMod.CONFIG.LogRoomTransitions) {
-						BetterMod.LOGGER.info(this.getUuid() + " entering room: " + CURRENT_ROOM.getUUID());
+						BetterMod.LOGGER.info("{} entering room: {}", this.getUuid(), CURRENT_ROOM.getUUID());
 					}
 					stamp = CURRENT_ROOM.getStamp();
 				} else {
 					stamp = RoomTracker.getNullRoomStamp();
 				}
 			} else {
-				if (CURRENT_ROOM.contains(this.blockPos())) {
+				if (CURRENT_ROOM.contains(this.betterMod$blockPos())) {
 					stamp = CURRENT_ROOM.getStamp();
 				} else {
 					if (BetterMod.CONFIG.LogRoomTransitions) {
-						BetterMod.LOGGER.info(this.getUuid() + " exiting room: " + CURRENT_ROOM.getUUID());
+						BetterMod.LOGGER.info("{} exiting room: {}", this.getUuid(), CURRENT_ROOM.getUUID());
 					}
-					CURRENT_ROOM = RoomTracker.getRoomForPos(this.blockPos());
+					CURRENT_ROOM = RoomTracker.getRoomForPos(this.betterMod$blockPos());
 					if (CURRENT_ROOM != null) {
 						if (BetterMod.CONFIG.LogRoomTransitions) {
-							BetterMod.LOGGER.info(this.getUuid() + " entering room: " + CURRENT_ROOM.getUUID());
+							BetterMod.LOGGER.info("{} entering room: {}", this.getUuid(), CURRENT_ROOM.getUUID());
 						}
 						stamp = CURRENT_ROOM.getStamp();
 					} else {
@@ -70,31 +70,31 @@ public abstract class MixinEntity implements RenderHooks.IRoomCaching {
 
 	@Unique
 	@Override
-	public int getStamp() {
+	public int betterMod$getStamp() {
 		return stamp;
 	}
 
 	@Unique
 	@Override
-	public void setStamp(int stamp) {
+	public void betterMod$setStamp(int stamp) {
 		this.stamp = stamp;
 	}
 
 	@Unique
 	@Override
-	public RoomTracker.Room getRoom() {
+	public RoomTracker.Room betterMod$getRoom() {
 		return CURRENT_ROOM;
 	}
 
 	@Unique
 	@Override
-	public void setRoom(RoomTracker.Room room) {
+	public void betterMod$setRoom(RoomTracker.Room room) {
 		this.CURRENT_ROOM = room;
 	}
 
 	@Unique
 	@Override
-	public BlockPos blockPos() {
+	public BlockPos betterMod$blockPos() {
 		return this.getBlockPos();
 	}
 }

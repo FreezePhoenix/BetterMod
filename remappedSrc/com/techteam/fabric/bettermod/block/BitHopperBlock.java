@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.block;
 
+import com.mojang.serialization.MapCodec;
 import com.techteam.fabric.bettermod.block.entity.BetterBookshelfBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.BitHopperBlockEntity;
 import net.minecraft.block.Block;
@@ -17,6 +18,12 @@ import org.jetbrains.annotations.Nullable;
 
 public final class BitHopperBlock extends BetterTickingBlock<BitHopperBlockEntity> {
 	public static final Identifier ID = new Identifier("bettermod", "bithopper");
+	public static final MapCodec<BitHopperBlock> CODEC = BitHopperBlock.createCodec(BitHopperBlock::new);
+	@Override
+	protected MapCodec<BitHopperBlock> getCodec() {
+		return CODEC;
+	}
+
 	public BitHopperBlock(@NotNull Settings settings) {
 		super(settings);
 	}

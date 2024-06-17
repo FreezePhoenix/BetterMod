@@ -23,7 +23,7 @@ public abstract class MixinMobSpawnerLogic {
             NbtCompound new_entry = new NbtCompound();
             new_entry.put("entity", old_entry);
             nbt.put("SpawnData", new_entry);
-            BetterMod.LOGGER.info("Converted SpawnData mapping from " + old_entry + " to " + new_entry);
+	        BetterMod.LOGGER.info("Converted SpawnData mapping from {} to {}", old_entry, new_entry);
         }
         if (nbt.contains("SpawnPotentials") && nbt.getList("SpawnPotentials", NbtElement.COMPOUND_TYPE).getCompound(0).contains("Weight")) {
             for (NbtElement ele : nbt.getList("SpawnPotentials", NbtElement.COMPOUND_TYPE)) {

@@ -23,12 +23,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.render.RenderLayer;
@@ -38,7 +35,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,7 +69,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 				ID,
 				new BlockItem(block, new FabricItemSettings())
 		);
-		ItemGroupEvents.modifyEntriesEvent(ItemGroups.getDefaultTab()).register(content -> {
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(content -> {
 			content.add(blockItem);
 		});
 		return block;
@@ -125,8 +121,9 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		ROOM_CONTROLLER_BLOCK = registerBlock(
 				RoomControllerBlock.ID,
-				new RoomControllerBlock(FabricBlockSettings.create(Material.GLASS))
+				new RoomControllerBlock(FabricBlockSettings.copyOf(Blocks.GLASS))
 		);
+
 		ROOM_CONTROLLER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				RoomControllerBlock.ID,
 				ROOM_CONTROLLER_BLOCK
@@ -137,11 +134,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		BIT_HOPPER_BLOCK = registerBlock(
 				BitHopperBlock.ID,
-				new BitHopperBlock(FabricBlockSettings.of(Material.METAL, MapColor.STONE_GRAY)
-				                                      .requiresTool()
-				                                      .strength(3.0f, 4.8f)
-				                                      .sounds(BlockSoundGroup.METAL)
-				                                      .nonOpaque())
+				new BitHopperBlock(FabricBlockSettings.copyOf(Blocks.HOPPER))
 		);
 		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				BitHopperBlockEntity.ID,
@@ -152,11 +145,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		PULL_HOPPER_BLOCK = registerBlock(
 				PullHopperBlock.ID,
-				new PullHopperBlock(FabricBlockSettings.of(Material.METAL, MapColor.STONE_GRAY)
-				                                       .requiresTool()
-				                                       .strength(3.0f, 4.8f)
-				                                       .sounds(BlockSoundGroup.METAL)
-				                                       .nonOpaque())
+				new PullHopperBlock(FabricBlockSettings.copyOf(Blocks.HOPPER))
 		);
 		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				PullHopperBlockEntity.ID,
@@ -167,11 +156,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		);
 		STICK_HOPPER_BLOCK = registerBlock(
 				StickHopperBlock.ID,
-				new StickHopperBlock(FabricBlockSettings.of(Material.METAL, MapColor.STONE_GRAY)
-				                                        .requiresTool()
-				                                        .strength(3.0f, 4.8f)
-				                                        .sounds(BlockSoundGroup.METAL)
-				                                        .nonOpaque())
+				new StickHopperBlock(FabricBlockSettings.copyOf(Blocks.HOPPER))
 		);
 		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				StickHopperBlockEntity.ID,

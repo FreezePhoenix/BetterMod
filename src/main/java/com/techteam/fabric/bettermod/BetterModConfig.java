@@ -9,7 +9,7 @@ public class BetterModConfig implements ConfigData {
 	public boolean LogRoomAllocations = true;
 
 	@Override
-	public void validatePostLoad() throws ValidationException {
+	public void validatePostLoad() {
 		BetterMod.CONFIG = this;
 	}
 }

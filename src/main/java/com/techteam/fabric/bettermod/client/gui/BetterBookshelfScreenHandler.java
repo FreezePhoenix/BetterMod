@@ -5,20 +5,19 @@ import com.techteam.fabric.bettermod.util.InventoryUtil;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 16;
 
-	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull PacketByteBuf buf) {
-		this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), buf.readBlockPos()));
+	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull BlockPos pos) {
+		this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), pos));
 	}
 
 	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {

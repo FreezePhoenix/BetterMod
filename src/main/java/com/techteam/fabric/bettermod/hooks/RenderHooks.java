@@ -1,13 +1,11 @@
 package com.techteam.fabric.bettermod.hooks;
 
-import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import com.techteam.fabric.bettermod.client.RoomTracker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
@@ -15,9 +13,9 @@ public final class RenderHooks {
 	public static boolean shouldRenderEntity(final Entity entity) {
 		IRoomCaching cache = (IRoomCaching) entity;
 		RoomTracker.Room currentRoom = RoomTracker.getActiveRoom();
-		return cache.forceRender() || (cache instanceof ItemFrameEntity && (currentRoom == null && RoomTracker.getRoom(
-				cache) == null || currentRoom != null && currentRoom.contains(cache.blockPos())) || !(cache instanceof ItemFrameEntity) && (currentRoom == null || currentRoom.contains(
-				cache.blockPos()) || RoomTracker.getRoom(
+		return cache.forceRender() || (cache instanceof ItemFrameEntity && (currentRoom == null && RoomTracker.getOrUpdateRoom(
+				cache) == null || currentRoom != null && currentRoom.contains(cache.betterMod$blockPos())) || !(cache instanceof ItemFrameEntity) && (currentRoom == null || currentRoom.contains(
+				cache.betterMod$blockPos()) || RoomTracker.getOrUpdateRoom(
 				cache) == null));
 	}
 
@@ -28,22 +26,22 @@ public final class RenderHooks {
 		}
 		RoomTracker.Room currentRoom = RoomTracker.getActiveRoom();
 		if(currentRoom == null) {
-			return RoomTracker.getRoom(cache) == null;
+			return RoomTracker.getOrUpdateRoom(cache) == null;
 		} else {
-			return currentRoom.contains(cache.blockPos());
+			return currentRoom.contains(cache.betterMod$blockPos());
 		}
 	}
 
 	@Environment(EnvType.CLIENT)
-	public static interface IRoomCaching extends IForceRender {
-		BlockPos blockPos();
-		int getStamp();
-		void setStamp(int stamp);
-		void setRoom(RoomTracker.Room room);
-		RoomTracker.Room getRoom();
+	public interface IRoomCaching extends IForceRender {
+		BlockPos betterMod$blockPos();
+		int betterMod$getStamp();
+		void betterMod$setStamp(int stamp);
+		void betterMod$setRoom(RoomTracker.Room room);
+		RoomTracker.Room betterMod$getRoom();
 	}
-	public static interface IForceRender {
-		public default boolean forceRender() {
+	public interface IForceRender {
+		default boolean forceRender() {
 			return false;
 		}
 	}

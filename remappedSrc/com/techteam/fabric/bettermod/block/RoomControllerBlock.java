@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.block;
 
+import com.mojang.serialization.MapCodec;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
@@ -13,6 +14,11 @@ import org.jetbrains.annotations.NotNull;
 
 public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEntity> {
 	public static final Identifier ID = new Identifier("betterperf", "room_controller");
+	public static final MapCodec<RoomControllerBlock> CODEC = RoomControllerBlock.createCodec(RoomControllerBlock::new);
+	@Override
+	protected MapCodec<RoomControllerBlock> getCodec() {
+		return CODEC;
+	}
 
 	public RoomControllerBlock(@NotNull Settings settings) {
 		super(settings.dynamicBounds().hardness(4.0f).nonOpaque());

@@ -1,8 +1,6 @@
 package com.techteam.fabric.bettermod.util;
 
 import org.jetbrains.annotations.Contract;
-import org.joml.Matrix3f;
-import sun.misc.Unsafe;
 
 public class MathUtil {
 	@Contract(pure = true)

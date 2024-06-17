@@ -6,9 +6,7 @@
   "mixins": [
     "MixinArgb",
     "MixinBlocks",
-    "MixinMobSpawnerLogic",
-    "MixinWorld",
-    "intrinsics.MixinMathHelper"
+    "MixinMobSpawnerLogic"
   ],
   "client": [
     "MixinBlockEntity",

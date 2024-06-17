@@ -1,13 +1,10 @@
 package com.techteam.fabric.bettermod.client;
 
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
-import com.techteam.fabric.bettermod.network.PacketIdentifiers;
-import io.netty.buffer.Unpooled;
+import com.techteam.fabric.bettermod.network.BoxUpdatePayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
@@ -15,9 +12,6 @@ import net.minecraft.util.math.ChunkSectionPos;
 import net.minecraft.util.math.GlobalPos;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class BoxPropertyDelegate implements PropertyDelegate {
 	final RoomControllerBlockEntity entity;
@@ -33,14 +27,17 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	}
 
 	public Property<?> getProperty(int index) {
-		if(index >= properties()) {
-			return null;
+		var properties = this.get().getProperties();
+
+		for(Property<?> property : properties) {
+			if(index-- == 0) {
+				return property;
+			}
 		}
 
-		var properties = new ArrayList<Property<?>>();
-		properties.addAll(this.get().getProperties());
-		return properties.get(index);
+		return null;
 	}
+
 	public int properties() {
 		return this.get().getProperties().size();
 	}
@@ -113,18 +110,12 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 
 	public void sync() {
 		if (entity.getWorld().isClient()) {
-			PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-			BlockPos pos = entity.getPos();
-			data.writeGlobalPos(GlobalPos.create(entity.getWorld().getRegistryKey(), pos));
-
-			data.writeByte(entity.minX);
-			data.writeByte(entity.minY);
-			data.writeByte(entity.minZ);
-			data.writeByte(entity.maxX);
-			data.writeByte(entity.maxY);
-			data.writeByte(entity.maxZ);
-			data.writeRegistryValue(Block.STATE_IDS,entity.getVariantState());
-			ClientPlayNetworking.send(PacketIdentifiers.BOX_UPDATE_PACKET, data);
+			ClientPlayNetworking.send(new BoxUpdatePayload(
+					GlobalPos.create(entity.getWorld().getRegistryKey(), entity.getPos()),
+					new BoxUpdatePayload.Vec3b(entity.minX, entity.minY, entity.minZ),
+					new BoxUpdatePayload.Vec3b(entity.maxX, entity.maxY, entity.maxZ),
+					entity.getVariantState()
+			));
 		}
 	}
 

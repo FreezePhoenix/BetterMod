@@ -1,6 +1,7 @@
 package com.techteam.fabric.bettermod.block;
 
 import com.mojang.datafixers.types.templates.TypeTemplate;
+import com.mojang.serialization.MapCodec;
 import com.techteam.fabric.bettermod.block.entity.BetterBlockEntity;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -30,11 +31,11 @@ public abstract class BetterBlock<E extends BetterBlockEntity> extends BlockWith
     }
 
     @Override
-    public void onBreak(@NotNull World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(@NotNull World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
         if(worldIn.getBlockEntity(pos) instanceof BetterBlockEntity betterBlockEntity) {
             betterBlockEntity.dropItems();
         }
-        super.onBreak(worldIn, pos, state, player);
+        return super.onBreak(worldIn, pos, state, player);
     }
     @Override
     public @NotNull ActionResult onUse(BlockState state, @NotNull World world, BlockPos pos, @NotNull PlayerEntity player, Hand hand, BlockHitResult hit) {

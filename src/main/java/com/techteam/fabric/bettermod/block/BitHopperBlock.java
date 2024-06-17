@@ -1,12 +1,10 @@
 package com.techteam.fabric.bettermod.block;
 
 import com.mojang.serialization.MapCodec;
-import com.techteam.fabric.bettermod.block.entity.BetterBookshelfBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.BitHopperBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
-import net.minecraft.block.entity.Hopper;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.util.Identifier;
@@ -17,8 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class BitHopperBlock extends BetterTickingBlock<BitHopperBlockEntity> {
-	public static final Identifier ID = new Identifier("bettermod", "bithopper");
+	public static final Identifier ID = Identifier.of("bettermod", "bithopper");
 	public static final MapCodec<BitHopperBlock> CODEC = BitHopperBlock.createCodec(BitHopperBlock::new);
+	@Contract(pure = true)
 	@Override
 	protected MapCodec<BitHopperBlock> getCodec() {
 		return CODEC;
@@ -37,7 +36,7 @@ public final class BitHopperBlock extends BetterTickingBlock<BitHopperBlockEntit
 	}
 	@Nullable
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
+	public BlockState getPlacementState(@NotNull ItemPlacementContext ctx) {
 		Direction direction = ctx.getSide().getOpposite();
 		return this.getDefaultState().with(
 				HopperBlock.FACING,

@@ -1,9 +1,7 @@
 package com.techteam.fabric.bettermod.block;
 
 import com.mojang.serialization.MapCodec;
-import com.techteam.fabric.bettermod.block.entity.BitHopperBlockEntity;
 import com.techteam.fabric.bettermod.block.entity.PullHopperBlockEntity;
-import com.techteam.fabric.bettermod.block.entity.StickHopperBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
@@ -17,8 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class PullHopperBlock extends BetterTickingBlock<PullHopperBlockEntity> {
-	public static final Identifier ID = new Identifier("bettermod", "pullhopper");
+	public static final Identifier ID = Identifier.of("bettermod", "pullhopper");
 	public static final MapCodec<PullHopperBlock> CODEC = PullHopperBlock.createCodec(PullHopperBlock::new);
+	@Contract(pure = true)
 	@Override
 	protected MapCodec<PullHopperBlock> getCodec() {
 		return CODEC;
@@ -28,7 +27,7 @@ public final class PullHopperBlock extends BetterTickingBlock<PullHopperBlockEnt
 		super(settings);
 	}
 
-	protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+	protected void appendProperties(StateManager.@NotNull Builder<Block, BlockState> builder) {
 		builder.add(HopperBlock.FACING);
 	}
 
@@ -40,7 +39,7 @@ public final class PullHopperBlock extends BetterTickingBlock<PullHopperBlockEnt
 
 	@Nullable
 	@Override
-	public BlockState getPlacementState(ItemPlacementContext ctx) {
+	public BlockState getPlacementState(@NotNull ItemPlacementContext ctx) {
 		Direction direction = ctx.getSide().getOpposite();
 		return this.getDefaultState().with(
 				HopperBlock.FACING,

@@ -1,20 +1,13 @@
 package com.techteam.fabric.bettermod.client.gui;
 
-import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.util.InventoryUtil;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class HopperScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 5;

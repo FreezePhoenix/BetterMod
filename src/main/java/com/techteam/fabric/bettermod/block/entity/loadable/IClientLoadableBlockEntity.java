@@ -21,7 +21,6 @@ public interface IClientLoadableBlockEntity {
     }
     @Environment(EnvType.CLIENT)
     static void onUnload(BlockEntity blockEntity, ClientWorld world) {
-        // Unfortunately this event never triggers when a block entity exits render distance...
         if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
             loadableBlockEntity.onClientUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
         }

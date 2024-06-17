@@ -13,10 +13,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -25,8 +23,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-public class StickHopperBlockEntity extends TickOnInterval implements IServerLoadableBlockEntity {
-	public static final Identifier ID = new Identifier("bettermod", "stick_hopper");
+public class StickHopperBlockEntity extends TickOnInterval<StickHopperBlockEntity> implements IServerLoadableBlockEntity {
+	public static final Identifier ID = Identifier.of("bettermod", "stick_hopper");
 	public final InventoryStorage SELF = InventoryStorage.of(this.inventory, null);
 
 	private BlockApiCache<Storage<ItemVariant>, Direction> PULL_TARGET_CACHE;
@@ -54,15 +52,9 @@ public class StickHopperBlockEntity extends TickOnInterval implements IServerLoa
 		}
 		return activated;
 	}
-
-	@Override
-	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-		buf.writeBlockPos(pos);
-	}
-
 	@Override
 	public Text getDisplayName() {
-		return Text.of("Stick Hopper");
+		return Text.translatableWithFallback("block.bettermod.stickhopper","Stick Hopper");
 	}
 
 	@Override
@@ -72,8 +64,8 @@ public class StickHopperBlockEntity extends TickOnInterval implements IServerLoa
 
 	@Override
 	public void onServerLoad(ServerWorld world, BlockPos pos, BlockState state) {
-		PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos.offset(state.get(HopperBlock.FACING)));
-		PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos.offset(Direction.UP));
+		PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, pos.offset(state.get(HopperBlock.FACING)));
+		PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, pos.offset(Direction.UP));
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package com.techteam.fabric.bettermod.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.loadable.IServerLoadableBlockEntity;
-import com.techteam.fabric.bettermod.client.gui.BitHopperScreenHandler;
 import com.techteam.fabric.bettermod.client.gui.PullHopperScreenHandler;
 import com.techteam.fabric.bettermod.util.InventoryUtil;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
@@ -14,11 +13,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -27,8 +23,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-public class PullHopperBlockEntity extends TickOnInterval implements IServerLoadableBlockEntity {
-	public static final Identifier ID = new Identifier("bettermod", "pull_hopper");
+public class PullHopperBlockEntity extends TickOnInterval<PullHopperBlockEntity> implements IServerLoadableBlockEntity {
+	public static final Identifier ID = Identifier.of("bettermod", "pull_hopper");
 
 	public final InventoryStorage SELF = InventoryStorage.of(this.inventory, null);
 	private BlockApiCache<Storage<ItemVariant>, Direction> PULL_TARGET_CACHE;
@@ -68,13 +64,8 @@ public class PullHopperBlockEntity extends TickOnInterval implements IServerLoad
 	}
 
 	@Override
-	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-		buf.writeBlockPos(pos);
-	}
-
-	@Override
 	public Text getDisplayName() {
-		return Text.of("Pull Hopper");
+		return Text.translatableWithFallback("block.bettermod.pullhopper", "Pull Hopper");
 	}
 
 	@Override
@@ -84,8 +75,8 @@ public class PullHopperBlockEntity extends TickOnInterval implements IServerLoad
 
 	@Override
 	public void onServerLoad(ServerWorld world, BlockPos pos, BlockState state) {
-		PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos.offset(state.get(HopperBlock.FACING)));
-		PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos.offset(Direction.UP));
+		PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, pos.offset(state.get(HopperBlock.FACING)));
+		PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, pos.offset(Direction.UP));
 	}
 
 	@Override

@@ -49,7 +49,7 @@ public class StickHopperBlockEntity extends TickOnInterval implements IServerLoa
 		{
 			Storage<ItemVariant> PULL_TARGET = PULL_TARGET_CACHE.find(Direction.DOWN);
 			if(PULL_TARGET != null) {
-				activated = activated || InventoryUtil.handleTransferStackable(PULL_TARGET, SELF);
+				activated = InventoryUtil.handleTransferStackable(PULL_TARGET, SELF) || activated;
 			}
 		}
 		return activated;

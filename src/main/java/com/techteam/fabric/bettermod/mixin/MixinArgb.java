@@ -2,7 +2,6 @@ package com.techteam.fabric.bettermod.mixin;
 
 import com.techteam.fabric.bettermod.util.MathUtil;
 import net.minecraft.util.math.ColorHelper;
-import org.jetbrains.annotations.Contract;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 

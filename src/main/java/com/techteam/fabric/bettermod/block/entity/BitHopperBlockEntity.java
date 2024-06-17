@@ -13,10 +13,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -26,8 +24,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public class BitHopperBlockEntity extends TickOnInterval implements IServerLoadableBlockEntity {
-	public static final Identifier ID = new Identifier("bettermod", "bit_hopper");
+public class BitHopperBlockEntity extends TickOnInterval<BitHopperBlockEntity> implements IServerLoadableBlockEntity {
+	public static final Identifier ID = Identifier.of("bettermod", "bit_hopper");
 	public final InventoryStorage SELF = InventoryStorage.of(this.inventory, null);
 	private BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
 
@@ -45,13 +43,8 @@ public class BitHopperBlockEntity extends TickOnInterval implements IServerLoada
 	}
 
 	@Override
-	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-		buf.writeBlockPos(pos);
-	}
-
-	@Override
 	public Text getDisplayName() {
-		return Text.of("Bit Hopper");
+		return Text.translatableWithFallback("block.bettermod.bithopper", "Bit Hopper");
 	}
 	@Contract("_, _, _ -> new")
 	@Override

@@ -25,25 +25,24 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	private final int y;
 	private final int z;
 
-	private List<Property<?>> properties;
-
 	public BoxPropertyDelegate(@NotNull RoomControllerBlockEntity roomController, BlockPos pos) {
 		this.entity = roomController;
 		this.x = pos.getX();
 		this.y = pos.getY();
 		this.z = pos.getZ();
-		properties = new ArrayList<>();
-		properties.addAll(this.get().getProperties());
 	}
 
 	public Property<?> getProperty(int index) {
 		if(index >= properties()) {
 			return null;
 		}
+
+		var properties = new ArrayList<Property<?>>();
+		properties.addAll(this.get().getProperties());
 		return properties.get(index);
 	}
 	public int properties() {
-		return properties.size();
+		return this.get().getProperties().size();
 	}
 
 	@Override
@@ -64,8 +63,6 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 
 	public void set(BlockState state) {
 		entity.setVariantState(state);
-		properties = new ArrayList<>();
-		properties.addAll(this.get().getProperties());
 		rerender();
 	}
 

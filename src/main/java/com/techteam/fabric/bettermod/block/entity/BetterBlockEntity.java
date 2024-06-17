@@ -6,32 +6,25 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.LootableContainerBlockEntity;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.Nameable;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public abstract class BetterBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory {
+public abstract class BetterBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory<BlockPos> {
 	public final SimpleInventory inventory;
 	public final InventoryStorage SELF;
 	protected final int size;
 	// Unused for most.
-	private UUID uuid = UUID.randomUUID();
-
-	public BetterBlockEntity(BlockEntityType<?> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState) {
-		this(blockEntityType, blockPos, blockState, 0);
-	}
+	private final UUID uuid = UUID.randomUUID();
 
 	public BetterBlockEntity(BlockEntityType<?> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState);
@@ -64,19 +57,21 @@ public abstract class BetterBlockEntity extends BlockEntity implements ExtendedS
 		ItemScatterer.spawn(world, pos, inventory);
 	}
 
+	@Contract(pure = true)
 	public final UUID getUUID() {
 		return uuid;
 	}
+
 	@Override
-	public void readNbt(@NotNull NbtCompound tag) {
-		InventoryUtil.readNbt(tag, this.inventory);
-		super.readNbt(tag);
+	public void readNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+		InventoryUtil.readNbt(tag, this.inventory, registryLookup);
+		super.readNbt(tag, registryLookup);
 	}
 
 	@Override
-	public void writeNbt(@NotNull NbtCompound tag) {
-		InventoryUtil.writeNbt(tag, this.inventory);
-		super.writeNbt(tag);
+	public void writeNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+		InventoryUtil.writeNbt(tag, this.inventory, registryLookup);
+		super.writeNbt(tag, registryLookup);
 	}
 
 	public boolean isValid(int slot, ItemStack stack) {
@@ -85,6 +80,12 @@ public abstract class BetterBlockEntity extends BlockEntity implements ExtendedS
 	public int getMaxCountPerStack() {
 		return -1;
 	}
+
+	@Override
+	public BlockPos getScreenOpeningData(ServerPlayerEntity player) {
+		return pos;
+	}
+
 	public Inventory getInventory() {
 		return this.inventory;
 	}

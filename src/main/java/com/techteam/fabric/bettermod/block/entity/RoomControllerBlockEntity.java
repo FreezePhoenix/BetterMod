@@ -7,7 +7,7 @@ import com.techteam.fabric.bettermod.client.RoomTracker;
 import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
 import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
+import net.fabricmc.fabric.api.blockview.v2.RenderDataBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
@@ -18,20 +18,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
@@ -39,11 +35,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public final class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, RenderAttachmentBlockEntity, IClientLoadableBlockEntity, RenderHooks.IForceRender {
-	public static final Identifier ID = new Identifier("betterperf", "room_controller");
-	public static final Box CUBE = new Box(0, 0, 0, 1, 1, 1);
+public class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, RenderDataBlockEntity, IClientLoadableBlockEntity, RenderHooks.IForceRender {
+	public static final Identifier ID = Identifier.of("betterperf", "room_controller");
 	private final @NotNull BoxPropertyDelegate delegate;
-
 	public byte minX;
 	public byte minY;
 	public byte minZ;
@@ -61,7 +55,6 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 		this.maxX = 1;
 		this.maxY = 1;
 		this.maxZ = 1;
-
 	}
 
 	@Override
@@ -79,7 +72,6 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 			this.maxY = (byte) (tag.getInt("py") - pos.getY());
 			this.maxZ = (byte) (tag.getInt("pz") - pos.getZ());
 		} else {
-
 			this.minX = tag.getByte("nx");
 			this.minY = tag.getByte("ny");
 			this.minZ = tag.getByte("nz");
@@ -122,7 +114,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	          pure = true)
 	@Override
 	public Text getDisplayName() {
-		return Text.of("Room Controller");
+		return Text.translatableWithFallback("block.bettermod.room_controller", "Room Controller");
 	}
 
 	@Contract(pure = true)
@@ -144,7 +136,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 
 	@Override
 	@Nullable
-	public Object getRenderAttachmentData() {
+	public Object getRenderData() {
 		return this.getVariantState();
 	}
 
@@ -153,7 +145,7 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 		return variantState;
 	}
 
-	public void setVariantState(BlockState state) {
+	public void setVariantState(@NotNull BlockState state) {
 		if(state.isAir()) {
 			this.variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
 		} else {
@@ -162,7 +154,6 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	@Deprecated
-	@Contract(mutates = "this")
 	public void setVariantIndex(int var) {
 		var = MathHelper.clamp(var, 0, this.getVariants() - 1);
 		ItemStack stack = inventory.getStack(0);
@@ -211,17 +202,15 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	@Override
-	public void readNbt(@NotNull NbtCompound NBT) {
-		super.readNbt(NBT);
+	public void readNbt(@NotNull NbtCompound NBT, RegistryWrapper.WrapperLookup registryLookup) {
+		super.readNbt(NBT, registryLookup);
 		NbtCompound tag = NBT.getCompound("room");
 		readFromNBTBB(tag);
 		if (NBT.contains("state")) {
-			RegistryWrapper<Block> registryEntryLookup = this.world != null ? this.world.createCommandRegistryWrapper(RegistryKeys.BLOCK) : Registries.BLOCK.getReadOnlyWrapper();
+			RegistryWrapper<Block> registryEntryLookup = registryLookup.getWrapperOrThrow(RegistryKeys.BLOCK);
 			setVariantState(NbtHelper.toBlockState(registryEntryLookup, NBT.getCompound("state")));
 		} else if (NBT.contains("var")) {
 			setVariantIndex(NBT.getInt("var"));
-		} else {
-			setVariantIndex(0);
 		}
 		if (world != null && world.isClient()) {
 			RoomTracker.updateRoom(
@@ -237,8 +226,8 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	@Override
-	public NbtCompound toInitialChunkDataNbt() {
-		return createNbt();
+	public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
+		return createNbt(registryLookup);
 	}
 
 
@@ -249,17 +238,11 @@ public final class RoomControllerBlockEntity extends BetterBlockEntity implement
 	}
 
 	@Override
-	public void writeNbt(@NotNull NbtCompound NBT) {
-		super.writeNbt(NBT);
+	public void writeNbt(@NotNull NbtCompound NBT, RegistryWrapper.WrapperLookup registryLookup) {
 		NBT.put("room", writeToNBTBB());
 		NBT.put("state", NbtHelper.fromBlockState(variantState));
+		super.writeNbt(NBT, registryLookup);
 	}
-
-	@Override
-	public void writeScreenOpeningData(ServerPlayerEntity player, @NotNull PacketByteBuf buf) {
-		buf.writeBlockPos(pos);
-	}
-
 	@Override
 	public boolean forceRender() {
 		return true;
