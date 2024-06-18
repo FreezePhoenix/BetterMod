@@ -20,7 +20,7 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.AbstractBlock;
@@ -33,7 +33,8 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -41,17 +42,21 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 
 public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
+
 	public static BetterModConfig CONFIG;
 	public static BlockEntityType<BetterBookshelfBlockEntity> BOOKSHELF_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
@@ -68,6 +73,14 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<StickHopperScreenHandler> STICK_HOPPER_SCREEN_HANDLER_TYPE;
 
+	public static Collection<ItemStack> ITEMS = new HashSet<>();
+
+	private static final ItemGroup ITEM_GROUP = FabricItemGroup.builder()
+	                                                           .icon(() -> new ItemStack(ROOM_CONTROLLER_BLOCK.asItem()))
+	                                                           .displayName(Text.translatable("bettermod.item_group"))
+	                                                           .entries((context, entries) -> entries.addAll(ITEMS))
+	                                                           .build();
+
 	@Contract("_, _ -> param2")
 	public static <E extends BetterBlockEntity> BetterBlock<E> registerBlock(Identifier ID, BetterBlock<E> block) {
 		Registry.register(Registries.BLOCK, ID, block);
@@ -76,7 +89,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 				ID,
 				new BlockItem(block, new Item.Settings())
 		);
-		ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(content -> content.add(blockItem));
+		ITEMS.add(blockItem.getDefaultStack());
 		return block;
 	}
 
@@ -106,7 +119,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static final PacketCodec<ByteBuf, BlockPos> BLOCK_POS = BlockPos.PACKET_CODEC;
 
 	@Contract("_, _ -> !null")
-	public static <E extends ScreenHandler> ScreenHandlerType<E> registerScreenHandler(Identifier ID, ExtendedScreenHandlerType.ExtendedFactory<E, BlockPos> factory) {
+	public static <T extends ScreenHandler> ScreenHandlerType<T> registerScreenHandler(Identifier ID, ExtendedScreenHandlerType.ExtendedFactory<T, BlockPos> factory) {
 		return Registry.register(Registries.SCREEN_HANDLER, ID, new ExtendedScreenHandlerType<>(factory, BLOCK_POS));
 	}
 
@@ -119,6 +132,8 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public void onInitialize() {
 		AutoConfig.register(BetterModConfig.class, GsonConfigSerializer::new);
 		CONFIG = AutoConfig.getConfigHolder(BetterModConfig.class).getConfig();
+
+		Registry.register(Registries.ITEM_GROUP, Identifier.of("bettermod", "item_group"), ITEM_GROUP);
 
 		ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register(IServerLoadableBlockEntity::onLoad);
 		ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(IServerLoadableBlockEntity::onUnLoad);

@@ -1,5 +1,6 @@
 package com.techteam.fabric.bettermod.util;
 
+import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.BetterBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -51,8 +52,7 @@ public class InventoryUtil {
 			if (itemStack.isEmpty()) continue;
 			NbtCompound nbtCompound = new NbtCompound();
 			nbtCompound.putByte("Slot", (byte) i);
-			itemStack.encode(registryLookup, nbtCompound);
-			nbtList.add(nbtCompound);
+			nbtList.add(itemStack.encode(registryLookup, nbtCompound));
 		}
 		nbt.put("Items", nbtList);
 	}
