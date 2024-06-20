@@ -15,18 +15,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
 
-public record BoxUpdatePayload(GlobalPos globalPos, Vec3b min, Vec3b max, BlockState state) implements CustomPayload {
+public record BoxUpdatePayload(BlockPos pos, Vec3b min, Vec3b max, BlockState state) implements CustomPayload {
 
 	public static final CustomPayload.Id<BoxUpdatePayload> ID = new CustomPayload.Id<>(Identifier.of("betterperf", "boxupdate"));
 	public static final PacketCodec<RegistryByteBuf, BoxUpdatePayload> CODEC = PacketCodec.tuple(
-			GlobalPos.PACKET_CODEC, BoxUpdatePayload::globalPos,
+			BlockPos.PACKET_CODEC, BoxUpdatePayload::pos,
 			BetterMod.VEC3B, BoxUpdatePayload::min,
 			BetterMod.VEC3B, BoxUpdatePayload::max,
 			BetterMod.BLOCK_STATE, BoxUpdatePayload::state,
 			BoxUpdatePayload::new
 	);
 	@Override
-	public Id<? extends CustomPayload> getId() {
+	public Id<BoxUpdatePayload> getId() {
 		return ID;
 	}
 	public record Vec3b(byte x, byte y, byte z) {}
@@ -40,20 +40,17 @@ public record BoxUpdatePayload(GlobalPos globalPos, Vec3b min, Vec3b max, BlockS
 	}
 
 	private static void handle(BoxUpdatePayload payload, ServerPlayNetworking.Context context) {
-		GlobalPos pos = payload.globalPos();
-		RegistryKey<World> dimensionKey = pos.dimension();
-		BlockPos blockPos = pos.pos();
-		byte minX = payload.min().x();
-		byte minY = payload.min().y();
-		byte minZ = payload.min().z();
-		byte maxX = payload.max().x();
-		byte maxY = payload.max().y();
-		byte maxZ = payload.max().z();
-		BlockState state = payload.state();
-		context.player().getServer().execute(() -> {
-			ServerWorld world = context.player().getServer().getWorld(dimensionKey);
+		context.server().execute(() -> {
+			byte minX = payload.min().x();
+			byte minY = payload.min().y();
+			byte minZ = payload.min().z();
+			byte maxX = payload.max().x();
+			byte maxY = payload.max().y();
+			byte maxZ = payload.max().z();
+			BlockState state = payload.state();
+			ServerWorld world = context.player().getServerWorld();
 			if(world != null) {
-				if(world.getBlockEntity(blockPos) instanceof RoomControllerBlockEntity roomController) {
+				if(world.getBlockEntity(payload.pos()) instanceof RoomControllerBlockEntity roomController) {
 					roomController.setBounds(minX, minY, minZ, maxX, maxY, maxZ);
 					roomController.setVariantState(state);
 					roomController.markDirty();

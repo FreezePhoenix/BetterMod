@@ -35,40 +35,11 @@ public class InventoryUtil {
 		}).orElseGet(fallback);
 	}
 
-	public static void readNbt(@NotNull NbtCompound nbt, @NotNull SimpleInventory stacks, RegistryWrapper.WrapperLookup registryLookup) {
-		NbtList nbtList = nbt.getList("Items", NbtElement.COMPOUND_TYPE);
-		for (int i = 0; i < nbtList.size(); ++i) {
-			NbtCompound nbtCompound = nbtList.getCompound(i);
-			int j = nbtCompound.getByte("Slot") & 0xFF;
-			if (j >= stacks.size()) continue;
-			stacks.setStack(j, ItemStack.fromNbt(registryLookup, nbtCompound).orElse(ItemStack.EMPTY));
-		}
-	}
-
-	public static void writeNbt(@NotNull NbtCompound nbt, @NotNull SimpleInventory stacks, RegistryWrapper.WrapperLookup registryLookup) {
-		NbtList nbtList = new NbtList();
-		for (int i = 0; i < stacks.size(); ++i) {
-			ItemStack itemStack = stacks.getStack(i);
-			if (itemStack.isEmpty()) continue;
-			NbtCompound nbtCompound = new NbtCompound();
-			nbtCompound.putByte("Slot", (byte) i);
-			nbtList.add(itemStack.encode(registryLookup, nbtCompound));
-		}
-		nbt.put("Items", nbtList);
-	}
-
 	public static boolean handleTransfer(@NotNull Storage<ItemVariant> from, @NotNull Storage<ItemVariant> to) {
 		for (StorageView<ItemVariant> view : from) {
-			ItemVariant resource = view.getResource();
-
-			if(resource.isBlank()) continue;
-
-			try (Transaction transferTransaction = Transaction.openOuter()) {
-				// check how much can be inserted
-				if (to.insert(resource, 1, transferTransaction) != 0 && view.extract(resource, 1, transferTransaction) != 0) {
-					transferTransaction.commit();
-					return true;
-				}
+			if (view.isResourceBlank()) continue;
+			if(handle(to, view)) {
+				return true;
 			}
 		}
 		return false;
@@ -76,19 +47,11 @@ public class InventoryUtil {
 
 	public static boolean handleTransferSticky(@NotNull Storage<ItemVariant> from, @NotNull Storage<ItemVariant> to) {
 		for (StorageView<ItemVariant> view : from) {
-			if (view.isResourceBlank()) continue;
-
-			if (view.getAmount() <= 1) {
+			if (view.isResourceBlank() || view.getAmount() <= 1) {
 				continue;
 			}
-			ItemVariant resource = view.getResource();
-
-			try (Transaction transferTransaction = Transaction.openOuter()) {
-				// check how much can be inserted
-				if (to.insert(resource, 1, transferTransaction) == 1 && view.extract(resource, 1, transferTransaction) == 1) {
-					transferTransaction.commit();
-					return true;
-				}
+			if(handle(to, view)) {
+				return true;
 			}
 		}
 		return false;
@@ -96,19 +59,22 @@ public class InventoryUtil {
 
 	public static boolean handleTransferStackable(@NotNull Storage<ItemVariant> from, @NotNull Storage<ItemVariant> to) {
 		for (StorageView<ItemVariant> view : from) {
-			if (view.isResourceBlank()) {
+			if (view.isResourceBlank() || view.getCapacity() <= 1) {
 				continue;
 			}
-			if (view.getCapacity() <= 1) {
-				continue;
+			if(handle(to, view)) {
+				return true;
 			}
-			ItemVariant resource = view.getResource();
+		}
+		return false;
+	}
 
-			try (Transaction transferTransaction = Transaction.openOuter()) {
-				if (to.insert(resource, 1, transferTransaction) == 1 && view.extract(resource, 1, transferTransaction) == 1) {
-					transferTransaction.commit();
-					return true;
-				}
+	private static boolean handle(Storage<ItemVariant> to, StorageView<ItemVariant> view) {
+		ItemVariant resource = view.getResource();
+		try (Transaction transferTransaction = Transaction.openOuter()) {
+			if (to.insert(resource, 1, transferTransaction) == 1 && view.extract(resource, 1, transferTransaction) == 1) {
+				transferTransaction.commit();
+				return true;
 			}
 		}
 		return false;

@@ -76,30 +76,15 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	@Override
 	public void set(int index, int value) {
 		switch (index) {
-			case 0:
-				entity.maxX = (byte) (value + 1);
-				updateBounds();
-				break;
-			case 1:
-				entity.minX = (byte) -value;
-				updateBounds();
-			case 2:
-				entity.maxY = (byte) (value + 1);
-				updateBounds();
-				break;
-			case 3:
-				entity.minY = (byte) -value;
-				updateBounds();
-				break;
-			case 4:
-				entity.maxZ = (byte) (value + 1);
-				updateBounds();
-				break;
-			case 5:
-				entity.minZ = (byte) -value;
-				updateBounds();
-				break;
+			case 0 -> entity.maxX = (byte) (value + 1);
+			case 1 -> entity.minX = (byte) -value;
+			case 2 -> entity.maxY = (byte) (value + 1);
+			case 3 -> entity.minY = (byte) -value;
+			case 4 -> entity.maxZ = (byte) (value + 1);
+			case 5 -> entity.minZ = (byte) -value;
+			default -> throw new IllegalStateException("Unexpected value: " + index);
 		}
+		updateBounds();
 	}
 
 	@Contract(pure = true)
@@ -111,7 +96,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	public void sync() {
 		if (entity.getWorld().isClient()) {
 			ClientPlayNetworking.send(new BoxUpdatePayload(
-					GlobalPos.create(entity.getWorld().getRegistryKey(), entity.getPos()),
+					entity.getPos(),
 					new BoxUpdatePayload.Vec3b(entity.minX, entity.minY, entity.minZ),
 					new BoxUpdatePayload.Vec3b(entity.maxX, entity.maxY, entity.maxZ),
 					entity.getVariantState()

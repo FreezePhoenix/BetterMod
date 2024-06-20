@@ -11,12 +11,15 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class BetterBookshelfBlockEntity extends BetterBlockEntity {
-    public BetterBookshelfBlockEntity(@NotNull BlockPos pos, BlockState state) {
+	public static final Identifier ID = Identifier.of("minecraft", "bookshelf");
+
+	public BetterBookshelfBlockEntity(@NotNull BlockPos pos, BlockState state) {
         super(BetterMod.BOOKSHELF_BLOCK_ENTITY_TYPE, pos, state, 16);
     }
 
