@@ -20,7 +20,7 @@ public final class BetterPerfModelLoadingPlugin implements ModelLoadingPlugin {
 		pluginContext.modifyModelOnLoad().register((original, context) -> {
 			var ID = context.topLevelId();
 			// This is called for every model that is loaded, so make sure we only target ours
-			if(ID != null && (ID.equals(ROOM_CONTROLLER_BLOCK_MODEL_ID) || ID.equals(ROOM_CONTROLLER_ITEM_MODEL_ID))) {
+			if(ID != null && (ID.equals(ROOM_CONTROLLER_BLOCK_MODEL_ID))) {
 				return ROOM_CONTROLLER_MODEL;
 			} else {
 				// If we don't modify the model we just return the original as-is

@@ -59,12 +59,13 @@ public class InventoryUtil {
 
 	public static boolean handleTransfer(@NotNull Storage<ItemVariant> from, @NotNull Storage<ItemVariant> to) {
 		for (StorageView<ItemVariant> view : from) {
-			if (view.isResourceBlank()) continue;
 			ItemVariant resource = view.getResource();
+
+			if(resource.isBlank()) continue;
 
 			try (Transaction transferTransaction = Transaction.openOuter()) {
 				// check how much can be inserted
-				if (to.insert(resource, 1, transferTransaction) == 1 && view.extract(resource, 1, transferTransaction) == 1) {
+				if (to.insert(resource, 1, transferTransaction) != 0 && view.extract(resource, 1, transferTransaction) != 0) {
 					transferTransaction.commit();
 					return true;
 				}
@@ -75,9 +76,8 @@ public class InventoryUtil {
 
 	public static boolean handleTransferSticky(@NotNull Storage<ItemVariant> from, @NotNull Storage<ItemVariant> to) {
 		for (StorageView<ItemVariant> view : from) {
-			if (view.isResourceBlank()) {
-				continue;
-			}
+			if (view.isResourceBlank()) continue;
+
 			if (view.getAmount() <= 1) {
 				continue;
 			}

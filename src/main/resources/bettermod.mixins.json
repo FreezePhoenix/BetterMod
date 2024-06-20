@@ -6,6 +6,7 @@
   "mixins": [
     "MixinArgb",
     "MixinBlocks",
+    "MixinDFU",
     "MixinMobSpawnerLogic"
   ],
   "client": [

@@ -49,6 +49,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -73,7 +74,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<StickHopperScreenHandler> STICK_HOPPER_SCREEN_HANDLER_TYPE;
 
-	public static Collection<ItemStack> ITEMS = new HashSet<>();
+	public static Collection<ItemStack> ITEMS = new ArrayList<>();
 
 	private static final ItemGroup ITEM_GROUP = FabricItemGroup.builder()
 	                                                           .icon(() -> new ItemStack(ROOM_CONTROLLER_BLOCK.asItem()))

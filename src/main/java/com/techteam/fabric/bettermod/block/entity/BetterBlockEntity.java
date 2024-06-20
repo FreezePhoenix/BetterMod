@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
@@ -64,13 +65,13 @@ public abstract class BetterBlockEntity extends BlockEntity implements ExtendedS
 
 	@Override
 	public void readNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		InventoryUtil.readNbt(tag, this.inventory, registryLookup);
+		Inventories.readNbt(tag,this.inventory.heldStacks,registryLookup);
 		super.readNbt(tag, registryLookup);
 	}
 
 	@Override
 	public void writeNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		InventoryUtil.writeNbt(tag, this.inventory, registryLookup);
+		Inventories.writeNbt(tag,this.inventory.heldStacks,registryLookup);
 		super.writeNbt(tag, registryLookup);
 	}
 

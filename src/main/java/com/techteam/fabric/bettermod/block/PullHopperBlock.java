@@ -10,6 +10,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,10 @@ public final class PullHopperBlock extends BetterTickingBlock<PullHopperBlockEnt
 	public PullHopperBlock(@NotNull Settings settings) {
 		super(settings);
 	}
-
+	@Override
+	protected boolean isShapeFullCube(BlockState state, BlockView world, BlockPos pos) {
+		return false;
+	}
 	protected void appendProperties(StateManager.@NotNull Builder<Block, BlockState> builder) {
 		builder.add(HopperBlock.FACING);
 	}

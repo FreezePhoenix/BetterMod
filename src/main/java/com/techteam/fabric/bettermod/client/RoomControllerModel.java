@@ -90,20 +90,18 @@ public final class RoomControllerModel implements UnbakedModel, BakedModel, Fabr
 
     @Override
     public void emitBlockQuads(BlockRenderView blockRenderView, BlockState blockState, BlockPos blockPos, Supplier<Random> randomSupplier, RenderContext renderContext) {
-        if (blockRenderView instanceof FabricBlockView extendedView) {
-            Object attachedData = extendedView.getBlockEntityRenderData(blockPos);
-            if (attachedData instanceof BlockState mimicState) {
-                if (mimicState.getBlock() != BetterMod.ROOM_CONTROLLER_BLOCK) {
-                    modelFor(mimicState).emitBlockQuads(blockRenderView,mimicState,blockPos,randomSupplier,renderContext);
-                    return;
-                }
+        Object attachedData = blockRenderView.getBlockEntityRenderData(blockPos);
+        if (attachedData instanceof BlockState mimicState) {
+            if (mimicState.getBlock() != BetterMod.ROOM_CONTROLLER_BLOCK) {
+                modelFor(mimicState).emitBlockQuads(blockRenderView,mimicState,blockPos,randomSupplier,renderContext);
+                return;
             }
         }
         mesh.outputTo(renderContext.getEmitter());
     }
     @Override
     public void emitItemQuads(ItemStack itemStack, Supplier<Random> supplier, @NotNull RenderContext renderContext) {
-        mesh.outputTo(renderContext.getEmitter());
+//        mesh.outputTo(renderContext.getEmitter());
     }
 
     @Contract(value = " -> new",
