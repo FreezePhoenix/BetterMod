@@ -17,6 +17,12 @@ public final class RoomControllerEntityRenderer implements BlockEntityRenderer<R
     @Contract(pure = true)
     public RoomControllerEntityRenderer(BlockEntityRendererFactory.Context ignoredContext) {}
 
+
+    @Override
+    public boolean rendersOutsideBoundingBox(RoomControllerBlockEntity blockEntity) {
+        return blockEntity.disguised();
+    }
+
     @Override
     public void render(@NotNull RoomControllerBlockEntity blockEntity, float tickDelta, @NotNull MatrixStack matrices, @NotNull VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if (!blockEntity.disguised()) {

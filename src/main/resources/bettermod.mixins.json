@@ -10,6 +10,7 @@
     "MixinMobSpawnerLogic"
   ],
   "client": [
+    "MixinSodiumWorldRenderer",
     "MixinBlockEntity",
     "MixinBlockEntityRenderDispatcher",
     "MixinClientPlayerEntity",
