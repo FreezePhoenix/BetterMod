@@ -19,6 +19,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
@@ -158,7 +159,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 		ROOM_CONTROLLER_BLOCK = registerBlock(
 				RoomControllerBlock.ID,
-				new RoomControllerBlock(AbstractBlock.Settings.copy(Blocks.GLASS))
+				new RoomControllerBlock(AbstractBlock.Settings.copy(Blocks.GLASS).dynamicBounds())
 		);
 
 		ROOM_CONTROLLER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
@@ -207,6 +208,22 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void onInitializeClient() {
+		ColorProviderRegistry.BLOCK.register((state, view, pos, tintIndex) -> {
+			if(view != null) {
+				Object attachedData = view.getBlockEntityRenderData(pos);
+				if (attachedData instanceof BlockState mimicState) {
+					if (mimicState.getBlock() != BetterMod.ROOM_CONTROLLER_BLOCK) {
+						var deferred_provider = ColorProviderRegistry.BLOCK.get(mimicState.getBlock());
+						if (deferred_provider != null) {
+							return deferred_provider.getColor(mimicState, view, pos, tintIndex);
+						}
+						return 0xFFFFFF;
+					}
+				}
+			}
+			return 0xFFFFFF;
+		}, ROOM_CONTROLLER_BLOCK);
+
 		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register(IClientLoadableBlockEntity::onLoad);
 		ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(IClientLoadableBlockEntity::onUnload);
 		BlockEntityRendererFactories.register(ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, RoomControllerEntityRenderer::new);

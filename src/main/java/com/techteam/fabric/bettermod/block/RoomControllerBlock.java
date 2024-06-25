@@ -31,6 +31,16 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	}
 
 	@Override
+	public VoxelShape getCameraCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
+			if (roomControllerBlockEntity.disguised()) {
+				return roomControllerBlockEntity.getVariantState().getCameraCollisionShape(world, pos, context);
+			}
+		}
+		return super.getCameraCollisionShape(state, world, pos, context);
+	}
+
+	@Override
 	public float getAmbientOcclusionLightLevel(BlockState state, @NotNull BlockView world, BlockPos pos) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {

@@ -12,6 +12,7 @@ import io.github.cottonmc.cotton.gui.widget.data.Insets;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -81,8 +82,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
             Block b = Block.getBlockFromItem(item.getItem());
             return b != Blocks.AIR
                     && !(b instanceof BlockEntityProvider)
-                    && b.getDefaultState()
-                    .isOpaque();
+                    && !RenderLayers.getBlockLayer(b.getDefaultState()).isTranslucent();
         });
         WPlayerInvPanel panel = this.createPlayerInventoryPanel();
         root.add(panel, 0, 72 + 18);

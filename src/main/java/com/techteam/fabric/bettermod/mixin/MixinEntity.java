@@ -1,17 +1,18 @@
 package com.techteam.fabric.bettermod.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.client.RoomTracker;
 import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.UUID;
 
@@ -29,16 +30,15 @@ public abstract class MixinEntity implements RenderHooks.IRoomCaching {
 	@Unique
 	private int stamp;
 
-	@Inject(method = "setPos",
-	        at = @At(value = "INVOKE",
-	                 target = "Lnet/minecraft/world/entity/EntityChangeListener;updateEntityPosition()V"))
-	public void onUpdateEntityPosition(double x, double y, double z, CallbackInfo ci) {
-		if(this.forceRender()) {
+	@WrapOperation(method = "setPos", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/Entity;blockPos:Lnet/minecraft/util/math/BlockPos;", opcode = Opcodes.PUTFIELD))
+	private void onUpdateEntityPosition(Entity instance, BlockPos value, Operation<Void> original) {
+		original.call(instance, value);
+		if (this.forceRender()) {
 			return;
 		}
 		if (this.world.isClient()) {
 			if (CURRENT_ROOM == null) {
-				CURRENT_ROOM = RoomTracker.getRoomForPos(this.betterMod$blockPos());
+				CURRENT_ROOM = RoomTracker.getRoomForPos(value);
 				if (CURRENT_ROOM != null) {
 					if (BetterMod.CONFIG.LogRoomTransitions) {
 						BetterMod.LOGGER.info("{} entering room: {}", this.getUuid(), CURRENT_ROOM.getUUID());
@@ -48,13 +48,13 @@ public abstract class MixinEntity implements RenderHooks.IRoomCaching {
 					stamp = RoomTracker.getNullRoomStamp();
 				}
 			} else {
-				if (CURRENT_ROOM.contains(this.betterMod$blockPos())) {
+				if (CURRENT_ROOM.contains(value)) {
 					stamp = CURRENT_ROOM.getStamp();
 				} else {
 					if (BetterMod.CONFIG.LogRoomTransitions) {
 						BetterMod.LOGGER.info("{} exiting room: {}", this.getUuid(), CURRENT_ROOM.getUUID());
 					}
-					CURRENT_ROOM = RoomTracker.getRoomForPos(this.betterMod$blockPos());
+					CURRENT_ROOM = RoomTracker.getRoomForPos(value);
 					if (CURRENT_ROOM != null) {
 						if (BetterMod.CONFIG.LogRoomTransitions) {
 							BetterMod.LOGGER.info("{} entering room: {}", this.getUuid(), CURRENT_ROOM.getUUID());

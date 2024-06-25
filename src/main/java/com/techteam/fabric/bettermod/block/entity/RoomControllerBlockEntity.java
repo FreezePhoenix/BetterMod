@@ -8,10 +8,8 @@ import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
 import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import net.fabricmc.fabric.api.blockview.v2.RenderDataBlockEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -176,7 +174,7 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	@Override
 	public boolean isValid(int slot, ItemStack item) {
 		Block b = Block.getBlockFromItem(item.getItem());
-		if (b == Blocks.AIR || b instanceof BlockEntityProvider || !b.getDefaultState().isOpaque()) {
+		if (b == Blocks.AIR || b instanceof BlockEntityProvider || RenderLayers.getBlockLayer(b.getDefaultState()).isTranslucent()) {
 			return false;
 		}
 		return super.isValid(slot, item);

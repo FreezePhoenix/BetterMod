@@ -6,7 +6,6 @@ import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.ClientPlayerTickable;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -72,6 +71,8 @@ public final class RoomTracker {
 						roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
 					}
 				}
+			} else if(cachedRoom.contains(roomCaching.betterMod$blockPos())) {
+				roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
 			} else {
 				cachedRoom = getRoomForPos(roomCaching.betterMod$blockPos());
 				roomCaching.betterMod$setRoom(cachedRoom);
@@ -156,17 +157,7 @@ public final class RoomTracker {
 		}
 
 		@Contract(pure = true)
-		public boolean contains(@NotNull Vec3d pos) {
-			return contains(pos.x, pos.y, pos.z);
-		}
-
-		@Contract(pure = true)
 		public boolean contains(int x, int y, int z) {
-			return x >= this.minX && x < this.maxX && y >= this.minY && y < this.maxY && z >= this.minZ && z < this.maxZ;
-		}
-
-		@Contract(pure = true)
-		public boolean contains(double x, double y, double z) {
 			return x >= this.minX && x < this.maxX && y >= this.minY && y < this.maxY && z >= this.minZ && z < this.maxZ;
 		}
 

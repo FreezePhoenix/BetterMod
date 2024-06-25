@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "bettermod:block/room_controller"
-  }
+  "parent": "betterperf:block/room_controller"
 }
