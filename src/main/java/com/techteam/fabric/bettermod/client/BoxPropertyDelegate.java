@@ -2,7 +2,6 @@ package com.techteam.fabric.bettermod.client;
 
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import com.techteam.fabric.bettermod.network.BoxUpdatePayload;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
@@ -10,7 +9,6 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkSectionPos;
-import net.minecraft.util.math.GlobalPos;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -95,7 +93,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	}
 
 	public void sync() {
-		if (entity.getWorld().isClient()) {
+		if (entity.getWorld() instanceof ClientWorld) {
 			ClientPlayNetworking.send(new BoxUpdatePayload(
 					entity.getPos(),
 					new BoxUpdatePayload.Vec3b(entity.minX, entity.minY, entity.minZ),
@@ -106,7 +104,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	}
 
 	public void updateBounds() {
-		if (entity.getWorld().isClient()) {
+		if (entity.getWorld() instanceof ClientWorld) {
 			RoomTracker.updateRoom(entity.getUUID(), entity.minX + x, entity.minY + y, entity.minZ + z, entity.maxX + x, entity.maxY + y, entity.maxZ + z);
 		}
 	}

@@ -1,6 +1,5 @@
 package com.techteam.fabric.bettermod.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -13,13 +12,10 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.BlockBreakingInfo;
 import net.minecraft.util.profiler.Profiler;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
 // TODO: FIX

@@ -6,20 +6,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.block.ShapeContext;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public final class StickHopperBlock extends BetterTickingBlock<StickHopperBlockEntity> {
+public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEntity> {
 	public static final Identifier ID = Identifier.of("bettermod", "stickhopper");
 	public static final MapCodec<StickHopperBlock> CODEC = StickHopperBlock.createCodec(StickHopperBlock::new);
 	@Contract(pure = true)
@@ -62,10 +58,6 @@ public final class StickHopperBlock extends BetterTickingBlock<StickHopperBlockE
 	}
 	public StickHopperBlock(@NotNull Settings settings) {
 		super(settings);
-	}
-
-	protected void appendProperties(StateManager.@NotNull Builder<Block, BlockState> builder) {
-		builder.add(HopperBlock.FACING);
 	}
 
 	@Override
@@ -119,18 +111,4 @@ public final class StickHopperBlock extends BetterTickingBlock<StickHopperBlockE
 	public @NotNull StickHopperBlockEntity createBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		return new StickHopperBlockEntity(pos, state);
 	}
-
-	@Nullable
-	@Override
-	public BlockState getPlacementState(@NotNull ItemPlacementContext ctx) {
-		Direction direction = ctx.getSide().getOpposite();
-		return this.getDefaultState().with(
-				HopperBlock.FACING,
-				direction.getAxis() == Direction.Axis.Y
-				? Direction.DOWN
-				: direction
-		);
-	}
-
-
 }

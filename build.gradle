@@ -25,7 +25,7 @@ dependencies {
 	modApi "me.shedaniel.cloth:cloth-config-fabric:15.0.127"
 	modApi "maven.modrinth:modmenu:11.0.0-rc.4"
 
-
+	modImplementation 'maven.modrinth:continuity:3.0.0-beta.5+1.21'
 	modImplementation 'maven.modrinth:sodium:mc1.21-0.5.9'
 	modImplementation 'maven.modrinth:indium:1.0.33+mc1.21'
 

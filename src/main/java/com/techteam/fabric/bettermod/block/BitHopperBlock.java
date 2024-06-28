@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class BitHopperBlock extends BetterTickingBlock<BitHopperBlockEntity> {
+public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity> {
 	public static final Identifier ID = Identifier.of("bettermod", "bithopper");
 	public static final MapCodec<BitHopperBlock> CODEC = BitHopperBlock.createCodec(BitHopperBlock::new);
 	@Contract(pure = true)
@@ -28,28 +28,9 @@ public final class BitHopperBlock extends BetterTickingBlock<BitHopperBlockEntit
 		super(settings);
 	}
 
-	@Override
-	protected boolean isShapeFullCube(BlockState state, BlockView world, BlockPos pos) {
-		return false;
-	}
-
-	protected void appendProperties(@NotNull StateManager.Builder<Block, BlockState> builder) {
-		builder.add(HopperBlock.FACING);
-	}
 	@Contract("_, _ -> new")
 	@Override
 	public @NotNull BitHopperBlockEntity createBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		return new BitHopperBlockEntity(pos, state);
-	}
-	@Nullable
-	@Override
-	public BlockState getPlacementState(@NotNull ItemPlacementContext ctx) {
-		Direction direction = ctx.getSide().getOpposite();
-		return this.getDefaultState().with(
-				HopperBlock.FACING,
-				direction.getAxis() == Direction.Axis.Y
-				? Direction.DOWN
-				: direction
-		);
 	}
 }

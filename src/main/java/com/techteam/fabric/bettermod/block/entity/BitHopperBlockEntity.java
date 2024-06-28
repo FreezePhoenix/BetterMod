@@ -2,7 +2,7 @@ package com.techteam.fabric.bettermod.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.loadable.IServerLoadableBlockEntity;
-import com.techteam.fabric.bettermod.client.gui.BitHopperScreenHandler;
+import com.techteam.fabric.bettermod.client.gui.HopperScreenHandler;
 import com.techteam.fabric.bettermod.util.InventoryUtil;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -49,7 +49,7 @@ public class BitHopperBlockEntity extends TickOnInterval<BitHopperBlockEntity> i
 	@Contract("_, _, _ -> new")
 	@Override
 	public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-		return new BitHopperScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
+		return new HopperScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
 	}
 
 	@Override

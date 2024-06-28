@@ -6,13 +6,15 @@ import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
 import com.techteam.fabric.bettermod.client.RoomTracker;
 import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
 import com.techteam.fabric.bettermod.hooks.RenderHooks;
+import com.techteam.fabric.bettermod.util.Texts;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
-import net.fabricmc.fabric.api.blockview.v2.RenderDataBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
@@ -33,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, RenderDataBlockEntity, IClientLoadableBlockEntity, RenderHooks.IForceRender {
+public class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, IClientLoadableBlockEntity, RenderHooks.IForceRender {
 	public static final Identifier ID = Identifier.of("betterperf", "room_controller");
 	private final @NotNull BoxPropertyDelegate delegate;
 	public byte minX;
@@ -61,33 +63,42 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 		this.setVariantState(getVariantState());
 	}
 
-	private void readFromNBTBB(@NotNull NbtCompound tag) {
-		if (tag.getType("nx") == NbtElement.INT_TYPE) {
-			this.minX = (byte) (tag.getInt("nx") - pos.getX());
-			this.minY = (byte) (tag.getInt("ny") - pos.getY());
-			this.minZ = (byte) (tag.getInt("nz") - pos.getZ());
-			this.maxX = (byte) (tag.getInt("px") - pos.getX());
-			this.maxY = (byte) (tag.getInt("py") - pos.getY());
-			this.maxZ = (byte) (tag.getInt("pz") - pos.getZ());
-		} else {
-			this.minX = tag.getByte("nx");
-			this.minY = tag.getByte("ny");
-			this.minZ = tag.getByte("nz");
-			this.maxX = tag.getByte("px");
-			this.maxY = tag.getByte("py");
-			this.maxZ = tag.getByte("pz");
+	private void readFromNBTBB(NbtElement tag) {
+		switch(tag) {
+			case NbtCompound nbtCompound -> {
+				if (nbtCompound.getType("nx") == NbtElement.INT_TYPE) {
+					this.minX = (byte) (nbtCompound.getInt("nx") - pos.getX());
+					this.minY = (byte) (nbtCompound.getInt("ny") - pos.getY());
+					this.minZ = (byte) (nbtCompound.getInt("nz") - pos.getZ());
+					this.maxX = (byte) (nbtCompound.getInt("px") - pos.getX());
+					this.maxY = (byte) (nbtCompound.getInt("py") - pos.getY());
+					this.maxZ = (byte) (nbtCompound.getInt("pz") - pos.getZ());
+				} else {
+					this.minX = nbtCompound.getByte("nx");
+					this.minY = nbtCompound.getByte("ny");
+					this.minZ = nbtCompound.getByte("nz");
+					this.maxX = nbtCompound.getByte("px");
+					this.maxY = nbtCompound.getByte("py");
+					this.maxZ = nbtCompound.getByte("pz");
+				}
+			}
+			case NbtByteArray byteArray -> {
+				byte[] realByteArray = byteArray.getByteArray();
+				this.minX = realByteArray[0];
+				this.minY = realByteArray[1];
+				this.minZ = realByteArray[2];
+				this.maxX = realByteArray[3];
+				this.maxY = realByteArray[4];
+				this.maxZ = realByteArray[5];
+			}
+			case null, default -> {
+
+			}
 		}
 	}
 
-	private @NotNull NbtCompound writeToNBTBB() {
-		NbtCompound tag = new NbtCompound();
-		tag.putByte("nx", this.minX);
-		tag.putByte("ny", this.minY);
-		tag.putByte("nz", this.minZ);
-		tag.putByte("px", this.maxX);
-		tag.putByte("py", this.maxY);
-		tag.putByte("pz", this.maxZ);
-		return tag;
+	private @NotNull NbtElement writeToNBTBB() {
+		return new NbtByteArray(new byte[]{maxZ, maxY, maxX, minZ, minY, minX});
 	}
 
 	@Override
@@ -112,7 +123,7 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	          pure = true)
 	@Override
 	public Text getDisplayName() {
-		return Text.translatableWithFallback("block.bettermod.room_controller", "Room Controller");
+		return Texts.ROOM_CONTROLLER;
 	}
 
 	@Contract(pure = true)
@@ -151,25 +162,6 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 		}
 	}
 
-	@Deprecated
-	public void setVariantIndex(int var) {
-		var = MathHelper.clamp(var, 0, this.getVariants() - 1);
-		ItemStack stack = inventory.getStack(0);
-		if (stack.isEmpty()) {
-			variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
-		} else {
-			variantState = Block.getBlockFromItem(getItemStack().getItem())
-			                    .getStateManager()
-			                    .getStates()
-			                    .get(var);
-		}
-	}
-
-	@Deprecated
-	public int getVariants() {
-		return Block.getBlockFromItem(getItemStack().getItem()).getStateManager().getStates().size();
-	}
-
 	@Contract(pure = true)
 	@Override
 	public boolean isValid(int slot, ItemStack item) {
@@ -202,15 +194,13 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	@Override
 	public void readNbt(@NotNull NbtCompound NBT, RegistryWrapper.WrapperLookup registryLookup) {
 		super.readNbt(NBT, registryLookup);
-		NbtCompound tag = NBT.getCompound("room");
+		NbtElement tag = NBT.get("room");
 		readFromNBTBB(tag);
 		if (NBT.contains("state")) {
 			RegistryWrapper<Block> registryEntryLookup = registryLookup.getWrapperOrThrow(RegistryKeys.BLOCK);
 			setVariantState(NbtHelper.toBlockState(registryEntryLookup, NBT.getCompound("state")));
-		} else if (NBT.contains("var")) {
-			setVariantIndex(NBT.getInt("var"));
 		}
-		if (world != null && world.isClient()) {
+		if (world instanceof ClientWorld) {
 			RoomTracker.updateRoom(
 					this.getUUID(),
 					minX + pos.getX(),

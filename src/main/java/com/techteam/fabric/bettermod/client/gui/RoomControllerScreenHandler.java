@@ -5,17 +5,19 @@ import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
 import com.techteam.fabric.bettermod.util.InventoryUtil;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.TooltipBuilder;
+import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import io.github.cottonmc.cotton.gui.widget.WPlayerInvPanel;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.RenderLayers;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.DebugStickItem;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.state.property.*;
 import net.minecraft.text.Text;
@@ -31,7 +33,11 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
         this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), pos));
     }
 
-    private Property selectedProperty = null;
+    private Property<?> selectedProperty;
+
+    private static <T extends Comparable<T>> String getValueString(BlockState state, Property<T> property) {
+        return property.name(state.get(property));
+    }
 
     public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
         super(
@@ -41,14 +47,12 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
                 )
         );
         BoxPropertyDelegate boxPropertyDelegate = (BoxPropertyDelegate) propertyDelegate;
-//		this.updateSyncHandler(null);
         WPlainPanel root = new WPlainPanel();
         root.setInsets(new Insets(2, 7, 0, 7));
-        this.titleVisible = false;
         setRootPanel(root);
         root.setSize(176, 168 + 9 + 9);
         for (int i = 0; i < 6; i++) {
-            WBoundSlider slider = new WBoundSlider(0, 60, true, i) {
+            WBoundSlider slider = new WBoundSlider(0, 63, true, i) {
                 @Override
                 public void addTooltip(@NotNull TooltipBuilder tooltip) {
                     tooltip.add(Text.of(STRINGS[this.bound_index] + propertyDelegate.get(this.bound_index)));
@@ -57,14 +61,14 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 
             slider.setValue(
                     i % 2 == 1
-                            ? 60 - propertyDelegate.get(i)
+                            ? 63 - propertyDelegate.get(i)
                             : propertyDelegate.get(i)
             );
             slider.setValueChangeListener((value) -> {
                 propertyDelegate.set(
                         slider.bound_index,
                         slider.bound_index % 2 == 1
-                                ? 60 - value
+                                ? 63 - value
                                 : value
                 );
                 ((BoxPropertyDelegate) propertyDelegate).sync();
@@ -76,7 +80,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
                 root.add(slider, (i % 2) * 85, (i / 2) * 18, 77, 18);
             }
         }
-        WSingleItemSlot slot = WSingleItemSlot.of(blockInventory, 0);
+	    WItemSlot slot = WItemSlot.of(blockInventory, 0);
         root.add(slot, 72, 18);
         slot.setInputFilter((item) -> {
             Block b = Block.getBlockFromItem(item.getItem());
@@ -104,7 +108,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
                 if(selectedProperty == null) {
                     tooltip.add(Text.of("null=null"));
                 } else {
-                    tooltip.add(Text.of(selectedProperty.getName() + "=" + selectedProperty.name(boxPropertyDelegate.get().get(selectedProperty))));
+                    tooltip.add(Text.of(selectedProperty.getName() + "=" + getValueString(boxPropertyDelegate.get(), selectedProperty)));
                 }
             }
         };
@@ -115,58 +119,77 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
                 return;
             }
             slider2.setMaxValue(selectedProperty.getValues().size() - 1);
-            if(selectedProperty instanceof DirectionProperty directionProperty) {
-                var values = directionProperty.getValues();
-                var enumValues = directionProperty.getType().getEnumConstants();
-                var direction = boxPropertyDelegate.get().get(directionProperty);
-                int index = 0;
-                for (Direction enumValue : enumValues) {
-                    if (values.contains(enumValue)) {
-                        if (enumValue == direction) {
-                            break;
-                        }
-                        index++;
-                    }
-                }
-                slider2.setValue(index, true);
-            } else if(selectedProperty instanceof BooleanProperty booleanProperty) {
-                int new_value = 0;
-                if(boxPropertyDelegate.get().get(booleanProperty)) {
-                    new_value = 1;
-                }
-                slider2.setValue(new_value, true);
-            } else if(selectedProperty instanceof IntProperty intProperty) {
-                int new_value = boxPropertyDelegate.get().get(intProperty) - intProperty.getValues().stream().min(Integer::compare).get();
-                slider2.setValue(new_value, true);
-            } else if(selectedProperty instanceof EnumProperty<? extends Enum<?>> enumProperty) {
-                slider2.setValue(boxPropertyDelegate.get().get((EnumProperty<? extends Enum<?>>) enumProperty).ordinal(), true);
-            }
+	        switch (selectedProperty) {
+		        case DirectionProperty directionProperty -> {
+			        var values = directionProperty.getValues();
+			        var enumValues = directionProperty.getType().getEnumConstants();
+			        var direction = boxPropertyDelegate.get().get(directionProperty);
+			        int index = 0;
+			        for (Direction enumValue : enumValues) {
+				        if (values.contains(enumValue)) {
+					        if (enumValue == direction) {
+						        break;
+					        }
+					        index++;
+				        }
+			        }
+			        slider2.setValue(index, true);
+		        }
+		        case BooleanProperty booleanProperty -> {
+			        int new_value = 0;
+			        if (boxPropertyDelegate.get().get(booleanProperty)) {
+				        new_value = 1;
+			        }
+			        slider2.setValue(new_value, true);
+		        }
+		        case IntProperty intProperty -> {
+			        int new_value = boxPropertyDelegate.get().get(intProperty) - intProperty.getValues()
+			                                                                                .stream()
+			                                                                                .min(Integer::compare)
+			                                                                                .get();
+			        slider2.setValue(new_value, true);
+		        }
+		        case EnumProperty<? extends Enum<?>> enumProperty ->
+				        slider2.setValue(boxPropertyDelegate.get().get(enumProperty).ordinal(), true);
+		        case null, default -> {
+		        }
+	        }
         });
         slider2.setValueChangeListener((value) -> {
-            if(selectedProperty instanceof DirectionProperty directionProperty) {
-                var values = directionProperty.getValues();
-                var enumValues = directionProperty.getType().getEnumConstants();
-                Direction direction = null;
-                int curIndex = 0;
-                for (Direction enumValue : enumValues) {
-                    if (values.contains(enumValue)) {
-                        if(curIndex == value) {
-                            direction = enumValue;
-                            break;
-                        }
-                        curIndex++;
-                    }
-                }
-                boxPropertyDelegate.set(boxPropertyDelegate.get().with(directionProperty,direction));
-            } else if(selectedProperty instanceof BooleanProperty booleanProperty) {
-                boolean new_value = value == 1;
-                boxPropertyDelegate.set(boxPropertyDelegate.get().with(booleanProperty,new_value));
-            } else if(selectedProperty instanceof IntProperty intProperty) {
-                int new_value = value + intProperty.getValues().stream().min(Integer::compare).get();
-                boxPropertyDelegate.set(boxPropertyDelegate.get().with(intProperty, new_value));
-            } else if(selectedProperty instanceof EnumProperty<? extends Enum<?>> enumProperty) {
-                boxPropertyDelegate.set(boxPropertyDelegate.get().with((EnumProperty) enumProperty, (Enum) enumProperty.getType().getEnumConstants()[value]));
-            }
+	        switch (selectedProperty) {
+		        case DirectionProperty directionProperty -> {
+			        var values = directionProperty.getValues();
+			        var enumValues = directionProperty.getType().getEnumConstants();
+			        Direction direction = null;
+			        int curIndex = 0;
+			        for (Direction enumValue : enumValues) {
+				        if (values.contains(enumValue)) {
+					        if (curIndex == value) {
+						        direction = enumValue;
+						        break;
+					        }
+					        curIndex++;
+				        }
+			        }
+			        boxPropertyDelegate.set(boxPropertyDelegate.get().with(directionProperty, direction));
+		        }
+		        case BooleanProperty booleanProperty -> {
+			        boolean new_value = value == 1;
+			        boxPropertyDelegate.set(boxPropertyDelegate.get().with(booleanProperty, new_value));
+		        }
+		        case IntProperty intProperty -> {
+			        int new_value = value + intProperty.getValues().stream().min(Integer::compare).get();
+			        boxPropertyDelegate.set(boxPropertyDelegate.get().with(intProperty, new_value));
+		        }
+		        case EnumProperty<? extends Enum<?>> enumProperty -> boxPropertyDelegate.set(boxPropertyDelegate.get()
+		                                                                                                        .with(
+				                                                                                                        (EnumProperty) enumProperty,
+				                                                                                                        (Enum) enumProperty.getType()
+				                                                                                                                           .getEnumConstants()[value]
+		                                                                                                        ));
+		        case null, default -> {
+		        }
+	        }
             ((BoxPropertyDelegate) propertyDelegate).sync();
         });
 
@@ -183,34 +206,45 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
             slider.setValue(0);
             if(selectedProperty != null) {
                 slider2.setMaxValue(selectedProperty.getValues().size() - 1);
-                if(selectedProperty instanceof DirectionProperty directionProperty) {
-                    var values = directionProperty.getValues();
-                    var enumValues = directionProperty.getType().getEnumConstants();
-                    var direction = boxPropertyDelegate.get().get(directionProperty);
-                    int lindex = 0;
-                    for (Direction enumValue : enumValues) {
-                        if (values.contains(enumValue)) {
-                            if (enumValue == direction) {
-                                break;
-                            }
-                            lindex++;
-                        }
-                    }
-                    slider2.setValue(lindex, true);
-                } else if(selectedProperty instanceof BooleanProperty booleanProperty) {
-                    int new_value = 0;
-                    if(boxPropertyDelegate.get().get(booleanProperty)) {
-                        new_value = 1;
-                    }
-                    slider2.setValue(new_value, true);
-                } else if(selectedProperty instanceof IntProperty intProperty) {
-                    int new_value = boxPropertyDelegate.get().get(intProperty) - intProperty.getValues().stream().min(Integer::compare).get();
-                    slider2.setValue(new_value, true);
-                } else if(selectedProperty instanceof EnumProperty<? extends Enum<?>> enumProperty) {
-                    slider2.setValue(boxPropertyDelegate.get().get((EnumProperty<? extends Enum<?>>) enumProperty).ordinal(), true);
-                }
-            } else {
-//                slider2.setMaxValue(0);
+	            switch (selectedProperty) {
+		            case DirectionProperty directionProperty -> {
+			            var values = directionProperty.getValues();
+			            var enumValues = directionProperty.getType().getEnumConstants();
+			            var direction = boxPropertyDelegate.get().get(directionProperty);
+			            int lindex = 0;
+			            for (Direction enumValue : enumValues) {
+				            if (values.contains(enumValue)) {
+					            if (enumValue == direction) {
+						            break;
+					            }
+					            lindex++;
+				            }
+			            }
+			            slider2.setValue(lindex, true);
+		            }
+		            case BooleanProperty booleanProperty -> {
+			            int new_value = 0;
+			            if (boxPropertyDelegate.get().get(booleanProperty)) {
+				            new_value = 1;
+			            }
+			            slider2.setValue(new_value, true);
+		            }
+		            case IntProperty intProperty -> {
+			            int new_value = boxPropertyDelegate.get().get(intProperty) - intProperty.getValues()
+			                                                                                    .stream()
+			                                                                                    .min(Integer::compare)
+			                                                                                    .get();
+			            slider2.setValue(new_value, true);
+		            }
+		            case EnumProperty<? extends Enum<?>> enumProperty -> slider2.setValue(
+				            boxPropertyDelegate.get()
+				                               .get((EnumProperty<? extends Enum<?>>) enumProperty)
+				                               .ordinal(),
+				            true
+		            );
+		            case null, default -> {
+		            }
+	            }
             }
             boxPropertyDelegate.rerender();
             inventory.markDirty();

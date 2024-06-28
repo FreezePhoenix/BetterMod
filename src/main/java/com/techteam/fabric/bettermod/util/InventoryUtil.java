@@ -1,6 +1,5 @@
 package com.techteam.fabric.bettermod.util;
 
-import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.block.entity.BetterBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -9,11 +8,6 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerContext;
 import org.jetbrains.annotations.NotNull;
 

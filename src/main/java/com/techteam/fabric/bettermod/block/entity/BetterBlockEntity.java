@@ -1,6 +1,5 @@
 package com.techteam.fabric.bettermod.block.entity;
 
-import com.techteam.fabric.bettermod.util.InventoryUtil;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;

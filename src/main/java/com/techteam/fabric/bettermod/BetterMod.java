@@ -6,7 +6,10 @@ import com.techteam.fabric.bettermod.block.entity.loadable.IClientLoadableBlockE
 import com.techteam.fabric.bettermod.block.entity.loadable.IServerLoadableBlockEntity;
 import com.techteam.fabric.bettermod.client.BetterPerfModelLoadingPlugin;
 import com.techteam.fabric.bettermod.client.RoomControllerEntityRenderer;
-import com.techteam.fabric.bettermod.client.gui.*;
+import com.techteam.fabric.bettermod.client.gui.BetterBookshelfScreenHandler;
+import com.techteam.fabric.bettermod.client.gui.BetterScreen;
+import com.techteam.fabric.bettermod.client.gui.HopperScreenHandler;
+import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
 import com.techteam.fabric.bettermod.network.BoxUpdatePayload;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.netty.buffer.ByteBuf;
@@ -52,7 +55,6 @@ import org.jetbrains.annotations.Contract;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 
@@ -67,13 +69,11 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static ScreenHandlerType<RoomControllerScreenHandler> ROOM_CONTROLLER_SCREEN_HANDLER_TYPE;
 	public static BetterBlock<BitHopperBlockEntity> BIT_HOPPER_BLOCK;
 	public static BlockEntityType<BitHopperBlockEntity> BIT_HOPPER_BLOCK_ENTITY_TYPE;
-	public static ScreenHandlerType<BitHopperScreenHandler> BIT_HOPPER_SCREEN_HANDLER_TYPE;
 	public static BetterBlock<PullHopperBlockEntity> PULL_HOPPER_BLOCK;
 	public static BlockEntityType<PullHopperBlockEntity> PULL_HOPPER_BLOCK_ENTITY_TYPE;
-	public static ScreenHandlerType<PullHopperScreenHandler> PULL_HOPPER_SCREEN_HANDLER_TYPE;
+	public static ScreenHandlerType<HopperScreenHandler> HOPPER_SCREEN_HANDLER_TYPE;
 	public static BetterBlock<StickHopperBlockEntity> STICK_HOPPER_BLOCK;
 	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
-	public static ScreenHandlerType<StickHopperScreenHandler> STICK_HOPPER_SCREEN_HANDLER_TYPE;
 
 	public static Collection<ItemStack> ITEMS = new ArrayList<>();
 
@@ -178,9 +178,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 				BitHopperBlockEntity.ID,
 				BIT_HOPPER_BLOCK
 		);
-		BIT_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
-				BitHopperBlock.ID, BitHopperScreenHandler::new
-		);
 		PULL_HOPPER_BLOCK = registerBlock(
 				PullHopperBlock.ID,
 				new PullHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
@@ -189,8 +186,8 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 				PullHopperBlockEntity.ID,
 				PULL_HOPPER_BLOCK
 		);
-		PULL_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
-				PullHopperBlock.ID, PullHopperScreenHandler::new
+		HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
+				PullHopperBlock.ID, HopperScreenHandler::new
 		);
 		STICK_HOPPER_BLOCK = registerBlock(
 				StickHopperBlock.ID,
@@ -199,9 +196,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				StickHopperBlockEntity.ID,
 				STICK_HOPPER_BLOCK
-		);
-		STICK_HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
-				StickHopperBlock.ID, StickHopperScreenHandler::new
 		);
 	}
 
@@ -229,9 +223,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		BlockEntityRendererFactories.register(ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, RoomControllerEntityRenderer::new);
 		BlockRenderLayerMap.INSTANCE.putBlock(ROOM_CONTROLLER_BLOCK, RenderLayer.getCutoutMipped());
 		registerScreen(BOOKSHELF_SCREEN_HANDLER_TYPE);
-		registerScreen(BIT_HOPPER_SCREEN_HANDLER_TYPE);
-		registerScreen(PULL_HOPPER_SCREEN_HANDLER_TYPE);
-		registerScreen(STICK_HOPPER_SCREEN_HANDLER_TYPE);
+		registerScreen(HOPPER_SCREEN_HANDLER_TYPE);
 		registerScreen(ROOM_CONTROLLER_SCREEN_HANDLER_TYPE);
 		ModelLoadingPlugin.register(new BetterPerfModelLoadingPlugin());
 	}

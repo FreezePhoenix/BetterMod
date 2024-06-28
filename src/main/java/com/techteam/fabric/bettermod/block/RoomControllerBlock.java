@@ -6,10 +6,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEntity> {
 	public static final Identifier ID = Identifier.of("betterperf", "room_controller");
@@ -22,6 +25,11 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 
 	public RoomControllerBlock(@NotNull Settings settings) {
 		super(settings.dynamicBounds().hardness(4.0f).nonOpaque());
+	}
+
+	@Override
+	public BlockState getAppearance(BlockState state, BlockRenderView renderView, BlockPos pos, Direction side, @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
+		return (BlockState) renderView.getBlockEntityRenderData(pos);
 	}
 
 	@Contract("_, _ -> new")
