@@ -11,6 +11,7 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public abstract class BetterBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory<BlockPos> {
+public abstract class BetterBlockEntity extends BlockEntity implements NamedScreenHandlerFactory {
 	public final SimpleInventory inventory;
 	public final InventoryStorage SELF;
 	protected final int size;
@@ -79,11 +80,6 @@ public abstract class BetterBlockEntity extends BlockEntity implements ExtendedS
 	}
 	public int getMaxCountPerStack() {
 		return -1;
-	}
-
-	@Override
-	public BlockPos getScreenOpeningData(ServerPlayerEntity player) {
-		return pos;
 	}
 
 	public Inventory getInventory() {
