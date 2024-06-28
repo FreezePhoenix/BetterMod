@@ -1,6 +1,7 @@
 package com.techteam.fabric.bettermod.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
+import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
 import com.techteam.fabric.bettermod.client.gui.BetterBookshelfScreenHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,7 +10,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +26,7 @@ public class BetterBookshelfBlockEntity extends BetterBlockEntity {
     @Contract("_, _, _ -> new")
     @Override
     public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new BetterBookshelfScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
+        return new BetterBookshelfScreenHandler(syncId, playerInventory, this.getInventory());
     }
 
     @Contract(value = " -> !null",

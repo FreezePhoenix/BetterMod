@@ -1,12 +1,13 @@
 package com.techteam.fabric.bettermod.hooks;
 
+import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
 import com.techteam.fabric.bettermod.client.RoomTracker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.LightBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.util.math.BlockPos;
 
 @Environment(EnvType.CLIENT)
 public final class RenderHooks {
@@ -32,17 +33,4 @@ public final class RenderHooks {
 		}
 	}
 
-	@Environment(EnvType.CLIENT)
-	public interface IRoomCaching extends IForceRender {
-		BlockPos betterMod$blockPos();
-		int betterMod$getStamp();
-		void betterMod$setStamp(int stamp);
-		void betterMod$setRoom(RoomTracker.Room room);
-		RoomTracker.Room betterMod$getRoom();
-	}
-	public interface IForceRender {
-		default boolean forceRender() {
-			return false;
-		}
-	}
 }

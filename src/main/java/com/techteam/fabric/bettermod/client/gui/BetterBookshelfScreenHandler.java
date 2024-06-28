@@ -6,6 +6,8 @@ import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -16,17 +18,17 @@ import org.jetbrains.annotations.NotNull;
 public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 16;
 
-	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull BlockPos pos) {
-		this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), pos));
+	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory) {
+		this(syncId, playerInventory,  new SimpleInventory(INVENTORY_SIZE));
 	}
 
-	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
+	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, Inventory inventory) {
 		super(
 				BetterMod.BOOKSHELF_SCREEN_HANDLER_TYPE,
 				syncId,
 				playerInventory,
-				InventoryUtil.getBlockInventory(context, INVENTORY_SIZE),
-				getBlockPropertyDelegate(context)
+				inventory,
+				null
 		);
 
 		WPlainPanel root = new WPlainPanel();

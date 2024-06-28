@@ -1,7 +1,7 @@
 package com.techteam.fabric.bettermod.mixin;
 
+import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
 import com.techteam.fabric.bettermod.client.RoomTracker;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(BlockEntity.class)
-public abstract class MixinBlockEntity implements RenderHooks.IRoomCaching {
+public abstract class MixinBlockEntity implements IRoomCaching {
 	@Shadow public abstract BlockPos getPos();
 	@Unique
 	private RoomTracker.Room CURRENT_ROOM;

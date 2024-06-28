@@ -3,8 +3,8 @@ package com.techteam.fabric.bettermod.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.techteam.fabric.bettermod.BetterMod;
+import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
 import com.techteam.fabric.bettermod.client.RoomTracker;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.UUID;
 
 @Mixin(Entity.class)
-public abstract class MixinEntity implements RenderHooks.IRoomCaching {
+public abstract class MixinEntity implements IRoomCaching {
 	@Shadow
 	private World world;
 

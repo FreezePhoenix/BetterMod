@@ -1,6 +1,5 @@
-package com.techteam.fabric.bettermod.block;
+package com.techteam.fabric.bettermod.api.block;
 
-import com.techteam.fabric.bettermod.api.block.BetterBlock;
 import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
 import com.techteam.fabric.bettermod.api.block.entity.ITickable;
 import net.minecraft.block.BlockState;

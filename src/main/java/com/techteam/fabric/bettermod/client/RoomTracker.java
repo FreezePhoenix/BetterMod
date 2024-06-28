@@ -1,8 +1,8 @@
 package com.techteam.fabric.bettermod.client;
 
 import com.techteam.fabric.bettermod.BetterMod;
+import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.ClientPlayerTickable;
@@ -26,7 +26,7 @@ public final class RoomTracker {
 
 	@Environment(EnvType.CLIENT)
 	@Contract("_ -> new")
-	public static @NotNull RoomTrackerTicker bind(@NotNull RenderHooks.IRoomCaching playerEntity) {
+	public static @NotNull RoomTrackerTicker bind(@NotNull IRoomCaching playerEntity) {
 		if (BetterMod.CONFIG.LogRoomAllocations) {
 			BetterMod.LOGGER.info("Bound new RoomTrackerTicker to player.");
 		}
@@ -44,7 +44,7 @@ public final class RoomTracker {
 		return currentRoom;
 	}
 
-	public static @Nullable Room getOrUpdateRoom(@NotNull RenderHooks.IRoomCaching roomCaching) {
+	public static @Nullable Room getOrUpdateRoom(@NotNull IRoomCaching roomCaching) {
 		Room cachedRoom = roomCaching.betterMod$getRoom();
 		if(cachedRoom == null) {
 			if(roomCaching.betterMod$getStamp() == nullRoomStamp) {
@@ -208,10 +208,10 @@ public final class RoomTracker {
 
 	@Environment(EnvType.CLIENT)
 	static public final class RoomTrackerTicker implements ClientPlayerTickable {
-		private final RenderHooks.IRoomCaching clientPlayer;
+		private final IRoomCaching clientPlayer;
 
 		@Contract(pure = true)
-		RoomTrackerTicker(RenderHooks.IRoomCaching player) {
+		RoomTrackerTicker(IRoomCaching player) {
 			this.clientPlayer = player;
 		}
 

@@ -1,19 +1,14 @@
 package com.techteam.fabric.bettermod.client.gui;
 
+import com.google.common.collect.Iterators;
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
 import com.techteam.fabric.bettermod.util.InventoryUtil;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
-import io.github.cottonmc.cotton.gui.widget.TooltipBuilder;
-import io.github.cottonmc.cotton.gui.widget.WItemSlot;
-import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
-import io.github.cottonmc.cotton.gui.widget.WPlayerInvPanel;
+import io.github.cottonmc.cotton.gui.widget.*;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;
 import io.github.cottonmc.cotton.gui.widget.data.Insets;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -21,13 +16,16 @@ import net.minecraft.item.DebugStickItem;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.state.property.*;
 import net.minecraft.text.Text;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+
 public final class RoomControllerScreenHandler extends SyncedGuiDescription {
     private static final int INVENTORY_SIZE = 1;
-    private static final String[] STRINGS = {"X+", "X-", "Y+", "Y-", "Z+", "Z-"};
+    private static final String[] STRINGS = {"X-", "X+", "Y-", "Y+", "Z-", "Z+"};
 
     public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull BlockPos pos) {
         this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), pos));
@@ -38,6 +36,14 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
     private static <T extends Comparable<T>> String getValueString(BlockState state, Property<T> property) {
         return property.name(state.get(property));
     }
+
+	private static <T extends Comparable<T>> BlockState with(BlockState state, Property<T> property, int index) {
+		return state.with(property, Iterators.get(property.getValues().iterator(), index));
+	}
+
+	private static <T extends Comparable<T>> int value(BlockState state, Property<T> property) {
+		return Iterators.indexOf(property.getValues().iterator(), state.get(property)::equals);
+	}
 
     public RoomControllerScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
         super(
@@ -50,6 +56,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
         WPlainPanel root = new WPlainPanel();
         root.setInsets(new Insets(2, 7, 0, 7));
         setRootPanel(root);
+		setTitleVisible(false);
         root.setSize(176, 168 + 9 + 9);
         for (int i = 0; i < 6; i++) {
             WBoundSlider slider = new WBoundSlider(0, 63, true, i) {
@@ -61,15 +68,15 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 
             slider.setValue(
                     i % 2 == 1
-                            ? 63 - propertyDelegate.get(i)
-                            : propertyDelegate.get(i)
+                            ? propertyDelegate.get(i)
+                            : 63 - propertyDelegate.get(i)
             );
             slider.setValueChangeListener((value) -> {
                 propertyDelegate.set(
                         slider.bound_index,
                         slider.bound_index % 2 == 1
-                                ? 63 - value
-                                : value
+                                ? value
+                                : 63 - value
                 );
                 ((BoxPropertyDelegate) propertyDelegate).sync();
             });
@@ -92,7 +99,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
         root.add(panel, 0, 72 + 18);
         selectedProperty = boxPropertyDelegate.getProperty(0);
 
-        WDynamicSlider slider = new WDynamicSlider(0, 1, Axis.HORIZONTAL) {
+        WSlider slider = new WSlider(0, 1, Axis.HORIZONTAL) {
             @Override
             public void addTooltip(@NotNull TooltipBuilder tooltip) {
                 if(selectedProperty == null) {
@@ -102,7 +109,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
                 }
             }
         };
-        WDynamicSlider slider2 = new WDynamicSlider(0, 1, Axis.HORIZONTAL) {
+        WSlider slider2 = new WSlider(0, 1, Axis.HORIZONTAL) {
             @Override
             public void addTooltip(@NotNull TooltipBuilder tooltip) {
                 if(selectedProperty == null) {
@@ -119,77 +126,11 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
                 return;
             }
             slider2.setMaxValue(selectedProperty.getValues().size() - 1);
-	        switch (selectedProperty) {
-		        case DirectionProperty directionProperty -> {
-			        var values = directionProperty.getValues();
-			        var enumValues = directionProperty.getType().getEnumConstants();
-			        var direction = boxPropertyDelegate.get().get(directionProperty);
-			        int index = 0;
-			        for (Direction enumValue : enumValues) {
-				        if (values.contains(enumValue)) {
-					        if (enumValue == direction) {
-						        break;
-					        }
-					        index++;
-				        }
-			        }
-			        slider2.setValue(index, true);
-		        }
-		        case BooleanProperty booleanProperty -> {
-			        int new_value = 0;
-			        if (boxPropertyDelegate.get().get(booleanProperty)) {
-				        new_value = 1;
-			        }
-			        slider2.setValue(new_value, true);
-		        }
-		        case IntProperty intProperty -> {
-			        int new_value = boxPropertyDelegate.get().get(intProperty) - intProperty.getValues()
-			                                                                                .stream()
-			                                                                                .min(Integer::compare)
-			                                                                                .get();
-			        slider2.setValue(new_value, true);
-		        }
-		        case EnumProperty<? extends Enum<?>> enumProperty ->
-				        slider2.setValue(boxPropertyDelegate.get().get(enumProperty).ordinal(), true);
-		        case null, default -> {
-		        }
-	        }
+	        slider2.setValue(RoomControllerScreenHandler.value(boxPropertyDelegate.get(), selectedProperty));
         });
+
         slider2.setValueChangeListener((value) -> {
-	        switch (selectedProperty) {
-		        case DirectionProperty directionProperty -> {
-			        var values = directionProperty.getValues();
-			        var enumValues = directionProperty.getType().getEnumConstants();
-			        Direction direction = null;
-			        int curIndex = 0;
-			        for (Direction enumValue : enumValues) {
-				        if (values.contains(enumValue)) {
-					        if (curIndex == value) {
-						        direction = enumValue;
-						        break;
-					        }
-					        curIndex++;
-				        }
-			        }
-			        boxPropertyDelegate.set(boxPropertyDelegate.get().with(directionProperty, direction));
-		        }
-		        case BooleanProperty booleanProperty -> {
-			        boolean new_value = value == 1;
-			        boxPropertyDelegate.set(boxPropertyDelegate.get().with(booleanProperty, new_value));
-		        }
-		        case IntProperty intProperty -> {
-			        int new_value = value + intProperty.getValues().stream().min(Integer::compare).get();
-			        boxPropertyDelegate.set(boxPropertyDelegate.get().with(intProperty, new_value));
-		        }
-		        case EnumProperty<? extends Enum<?>> enumProperty -> boxPropertyDelegate.set(boxPropertyDelegate.get()
-		                                                                                                        .with(
-				                                                                                                        (EnumProperty) enumProperty,
-				                                                                                                        (Enum) enumProperty.getType()
-				                                                                                                                           .getEnumConstants()[value]
-		                                                                                                        ));
-		        case null, default -> {
-		        }
-	        }
+	        boxPropertyDelegate.set(RoomControllerScreenHandler.with(boxPropertyDelegate.get(), selectedProperty, value));
             ((BoxPropertyDelegate) propertyDelegate).sync();
         });
 
@@ -206,45 +147,7 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
             slider.setValue(0);
             if(selectedProperty != null) {
                 slider2.setMaxValue(selectedProperty.getValues().size() - 1);
-	            switch (selectedProperty) {
-		            case DirectionProperty directionProperty -> {
-			            var values = directionProperty.getValues();
-			            var enumValues = directionProperty.getType().getEnumConstants();
-			            var direction = boxPropertyDelegate.get().get(directionProperty);
-			            int lindex = 0;
-			            for (Direction enumValue : enumValues) {
-				            if (values.contains(enumValue)) {
-					            if (enumValue == direction) {
-						            break;
-					            }
-					            lindex++;
-				            }
-			            }
-			            slider2.setValue(lindex, true);
-		            }
-		            case BooleanProperty booleanProperty -> {
-			            int new_value = 0;
-			            if (boxPropertyDelegate.get().get(booleanProperty)) {
-				            new_value = 1;
-			            }
-			            slider2.setValue(new_value, true);
-		            }
-		            case IntProperty intProperty -> {
-			            int new_value = boxPropertyDelegate.get().get(intProperty) - intProperty.getValues()
-			                                                                                    .stream()
-			                                                                                    .min(Integer::compare)
-			                                                                                    .get();
-			            slider2.setValue(new_value, true);
-		            }
-		            case EnumProperty<? extends Enum<?>> enumProperty -> slider2.setValue(
-				            boxPropertyDelegate.get()
-				                               .get((EnumProperty<? extends Enum<?>>) enumProperty)
-				                               .ordinal(),
-				            true
-		            );
-		            case null, default -> {
-		            }
-	            }
+	            slider2.setValue(RoomControllerScreenHandler.value(boxPropertyDelegate.get(), selectedProperty));
             }
             boxPropertyDelegate.rerender();
             inventory.markDirty();

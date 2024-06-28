@@ -29,7 +29,7 @@ public final class RoomControllerEntityRenderer implements BlockEntityRenderer<R
         if (!blockEntity.disguised()) {
             WorldRenderer.drawBox(
                     matrices,
-                    vertexConsumers.getBuffer(RenderLayer.getLines()),
+                    vertexConsumers.getBuffer(RenderLayer.getLineStrip()),
                     (blockEntity.minX) - 0.001,
                     (blockEntity.minY) - 0.001,
                     (blockEntity.minZ) - 0.001,

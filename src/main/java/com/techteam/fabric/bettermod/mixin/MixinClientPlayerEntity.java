@@ -1,7 +1,7 @@
 package com.techteam.fabric.bettermod.mixin;
 
+import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
 import com.techteam.fabric.bettermod.client.RoomTracker;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.ClientPlayerTickable;
 import org.spongepowered.asm.mixin.Final;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(ClientPlayerEntity.class)
-public abstract class MixinClientPlayerEntity implements RenderHooks.IRoomCaching {
+public abstract class MixinClientPlayerEntity implements IRoomCaching {
     @Shadow
     @Final
     private List<ClientPlayerTickable> tickables;

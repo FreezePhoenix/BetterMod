@@ -6,6 +6,8 @@ import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
@@ -13,9 +15,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class HopperScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 5;
-	public HopperScreenHandler(ScreenHandlerType<?>type, int syncId, PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
+	public HopperScreenHandler(ScreenHandlerType<?>type, int syncId, PlayerInventory playerInventory, Inventory inventory) {
 
-		super(type, syncId, playerInventory, InventoryUtil.getBlockInventory(context, INVENTORY_SIZE), getBlockPropertyDelegate(context));
+		super(type, syncId, playerInventory, inventory, null);
 		WPlainPanel root = new WPlainPanel();
 		setRootPanel(root);
 		root.setSize(176, 131);
@@ -29,15 +31,15 @@ public class HopperScreenHandler extends SyncedGuiDescription {
 		root.add(this.createPlayerInventoryPanel(), 7, 37);
 		root.validate(this);
 	}
-	public HopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull BlockPos pos) {
-		this(syncId, playerInventory, ScreenHandlerContext.create(playerInventory.player.getWorld(), pos));
+	public HopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory) {
+		this(syncId, playerInventory, new SimpleInventory(INVENTORY_SIZE));
 	}
-	public HopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, @NotNull ScreenHandlerContext context) {
+	public HopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, Inventory inventory) {
 		this(
 				BetterMod.HOPPER_SCREEN_HANDLER_TYPE,
 				syncId,
 				playerInventory,
-				context
+				inventory
 		);
 	}
 }

@@ -2,8 +2,8 @@ package com.techteam.fabric.bettermod;
 
 import com.techteam.fabric.bettermod.block.*;
 import com.techteam.fabric.bettermod.block.entity.*;
-import com.techteam.fabric.bettermod.block.entity.loadable.IClientLoadableBlockEntity;
-import com.techteam.fabric.bettermod.block.entity.loadable.IServerLoadableBlockEntity;
+import com.techteam.fabric.bettermod.api.block.entity.loadable.IClientLoadableBlockEntity;
+import com.techteam.fabric.bettermod.api.block.entity.loadable.IServerLoadableBlockEntity;
 import com.techteam.fabric.bettermod.client.BetterPerfModelProvider;
 import com.techteam.fabric.bettermod.client.RoomControllerEntityRenderer;
 import com.techteam.fabric.bettermod.client.gui.*;

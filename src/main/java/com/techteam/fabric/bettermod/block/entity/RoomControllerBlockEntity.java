@@ -1,13 +1,15 @@
 package com.techteam.fabric.bettermod.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
-import com.techteam.fabric.bettermod.block.entity.loadable.IClientLoadableBlockEntity;
+import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
+import com.techteam.fabric.bettermod.api.block.entity.loadable.IClientLoadableBlockEntity;
+import com.techteam.fabric.bettermod.api.hooks.IForceRender;
 import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
 import com.techteam.fabric.bettermod.client.RoomTracker;
 import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
 import com.techteam.fabric.bettermod.util.Texts;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.*;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.world.ClientWorld;
@@ -25,17 +27,17 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, IClientLoadableBlockEntity, RenderHooks.IForceRender {
+public class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, IClientLoadableBlockEntity, IForceRender, ExtendedScreenHandlerFactory<BlockPos> {
 	public static final Identifier ID = Identifier.of("betterperf", "room_controller");
 	private final @NotNull BoxPropertyDelegate delegate;
 	public byte minX;
@@ -98,7 +100,7 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	}
 
 	private @NotNull NbtElement writeToNBTBB() {
-		return new NbtByteArray(new byte[]{maxZ, maxY, maxX, minZ, minY, minX});
+		return new NbtByteArray(new byte[]{minX, minY, minZ, maxX, maxY, maxZ});
 	}
 
 	@Override
@@ -200,6 +202,10 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 			RegistryWrapper<Block> registryEntryLookup = registryLookup.getWrapperOrThrow(RegistryKeys.BLOCK);
 			setVariantState(NbtHelper.toBlockState(registryEntryLookup, NBT.getCompound("state")));
 		}
+		updateRoom();
+	}
+
+	public void updateRoom() {
 		if (world instanceof ClientWorld) {
 			RoomTracker.updateRoom(
 					this.getUUID(),
@@ -223,6 +229,11 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	@Override
 	public @NotNull Packet<ClientPlayPacketListener> toUpdatePacket() {
 		return BlockEntityUpdateS2CPacket.create(this);
+	}
+
+	@Override
+	public BlockPos getScreenOpeningData(ServerPlayerEntity player) {
+		return pos;
 	}
 
 	@Override

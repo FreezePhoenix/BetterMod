@@ -1,6 +1,7 @@
 package com.techteam.fabric.bettermod.block;
 
 import com.mojang.serialization.MapCodec;
+import com.techteam.fabric.bettermod.api.block.BetterBlock;
 import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;

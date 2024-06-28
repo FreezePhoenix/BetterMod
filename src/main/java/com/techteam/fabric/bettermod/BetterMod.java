@@ -1,9 +1,11 @@
 package com.techteam.fabric.bettermod;
 
+import com.techteam.fabric.bettermod.api.block.BetterBlock;
+import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
 import com.techteam.fabric.bettermod.block.*;
 import com.techteam.fabric.bettermod.block.entity.*;
-import com.techteam.fabric.bettermod.block.entity.loadable.IClientLoadableBlockEntity;
-import com.techteam.fabric.bettermod.block.entity.loadable.IServerLoadableBlockEntity;
+import com.techteam.fabric.bettermod.api.block.entity.loadable.IClientLoadableBlockEntity;
+import com.techteam.fabric.bettermod.api.block.entity.loadable.IServerLoadableBlockEntity;
 import com.techteam.fabric.bettermod.client.BetterPerfModelLoadingPlugin;
 import com.techteam.fabric.bettermod.client.RoomControllerEntityRenderer;
 import com.techteam.fabric.bettermod.client.gui.BetterBookshelfScreenHandler;
@@ -44,6 +46,7 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
@@ -120,9 +123,14 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static final PacketCodec<ByteBuf, BlockState> BLOCK_STATE = PacketCodecs.entryOf(Block.STATE_IDS);
 	public static final PacketCodec<ByteBuf, BlockPos> BLOCK_POS = BlockPos.PACKET_CODEC;
 
+	@Contract("_, _, _ -> !null")
+	public static <T extends ScreenHandler, D> ScreenHandlerType<T> registerExtendedScreenHandler(Identifier ID, ExtendedScreenHandlerType.ExtendedFactory<T, D> factory, PacketCodec<? super RegistryByteBuf, D> codec) {
+		return Registry.register(Registries.SCREEN_HANDLER, ID, new ExtendedScreenHandlerType<>(factory, codec));
+	}
+
 	@Contract("_, _ -> !null")
-	public static <T extends ScreenHandler> ScreenHandlerType<T> registerScreenHandler(Identifier ID, ExtendedScreenHandlerType.ExtendedFactory<T, BlockPos> factory) {
-		return Registry.register(Registries.SCREEN_HANDLER, ID, new ExtendedScreenHandlerType<>(factory, BLOCK_POS));
+	public static <T extends ScreenHandler> ScreenHandlerType<T> registerScreenHandler(Identifier ID, ScreenHandlerType.Factory<T> factory) {
+		return Registry.register(Registries.SCREEN_HANDLER, ID, new ScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES));
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -166,9 +174,10 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 				RoomControllerBlock.ID,
 				ROOM_CONTROLLER_BLOCK
 		);
-		ROOM_CONTROLLER_SCREEN_HANDLER_TYPE = registerScreenHandler(
+		ROOM_CONTROLLER_SCREEN_HANDLER_TYPE = registerExtendedScreenHandler(
 				RoomControllerBlock.ID,
-				RoomControllerScreenHandler::new
+				RoomControllerScreenHandler::new,
+				BLOCK_POS
 		);
 		BIT_HOPPER_BLOCK = registerBlock(
 				BitHopperBlock.ID,

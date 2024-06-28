@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.block.entity.loadable;
+package com.techteam.fabric.bettermod.api.block.entity.loadable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

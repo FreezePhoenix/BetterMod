@@ -26,8 +26,7 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	}
 
 	public Property<?> getProperty(int index) {
-		var properties = this.get().getProperties();
-
+		var properties = this.get().getBlock().getStateManager().getProperties();
 		for(Property<?> property : properties) {
 			if(index-- == 0) {
 				return property;
@@ -38,18 +37,18 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	}
 
 	public int properties() {
-		return this.get().getProperties().size();
+		return this.get().getBlock().getStateManager().getProperties().size();
 	}
 
 	@Override
 	public int get(int index) {
 		return switch (index) {
-			case 0 -> entity.maxX - 1;
-			case 1 -> -entity.minX;
-			case 2 -> entity.maxY - 1;
-			case 3 -> -entity.minY;
-			case 4 -> entity.maxZ - 1;
-			case 5 -> -entity.minZ;
+			case 0 -> -entity.minX;
+			case 1 -> entity.maxX - 1;
+			case 2 -> -entity.minY;
+			case 3 -> entity.maxY - 1;
+			case 4 -> -entity.minZ;
+			case 5 -> entity.maxZ - 1;
 			default -> throw new IllegalStateException("Unexpected value: " + index);
 		};
 	}
@@ -64,23 +63,19 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 
 	public void rerender() {
 		if (entity.getWorld() instanceof ClientWorld clientWorld) {
-			clientWorld.scheduleBlockRenders(
-					ChunkSectionPos.getSectionCoord(x),
-					ChunkSectionPos.getSectionCoord(y),
-					ChunkSectionPos.getSectionCoord(z)
-			);
+			clientWorld.updateListeners(entity.getPos(), entity.getCachedState(), entity.getCachedState(), 0);
 		}
 	}
 
 	@Override
 	public void set(int index, int value) {
 		switch (index) {
-			case 0 -> entity.maxX = (byte) (value + 1);
-			case 1 -> entity.minX = (byte) -value;
-			case 2 -> entity.maxY = (byte) (value + 1);
-			case 3 -> entity.minY = (byte) -value;
-			case 4 -> entity.maxZ = (byte) (value + 1);
-			case 5 -> entity.minZ = (byte) -value;
+			case 0 -> entity.minX = (byte) -value;
+			case 1 -> entity.maxX = (byte) (value + 1);
+			case 2 -> entity.minY = (byte) -value;
+			case 3 -> entity.maxY = (byte) (value + 1);
+			case 4 -> entity.minZ = (byte) -value;
+			case 5 -> entity.maxZ = (byte) (value + 1);
 			default -> throw new IllegalStateException("Unexpected value: " + index);
 		}
 		updateBounds();
@@ -104,8 +99,6 @@ public final class BoxPropertyDelegate implements PropertyDelegate {
 	}
 
 	public void updateBounds() {
-		if (entity.getWorld() instanceof ClientWorld) {
-			RoomTracker.updateRoom(entity.getUUID(), entity.minX + x, entity.minY + y, entity.minZ + z, entity.maxX + x, entity.maxY + y, entity.maxZ + z);
-		}
+		entity.updateRoom();
 	}
 }

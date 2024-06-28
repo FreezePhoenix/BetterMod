@@ -1,7 +1,7 @@
 package com.techteam.fabric.bettermod.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
-import com.techteam.fabric.bettermod.block.entity.loadable.IServerLoadableBlockEntity;
+import com.techteam.fabric.bettermod.api.block.entity.loadable.IServerLoadableBlockEntity;
 import com.techteam.fabric.bettermod.client.gui.BitHopperScreenHandler;
 import com.techteam.fabric.bettermod.client.gui.PullHopperScreenHandler;
 import com.techteam.fabric.bettermod.util.InventoryUtil;

@@ -1,4 +1,7 @@
 package com.techteam.fabric.bettermod.api.hooks;
 
-public class IForceRender {
+public interface IForceRender {
+	default boolean forceRender() {
+		return false;
+	}
 }

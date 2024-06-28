@@ -1,9 +1,9 @@
 package com.techteam.fabric.bettermod.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
-import com.techteam.fabric.bettermod.block.entity.loadable.IServerLoadableBlockEntity;
-import com.techteam.fabric.bettermod.client.gui.HopperScreenHandler;
+import com.techteam.fabric.bettermod.api.block.entity.loadable.IServerLoadableBlockEntity;
 import com.techteam.fabric.bettermod.util.InventoryUtil;
+import com.techteam.fabric.bettermod.util.Texts;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -11,10 +11,6 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -23,14 +19,14 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-public class StickHopperBlockEntity extends TickOnInterval<StickHopperBlockEntity> implements IServerLoadableBlockEntity {
+public class StickHopperBlockEntity extends BetterHopperBlockEntity<StickHopperBlockEntity> implements IServerLoadableBlockEntity {
 	public static final Identifier ID = Identifier.of("bettermod", "stick_hopper");
 	public final InventoryStorage SELF = InventoryStorage.of(this.inventory, null);
 
 	private BlockApiCache<Storage<ItemVariant>, Direction> PULL_TARGET_CACHE;
 	private BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
 	public StickHopperBlockEntity(@NotNull BlockPos blockPos, BlockState blockState) {
-		super(BetterMod.STICK_HOPPER_BLOCK_ENTITY_TYPE, blockPos, blockState, 5, 8);
+		super(BetterMod.STICK_HOPPER_BLOCK_ENTITY_TYPE, blockPos, blockState);
 	}
 
 	@Override
@@ -54,12 +50,7 @@ public class StickHopperBlockEntity extends TickOnInterval<StickHopperBlockEntit
 	}
 	@Override
 	public Text getDisplayName() {
-		return Text.translatableWithFallback("block.bettermod.stickhopper","Stick Hopper");
-	}
-
-	@Override
-	public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-		return new HopperScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
+		return Texts.STICK_HOPPER;
 	}
 
 	@Override

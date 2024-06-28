@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.block.entity.loadable;
+package com.techteam.fabric.bettermod.api.block.entity.loadable;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

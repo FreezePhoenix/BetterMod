@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.block.entity;
+package com.techteam.fabric.bettermod.api.block.entity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;

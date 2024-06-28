@@ -1,9 +1,7 @@
 package com.techteam.fabric.bettermod.block;
 
-import com.techteam.fabric.bettermod.block.entity.BetterBlockEntity;
-import com.techteam.fabric.bettermod.block.entity.ITickable;
-import com.techteam.fabric.bettermod.block.entity.PullHopperBlockEntity;
-import net.minecraft.block.AbstractBlock;
+import com.techteam.fabric.bettermod.api.block.BetterTickingBlock;
+import com.techteam.fabric.bettermod.block.entity.BetterHopperBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
@@ -15,7 +13,7 @@ import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BetterHopperBlock<T extends BetterBlockEntity & ITickable> extends BetterTickingBlock<T> {
+public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> extends BetterTickingBlock<T> {
 	public BetterHopperBlock(@NotNull Settings settings) {
 		super(settings);
 	}
