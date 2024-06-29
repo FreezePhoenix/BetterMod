@@ -63,7 +63,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public VoxelShape getCollisionShape(BlockState state, @NotNull BlockView world, BlockPos pos, ShapeContext context) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity)
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getVariantState().getCollisionShape(world, pos);
+				return roomControllerBlockEntity.getVariantState().getCollisionShape(world, pos, context);
 			}
 		return super.getCollisionShape(state, world, pos, context);
 	}
@@ -92,7 +92,7 @@ public final class RoomControllerBlock extends BetterBlock<RoomControllerBlockEn
 	public VoxelShape getOutlineShape(BlockState state, @NotNull BlockView world, BlockPos pos, ShapeContext context) {
 		if (world.getBlockEntity(pos) instanceof RoomControllerBlockEntity roomControllerBlockEntity) {
 			if (roomControllerBlockEntity.disguised()) {
-				return roomControllerBlockEntity.getVariantState().getOutlineShape(world, pos);
+				return roomControllerBlockEntity.getVariantState().getOutlineShape(world, pos, context);
 			}
 		}
 		return super.getOutlineShape(state, world, pos, context);

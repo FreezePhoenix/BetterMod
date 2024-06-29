@@ -9,7 +9,6 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.enchantment.Enchantment;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +28,7 @@ public final class RoomControllerEntityRenderer implements BlockEntityRenderer<R
         if (!blockEntity.disguised()) {
             WorldRenderer.drawBox(
                     matrices,
-                    vertexConsumers.getBuffer(RenderLayer.getLineStrip()),
+                    vertexConsumers.getBuffer(RenderLayer.getLines()),
                     (blockEntity.minX) - 0.001,
                     (blockEntity.minY) - 0.001,
                     (blockEntity.minZ) - 0.001,

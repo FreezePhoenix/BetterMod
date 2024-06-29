@@ -2,7 +2,6 @@ package com.techteam.fabric.bettermod.client;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
-import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.ClientPlayerTickable;
@@ -87,24 +86,26 @@ public final class RoomTracker {
 	}
 	public static @Nullable Room getRoomForPos(@NotNull Vec3i pos) {
 		final int x = pos.getX(), y = pos.getY(), z = pos.getZ();
-		ROOM_HASH_MAP_LOCK.readLock().lock();
-		for (final Room room : ROOM_COLLECTION) {
-			if (room.contains(x, y, z)) {
-				ROOM_HASH_MAP_LOCK.readLock().unlock();
-				return room;
+		try {
+			ROOM_HASH_MAP_LOCK.readLock().lock();
+			for (final Room room : ROOM_COLLECTION) {
+				if (room.contains(x, y, z)) {
+					return room;
+				}
 			}
+			return null;
+		} finally {
+			ROOM_HASH_MAP_LOCK.readLock().unlock();
 		}
-		ROOM_HASH_MAP_LOCK.readLock().unlock();
-		return null;
 	}
 
-	public static void removeRoom(final @NotNull RoomControllerBlockEntity roomController) {
+	public static void removeRoom(@NotNull UUID uuid) {
 		ROOM_HASH_MAP_LOCK.writeLock().lock();
-		UUID_ROOM_HASH_MAP.remove(roomController.getUUID()).markRemoved();
+		UUID_ROOM_HASH_MAP.remove(uuid).markRemoved();
 		ROOM_HASH_MAP_LOCK.readLock().lock();
 		ROOM_HASH_MAP_LOCK.writeLock().unlock();
 		if (BetterMod.CONFIG.LogRoomAllocations) {
-			BetterMod.LOGGER.info("Room removed: {}. New room count: {}", roomController.getUUID(), UUID_ROOM_HASH_MAP.size());
+			BetterMod.LOGGER.info("Room removed: {}. New room count: {}", uuid, UUID_ROOM_HASH_MAP.size());
 		}
 		ROOM_HASH_MAP_LOCK.readLock().unlock();
 	}
@@ -115,19 +116,25 @@ public final class RoomTracker {
 		ROOM_HASH_MAP_LOCK.readLock().lock();
 		ROOM_HASH_MAP_LOCK.writeLock().unlock();
 		if (BetterMod.CONFIG.LogRoomAllocations) {
-			BetterMod.LOGGER.info("Room added: {}", id);
-			BetterMod.LOGGER.info("Room count: {}", UUID_ROOM_HASH_MAP.size());
+			BetterMod.LOGGER.info("Room added: {}. New room count: {}", id, UUID_ROOM_HASH_MAP.size());
 		}
 		ROOM_HASH_MAP_LOCK.readLock().unlock();
 	}
 
 	public static void updateRoom(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-		ROOM_HASH_MAP_LOCK.readLock().lock();
-		UUID_ROOM_HASH_MAP.get(id).setBounds(minX, minY, minZ, maxX, maxY, maxZ);
-		ROOM_HASH_MAP_LOCK.readLock().unlock();
-		if (BetterMod.CONFIG.LogRoomAllocations) {
-			BetterMod.LOGGER.info("Room updated: {}", id);
+		ROOM_HASH_MAP_LOCK.writeLock().lock();
+		if(UUID_ROOM_HASH_MAP.containsKey(id)) {
+			UUID_ROOM_HASH_MAP.get(id).setBounds(minX, minY, minZ, maxX, maxY, maxZ);
+			if (BetterMod.CONFIG.LogRoomAllocations) {
+				BetterMod.LOGGER.info("Room updated: {}", id);
+			}
+		} else {
+			UUID_ROOM_HASH_MAP.put(id, new Room(id, minX, minY, minZ, maxX, maxY, maxZ));
+			if (BetterMod.CONFIG.LogRoomAllocations) {
+				BetterMod.LOGGER.info("Room added: {}. New room count: {}", id, UUID_ROOM_HASH_MAP.size());
+			}
 		}
+		ROOM_HASH_MAP_LOCK.writeLock().unlock();
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -165,7 +172,7 @@ public final class RoomTracker {
 		          pure = true)
 		@Override
 		public boolean equals(Object o) {
-			return o instanceof Room && ((Room) o).id.equals(id);
+			return o instanceof Room room && room.id.equals(id);
 		}
 
 		@Contract(pure = true)

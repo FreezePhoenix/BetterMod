@@ -177,20 +177,20 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	@Contract(pure = true)
 	@Override
 	public void onClientLoad(World world, BlockPos pos, BlockState state) {
-		RoomTracker.addRoom(
-				this.getUUID(),
-				minX + pos.getX(),
-				minY + pos.getY(),
-				minZ + pos.getZ(),
-				maxX + pos.getX(),
-				maxY + pos.getY(),
-				maxZ + pos.getZ()
-		);
+//		RoomTracker.addRoom(
+//				this.getUUID(),
+//				minX + pos.getX(),
+//				minY + pos.getY(),
+//				minZ + pos.getZ(),
+//				maxX + pos.getX(),
+//				maxY + pos.getY(),
+//				maxZ + pos.getZ()
+//		);
 	}
 
 	@Override
 	public void onClientUnload(World world, BlockPos pos, BlockState state) {
-		RoomTracker.removeRoom(this);
+		RoomTracker.removeRoom(this.getUUID());
 	}
 
 	@Override

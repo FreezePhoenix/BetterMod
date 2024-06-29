@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -21,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class PullHopperBlockEntity extends BetterHopperBlockEntity<PullHopperBlockEntity> implements IServerLoadableBlockEntity {
 	public static final Identifier ID = Identifier.of("bettermod", "pull_hopper");
-
-	public final InventoryStorage SELF = InventoryStorage.of(this.inventory, null);
 	private BlockApiCache<Storage<ItemVariant>, Direction> PULL_TARGET_CACHE;
 	private BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
 
@@ -34,7 +33,7 @@ public class PullHopperBlockEntity extends BetterHopperBlockEntity<PullHopperBlo
 	public boolean scheduledTick(World world, BlockPos pos, BlockState blockState) {
 		boolean activated = false;
 		// Push
-		{
+		if(!inventory.isEmpty()){
 			Storage<ItemVariant> PUSH_TARGET = PUSH_TARGET_CACHE.find(blockState.get(HopperBlock.FACING).getOpposite());
 			if(PUSH_TARGET != null) {
 				activated = InventoryUtil.handleTransfer(SELF, PUSH_TARGET);
@@ -49,6 +48,8 @@ public class PullHopperBlockEntity extends BetterHopperBlockEntity<PullHopperBlo
 		}
 		return activated;
 	}
+
+
 
 	@Override
 	public Text getDisplayName() {

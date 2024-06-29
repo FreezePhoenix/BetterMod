@@ -220,7 +220,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 						if (deferred_provider != null) {
 							return deferred_provider.getColor(mimicState, view, pos, tintIndex);
 						}
-						return 0xFFFFFF;
 					}
 				}
 			}

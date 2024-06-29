@@ -4,11 +4,13 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.util.ItemScatterer;
@@ -23,7 +25,7 @@ public abstract class BetterBlockEntity extends BlockEntity implements NamedScre
 	public final InventoryStorage SELF;
 	protected final int size;
 	// Unused for most.
-	private final UUID uuid = UUID.randomUUID();
+	private UUID uuid = UUID.randomUUID();
 
 	public BetterBlockEntity(BlockEntityType<?> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState);
@@ -63,12 +65,16 @@ public abstract class BetterBlockEntity extends BlockEntity implements NamedScre
 
 	@Override
 	public void readNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+		if(tag.containsUuid(Entity.UUID_KEY)) {
+			uuid = tag.getUuid(Entity.UUID_KEY);
+		}
 		Inventories.readNbt(tag,this.inventory.heldStacks,registryLookup);
 		super.readNbt(tag, registryLookup);
 	}
 
 	@Override
 	public void writeNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
+		tag.putUuid(Entity.UUID_KEY, this.getUUID());
 		Inventories.writeNbt(tag,this.inventory.heldStacks,registryLookup);
 		super.writeNbt(tag, registryLookup);
 	}

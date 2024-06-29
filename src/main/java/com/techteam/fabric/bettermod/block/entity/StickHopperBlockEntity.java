@@ -21,8 +21,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class StickHopperBlockEntity extends BetterHopperBlockEntity<StickHopperBlockEntity> implements IServerLoadableBlockEntity {
 	public static final Identifier ID = Identifier.of("bettermod", "stick_hopper");
-	public final InventoryStorage SELF = InventoryStorage.of(this.inventory, null);
-
 	private BlockApiCache<Storage<ItemVariant>, Direction> PULL_TARGET_CACHE;
 	private BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
 	public StickHopperBlockEntity(@NotNull BlockPos blockPos, BlockState blockState) {
