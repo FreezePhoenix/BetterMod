@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.item;
+package com.techteam.fabric.bettermod.impl.item;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

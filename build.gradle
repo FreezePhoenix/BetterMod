@@ -29,6 +29,7 @@ dependencies {
 	modImplementation 'maven.modrinth:sodium:mc1.21-0.5.9'
 	modImplementation 'maven.modrinth:indium:1.0.33+mc1.21'
 
+	modImplementation 'maven.modrinth:lithium:mc1.21-0.12.7'
 	modImplementation 'maven.modrinth:entityculling:Bu3hSiJb'
 	modImplementation 'maven.modrinth:spark:1.10.73-fabric'
 	modImplementation 'maven.modrinth:fabric-permissions-api:0.3.1'

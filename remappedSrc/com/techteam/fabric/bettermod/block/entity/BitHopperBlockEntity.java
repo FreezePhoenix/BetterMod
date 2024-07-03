@@ -1,9 +1,9 @@
-package com.techteam.fabric.bettermod.block.entity;
+package com.techteam.fabric.bettermod.impl.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.api.block.entity.loadable.IServerLoadableBlockEntity;
-import com.techteam.fabric.bettermod.client.gui.BitHopperScreenHandler;
-import com.techteam.fabric.bettermod.util.InventoryUtil;
+import com.techteam.fabric.bettermod.impl.client.gui.BitHopperScreenHandler;
+import com.techteam.fabric.bettermod.impl.util.InventoryUtil;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;

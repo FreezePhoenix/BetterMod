@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.util;
+package com.techteam.fabric.bettermod.impl.util;
 
 import org.jetbrains.annotations.Contract;
 import org.joml.Matrix3f;

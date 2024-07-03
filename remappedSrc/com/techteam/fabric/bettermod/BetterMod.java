@@ -1,13 +1,13 @@
 package com.techteam.fabric.bettermod;
 
-import com.techteam.fabric.bettermod.block.*;
-import com.techteam.fabric.bettermod.block.entity.*;
+import com.techteam.fabric.bettermod.impl.block.*;
+import com.techteam.fabric.bettermod.impl.block.entity.*;
 import com.techteam.fabric.bettermod.api.block.entity.loadable.IClientLoadableBlockEntity;
 import com.techteam.fabric.bettermod.api.block.entity.loadable.IServerLoadableBlockEntity;
-import com.techteam.fabric.bettermod.client.BetterPerfModelProvider;
-import com.techteam.fabric.bettermod.client.RoomControllerEntityRenderer;
-import com.techteam.fabric.bettermod.client.gui.*;
-import com.techteam.fabric.bettermod.network.NetworkHandlers;
+import com.techteam.fabric.bettermod.impl.client.BetterPerfModelProvider;
+import com.techteam.fabric.bettermod.impl.client.RoomControllerEntityRenderer;
+import com.techteam.fabric.bettermod.impl.client.gui.*;
+import com.techteam.fabric.bettermod.impl.network.NetworkHandlers;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;

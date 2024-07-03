@@ -1,8 +1,8 @@
-package com.techteam.fabric.bettermod.mixin;
+package com.techteam.fabric.bettermod.impl.mixin;
 
 import com.google.common.collect.Iterators;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
+import com.techteam.fabric.bettermod.impl.hooks.RenderHooks;
 import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;

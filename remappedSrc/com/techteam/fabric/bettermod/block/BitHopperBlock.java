@@ -1,8 +1,8 @@
-package com.techteam.fabric.bettermod.block;
+package com.techteam.fabric.bettermod.impl.block;
 
 import com.mojang.serialization.MapCodec;
-import com.techteam.fabric.bettermod.block.entity.BetterBookshelfBlockEntity;
-import com.techteam.fabric.bettermod.block.entity.BitHopperBlockEntity;
+import com.techteam.fabric.bettermod.impl.block.entity.BetterBookshelfBlockEntity;
+import com.techteam.fabric.bettermod.impl.block.entity.BitHopperBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;

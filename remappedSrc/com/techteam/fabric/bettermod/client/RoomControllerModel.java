@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.client;
+package com.techteam.fabric.bettermod.impl.client;
 
 import com.mojang.datafixers.util.Pair;
 import com.techteam.fabric.bettermod.BetterMod;

@@ -1,6 +1,6 @@
-package com.techteam.fabric.bettermod.mixin;
+package com.techteam.fabric.bettermod.impl.mixin;
 
-import com.techteam.fabric.bettermod.util.MathUtil;
+import com.techteam.fabric.bettermod.impl.util.MathUtil;
 import net.minecraft.util.math.ColorHelper;
 import org.jetbrains.annotations.Contract;
 import org.spongepowered.asm.mixin.Mixin;

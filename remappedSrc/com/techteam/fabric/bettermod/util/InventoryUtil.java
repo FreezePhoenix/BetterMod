@@ -1,6 +1,6 @@
-package com.techteam.fabric.bettermod.util;
+package com.techteam.fabric.bettermod.impl.util;
 
-import com.techteam.fabric.bettermod.block.entity.BetterBlockEntity;
+import com.techteam.fabric.bettermod.impl.block.entity.BetterBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;

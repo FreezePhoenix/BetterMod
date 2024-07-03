@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.client.gui;
+package com.techteam.fabric.bettermod.impl.client.gui;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;

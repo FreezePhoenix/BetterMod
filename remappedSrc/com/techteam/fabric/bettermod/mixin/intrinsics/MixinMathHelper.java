@@ -1,7 +1,7 @@
-package com.techteam.fabric.bettermod.mixin.intrinsics;
+package com.techteam.fabric.bettermod.impl.mixin.intrinsics;
 
 import com.ibm.icu.util.CodePointTrie;
-import com.techteam.fabric.bettermod.util.MathUtil;
+import com.techteam.fabric.bettermod.impl.util.MathUtil;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Contract;

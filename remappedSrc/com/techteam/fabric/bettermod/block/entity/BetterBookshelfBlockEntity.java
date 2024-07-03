@@ -1,7 +1,7 @@
-package com.techteam.fabric.bettermod.block.entity;
+package com.techteam.fabric.bettermod.impl.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
-import com.techteam.fabric.bettermod.client.gui.BetterBookshelfScreenHandler;
+import com.techteam.fabric.bettermod.impl.client.gui.BetterBookshelfScreenHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

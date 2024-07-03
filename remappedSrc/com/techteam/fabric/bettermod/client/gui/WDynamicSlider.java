@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.client.gui;
+package com.techteam.fabric.bettermod.impl.client.gui;
 
 import io.github.cottonmc.cotton.gui.widget.WSlider;
 import io.github.cottonmc.cotton.gui.widget.data.Axis;

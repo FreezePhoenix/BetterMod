@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.mixin.intrinsics;
+package com.techteam.fabric.bettermod.impl.mixin.intrinsics;
 
 import net.minecraft.util.math.Vec3i;
 import org.spongepowered.asm.mixin.Final;

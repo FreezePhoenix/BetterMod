@@ -1,8 +1,8 @@
-package com.techteam.fabric.bettermod.client;
+package com.techteam.fabric.bettermod.impl.client;
 
 import com.techteam.fabric.bettermod.BetterMod;
-import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
+import com.techteam.fabric.bettermod.impl.block.entity.RoomControllerBlockEntity;
+import com.techteam.fabric.bettermod.impl.hooks.RenderHooks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.ClientPlayerTickable;

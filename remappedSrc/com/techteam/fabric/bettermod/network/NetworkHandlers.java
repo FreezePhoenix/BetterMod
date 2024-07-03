@@ -1,6 +1,6 @@
-package com.techteam.fabric.bettermod.network;
+package com.techteam.fabric.bettermod.impl.network;
 
-import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
+import com.techteam.fabric.bettermod.impl.block.entity.RoomControllerBlockEntity;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;

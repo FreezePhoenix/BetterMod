@@ -1,7 +1,7 @@
-package com.techteam.fabric.bettermod.mixin;
+package com.techteam.fabric.bettermod.impl.mixin;
 
-import com.techteam.fabric.bettermod.client.RoomTracker;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
+import com.techteam.fabric.bettermod.impl.client.RoomTracker;
+import com.techteam.fabric.bettermod.impl.hooks.RenderHooks;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.ClientPlayerTickable;
 import org.spongepowered.asm.mixin.*;

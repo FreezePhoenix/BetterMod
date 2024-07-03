@@ -1,17 +1,24 @@
 package com.techteam.fabric.bettermod.api.block.entity;
 
+import me.jellysquid.mods.lithium.common.block.entity.SleepingBlockEntity;
+import me.jellysquid.mods.lithium.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.BlockEntityTickInvoker;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public abstract class TickOnInterval<T extends BetterBlockEntity> extends BetterBlockEntity implements ITickable {
 	private static final String DELAY_ID = "TickOnInterval::cooldown";
-	private final int MAX_COOLDOWN;
-	private int cooldown = 0;
+	protected final int MAX_COOLDOWN;
+	public int cooldown = 0;
+	public long LAST_TICK;
 
 	public TickOnInterval(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size, int MAX_COOLDOWN) {
 		super(blockEntityType, blockPos, blockState, size);
@@ -26,7 +33,7 @@ public abstract class TickOnInterval<T extends BetterBlockEntity> extends Better
 	 * @return Whether the BE should go back on cooldown.
 	 */
 
-	public abstract boolean scheduledTick(World world, BlockPos pos, BlockState blockState);
+	public abstract void scheduledTick(World world, BlockPos pos, BlockState blockState);
 
 	@Override
 	public void writeNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
@@ -40,15 +47,18 @@ public abstract class TickOnInterval<T extends BetterBlockEntity> extends Better
 		super.readNbt(tag, registryLookup);
 	}
 
+	public void setCooldown(int cooldown) {
+		this.cooldown = cooldown;
+	}
+
 	@Override
 	public final void tick(World world, BlockPos pos, BlockState blockState) {
 		if (!world.isClient()) {
-			if (--cooldown > 0) {
-				return;
-			}
-			cooldown = 0;
-			if(scheduledTick(world, pos, blockState)) {
-				cooldown = MAX_COOLDOWN;
+			--cooldown;
+			LAST_TICK = world.getTime();
+			if (!(cooldown > 0)) {
+				cooldown = 0;
+				scheduledTick(world, pos, blockState);
 			}
 		}
 	}

@@ -1,7 +1,7 @@
-package com.techteam.fabric.bettermod.mixin;
+package com.techteam.fabric.bettermod.impl.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
+import com.techteam.fabric.bettermod.impl.hooks.RenderHooks;
 import net.minecraft.block.entity.Hopper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Frustum;

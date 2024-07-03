@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "bettermod",
-	"version": "1.7.5",
+	"version": "1.7.6",
 
 	"name": "BetterMod",
 	"description": "Improve your MC world! Put items in Bookshelves! Use Room Controllers!",
@@ -15,13 +15,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.techteam.fabric.bettermod.BetterMod"
+			"com.techteam.fabric.bettermod.impl.BetterMod"
 		],
 		"client": [
-			"com.techteam.fabric.bettermod.BetterMod"
+			"com.techteam.fabric.bettermod.impl.BetterMod"
 		],
 		"modmenu": [
-			"com.techteam.fabric.bettermod.BetterModModMenu"
+			"com.techteam.fabric.bettermod.impl.BetterModModMenu"
 		],
 		"preLaunch": [
 			"com.llamalad7.mixinextras.MixinExtrasBootstrap::init"

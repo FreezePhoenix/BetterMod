@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.network;
+package com.techteam.fabric.bettermod.impl.network;
 
 import net.minecraft.util.Identifier;
 

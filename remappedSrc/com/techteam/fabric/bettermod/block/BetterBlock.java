@@ -1,8 +1,8 @@
-package com.techteam.fabric.bettermod.block;
+package com.techteam.fabric.bettermod.impl.block;
 
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.serialization.MapCodec;
-import com.techteam.fabric.bettermod.block.entity.BetterBlockEntity;
+import com.techteam.fabric.bettermod.impl.block.entity.BetterBlockEntity;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;

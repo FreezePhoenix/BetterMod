@@ -1,6 +1,6 @@
 package com.techteam.fabric.bettermod.api.hooks;
 
-import com.techteam.fabric.bettermod.client.RoomTracker;
+import com.techteam.fabric.bettermod.impl.client.RoomTracker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.math.BlockPos;

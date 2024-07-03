@@ -1,11 +1,11 @@
-package com.techteam.fabric.bettermod.block.entity;
+package com.techteam.fabric.bettermod.impl.block.entity;
 
 import com.techteam.fabric.bettermod.BetterMod;
 import com.techteam.fabric.bettermod.api.block.entity.loadable.IClientLoadableBlockEntity;
-import com.techteam.fabric.bettermod.client.BoxPropertyDelegate;
-import com.techteam.fabric.bettermod.client.RoomTracker;
-import com.techteam.fabric.bettermod.client.gui.RoomControllerScreenHandler;
-import com.techteam.fabric.bettermod.hooks.RenderHooks;
+import com.techteam.fabric.bettermod.impl.client.BoxPropertyDelegate;
+import com.techteam.fabric.bettermod.impl.client.RoomTracker;
+import com.techteam.fabric.bettermod.impl.client.gui.RoomControllerScreenHandler;
+import com.techteam.fabric.bettermod.impl.hooks.RenderHooks;
 import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
 import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachmentBlockEntity;
 import net.minecraft.block.Block;

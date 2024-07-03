@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.client;
+package com.techteam.fabric.bettermod.impl.client;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

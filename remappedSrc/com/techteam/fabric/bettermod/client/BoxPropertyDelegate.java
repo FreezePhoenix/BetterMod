@@ -1,7 +1,7 @@
-package com.techteam.fabric.bettermod.client;
+package com.techteam.fabric.bettermod.impl.client;
 
-import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
-import com.techteam.fabric.bettermod.network.PacketIdentifiers;
+import com.techteam.fabric.bettermod.impl.block.entity.RoomControllerBlockEntity;
+import com.techteam.fabric.bettermod.impl.network.PacketIdentifiers;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.block.Block;

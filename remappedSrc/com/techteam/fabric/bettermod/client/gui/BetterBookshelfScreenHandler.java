@@ -1,7 +1,7 @@
-package com.techteam.fabric.bettermod.client.gui;
+package com.techteam.fabric.bettermod.impl.client.gui;
 
 import com.techteam.fabric.bettermod.BetterMod;
-import com.techteam.fabric.bettermod.util.InventoryUtil;
+import com.techteam.fabric.bettermod.impl.util.InventoryUtil;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;

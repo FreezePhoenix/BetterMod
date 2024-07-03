@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.mixin;;
+package com.techteam.fabric.bettermod.impl.mixin;;
 import com.techteam.fabric.bettermod.BetterMod;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.World;

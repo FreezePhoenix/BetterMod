@@ -1,7 +1,7 @@
-package com.techteam.fabric.bettermod.hooks;
+package com.techteam.fabric.bettermod.impl.hooks;
 
-import com.techteam.fabric.bettermod.block.entity.RoomControllerBlockEntity;
-import com.techteam.fabric.bettermod.client.RoomTracker;
+import com.techteam.fabric.bettermod.impl.block.entity.RoomControllerBlockEntity;
+import com.techteam.fabric.bettermod.impl.client.RoomTracker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.entity.BlockEntity;
