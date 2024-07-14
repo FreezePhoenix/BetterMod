@@ -83,6 +83,5 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 		if (activated) {
 			setCooldown(MAX_COOLDOWN);
 		}
-		LAST_VERSION = VERSION;
 	}
 }

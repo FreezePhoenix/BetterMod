@@ -11,8 +11,4 @@ public final class BetterScreen<T extends SyncedGuiDescription> extends CottonIn
     public BetterScreen(@NotNull T description, @NotNull PlayerInventory inventory, Text title) {
         super(description, inventory, title);
     }
-    @Contract("_, _, _ -> new")
-    public static <T extends SyncedGuiDescription> @NotNull BetterScreen<T> create(@NotNull T description, @NotNull PlayerInventory inventory, Text title) {
-        return new BetterScreen<>(description, inventory, title);
-    }
 }

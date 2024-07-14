@@ -63,7 +63,8 @@ import java.util.Set;
 
 public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
-
+	public static final PacketCodec<ByteBuf, BlockState> BLOCK_STATE = PacketCodecs.entryOf(Block.STATE_IDS);
+	public static final PacketCodec<ByteBuf, BlockPos> BLOCK_POS = BlockPos.PACKET_CODEC;
 	public static BetterModConfig CONFIG;
 	public static BlockEntityType<BetterBookshelfBlockEntity> BOOKSHELF_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
@@ -77,7 +78,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static ScreenHandlerType<HopperScreenHandler> HOPPER_SCREEN_HANDLER_TYPE;
 	public static BetterBlock<StickHopperBlockEntity> STICK_HOPPER_BLOCK;
 	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
-
 	public static Collection<ItemStack> ITEMS = new ArrayList<>();
 
 	private static final ItemGroup ITEM_GROUP = FabricItemGroup.builder()
@@ -85,43 +85,36 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	                                                           .displayName(Text.translatable("bettermod.item_group"))
 	                                                           .entries((context, entries) -> entries.addAll(ITEMS))
 	                                                           .build();
+	public static PacketCodec<RegistryByteBuf, BoxUpdatePayload.Vec3b> VEC3B = PacketCodec.tuple(PacketCodecs.BYTE,
+	                                                                                             BoxUpdatePayload.Vec3b::x,
+	                                                                                             PacketCodecs.BYTE,
+	                                                                                             BoxUpdatePayload.Vec3b::y,
+	                                                                                             PacketCodecs.BYTE,
+	                                                                                             BoxUpdatePayload.Vec3b::z,
+	                                                                                             BoxUpdatePayload.Vec3b::new
+	);
 
 	@Contract("_, _ -> param2")
 	public static <E extends BetterBlockEntity> BetterBlock<E> registerBlock(Identifier ID, BetterBlock<E> block) {
 		Registry.register(Registries.BLOCK, ID, block);
-		final BlockItem blockItem = Registry.register(
-				Registries.ITEM,
-				ID,
-				new BlockItem(block, new Item.Settings())
-		);
+		final BlockItem blockItem = Registry.register(Registries.ITEM, ID, new BlockItem(block, new Item.Settings()));
 		ITEMS.add(blockItem.getDefaultStack());
 		return block;
 	}
 
 	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block) {
-		BlockEntityType<E> blockEntityType = Registry.register(
-				Registries.BLOCK_ENTITY_TYPE,
-				ID,
-				new BlockEntityType<>(block::createBlockEntity, Set.of(block), null)
+		BlockEntityType<E> blockEntityType = Registry.register(Registries.BLOCK_ENTITY_TYPE,
+		                                                       ID,
+		                                                       new BlockEntityType<>(block::createBlockEntity,
+		                                                                             Set.of(block),
+		                                                                             null
+		                                                       )
 		);
-		ItemStorage.SIDED.registerForBlockEntity(
-				(betterBlockEntity, direction) -> betterBlockEntity.SELF,
-				blockEntityType
+		ItemStorage.SIDED.registerForBlockEntity((betterBlockEntity, direction) -> betterBlockEntity.SELF,
+		                                         blockEntityType
 		);
 		return blockEntityType;
 	}
-
-	public static PacketCodec<RegistryByteBuf, BoxUpdatePayload.Vec3b> VEC3B = PacketCodec.tuple(
-			PacketCodecs.BYTE,
-			BoxUpdatePayload.Vec3b::x,
-			PacketCodecs.BYTE,
-			BoxUpdatePayload.Vec3b::y,
-			PacketCodecs.BYTE,
-			BoxUpdatePayload.Vec3b::z,
-			BoxUpdatePayload.Vec3b::new
-	);
-	public static final PacketCodec<ByteBuf, BlockState> BLOCK_STATE = PacketCodecs.entryOf(Block.STATE_IDS);
-	public static final PacketCodec<ByteBuf, BlockPos> BLOCK_POS = BlockPos.PACKET_CODEC;
 
 	@Contract("_, _, _ -> !null")
 	public static <T extends ScreenHandler, D> ScreenHandlerType<T> registerExtendedScreenHandler(Identifier ID, ExtendedScreenHandlerType.ExtendedFactory<T, D> factory, PacketCodec<? super RegistryByteBuf, D> codec) {
@@ -130,7 +123,11 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 	@Contract("_, _ -> !null")
 	public static <T extends ScreenHandler> ScreenHandlerType<T> registerScreenHandler(Identifier ID, ScreenHandlerType.Factory<T> factory) {
-		return Registry.register(Registries.SCREEN_HANDLER, ID, new ScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES));
+		return Registry.register(
+				Registries.SCREEN_HANDLER,
+				ID,
+				new ScreenHandlerType<>(factory, FeatureFlags.VANILLA_FEATURES)
+		);
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -152,67 +149,45 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 		if (Blocks.BOOKSHELF instanceof BetterBookshelfBlock betterBookshelfBlock) {
 			LOGGER.info("BetterBookshelves was successful!");
-			BOOKSHELF_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-					BetterBookshelfBlock.ID,
-					betterBookshelfBlock
-			);
+			BOOKSHELF_BLOCK_ENTITY_TYPE = registerBlockEntityType(BetterBookshelfBlock.ID, betterBookshelfBlock);
 		} else {
 			LOGGER.error("BetterBookshelves was not successful! This is a bug!");
 		}
 
-		BOOKSHELF_SCREEN_HANDLER_TYPE = registerScreenHandler(
-				BetterBookshelfBlock.ID,
-				BetterBookshelfScreenHandler::new
+		ROOM_CONTROLLER_BLOCK = registerBlock(RoomControllerBlock.ID,
+		                                      new RoomControllerBlock(AbstractBlock.Settings.copy(Blocks.GLASS)
+		                                                                                    .dynamicBounds())
+		);
+		BIT_HOPPER_BLOCK = registerBlock(BitHopperBlock.ID,
+		                                 new BitHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
+		);
+		STICK_HOPPER_BLOCK = registerBlock(StickHopperBlock.ID,
+		                                   new StickHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
+		);
+		PULL_HOPPER_BLOCK = registerBlock(PullHopperBlock.ID,
+		                                  new PullHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
 		);
 
-		ROOM_CONTROLLER_BLOCK = registerBlock(
-				RoomControllerBlock.ID,
-				new RoomControllerBlock(AbstractBlock.Settings.copy(Blocks.GLASS).dynamicBounds())
-		);
+		ROOM_CONTROLLER_BLOCK_ENTITY_TYPE = registerBlockEntityType(RoomControllerBlock.ID, ROOM_CONTROLLER_BLOCK);
+		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(BitHopperBlockEntity.ID, BIT_HOPPER_BLOCK);
+		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(StickHopperBlockEntity.ID, STICK_HOPPER_BLOCK);
+		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(PullHopperBlockEntity.ID, PULL_HOPPER_BLOCK);
 
-		ROOM_CONTROLLER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-				RoomControllerBlock.ID,
-				ROOM_CONTROLLER_BLOCK
+		BOOKSHELF_SCREEN_HANDLER_TYPE = registerScreenHandler(BetterBookshelfBlock.ID,
+		                                                      BetterBookshelfScreenHandler::new
 		);
-		ROOM_CONTROLLER_SCREEN_HANDLER_TYPE = registerExtendedScreenHandler(
-				RoomControllerBlock.ID,
-				RoomControllerScreenHandler::new,
-				BLOCK_POS
+		ROOM_CONTROLLER_SCREEN_HANDLER_TYPE = registerExtendedScreenHandler(RoomControllerBlock.ID,
+		                                                                    RoomControllerScreenHandler::new,
+		                                                                    BoxUpdatePayload.CODEC
 		);
-		BIT_HOPPER_BLOCK = registerBlock(
-				BitHopperBlock.ID,
-				new BitHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
-		);
-		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-				BitHopperBlockEntity.ID,
-				BIT_HOPPER_BLOCK
-		);
-		PULL_HOPPER_BLOCK = registerBlock(
-				PullHopperBlock.ID,
-				new PullHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
-		);
-		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-				PullHopperBlockEntity.ID,
-				PULL_HOPPER_BLOCK
-		);
-		HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(
-				PullHopperBlock.ID, HopperScreenHandler::new
-		);
-		STICK_HOPPER_BLOCK = registerBlock(
-				StickHopperBlock.ID,
-				new StickHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
-		);
-		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-				StickHopperBlockEntity.ID,
-				STICK_HOPPER_BLOCK
-		);
+		HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(PullHopperBlock.ID, HopperScreenHandler::new);
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void onInitializeClient() {
 		ColorProviderRegistry.BLOCK.register((state, view, pos, tintIndex) -> {
-			if(view != null) {
+			if (view != null) {
 				Object attachedData = view.getBlockEntityRenderData(pos);
 				if (attachedData instanceof BlockState mimicState) {
 					if (mimicState.getBlock() != BetterMod.ROOM_CONTROLLER_BLOCK) {
@@ -225,6 +200,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 			}
 			return 0xFFFFFF;
 		}, ROOM_CONTROLLER_BLOCK);
+		BoxUpdatePayload.registerClient();
 
 		ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register(IClientLoadableBlockEntity::onLoad);
 		ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register(IClientLoadableBlockEntity::onUnload);

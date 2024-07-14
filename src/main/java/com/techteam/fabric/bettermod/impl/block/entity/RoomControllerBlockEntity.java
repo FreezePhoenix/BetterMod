@@ -1,20 +1,22 @@
 package com.techteam.fabric.bettermod.impl.block.entity;
 
-import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
 import com.techteam.fabric.bettermod.api.block.entity.loadable.IClientLoadableBlockEntity;
 import com.techteam.fabric.bettermod.api.hooks.IForceRender;
-import com.techteam.fabric.bettermod.impl.client.BoxPropertyDelegate;
+import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.client.RoomTracker;
 import com.techteam.fabric.bettermod.impl.client.gui.RoomControllerScreenHandler;
+import com.techteam.fabric.bettermod.impl.network.BoxUpdatePayload;
 import com.techteam.fabric.bettermod.impl.util.Texts;
-import io.github.cottonmc.cotton.gui.PropertyDelegateHolder;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.api.EnvironmentInterface;
+import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -28,7 +30,6 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -38,21 +39,21 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-
-public class RoomControllerBlockEntity extends BetterBlockEntity implements PropertyDelegateHolder, IClientLoadableBlockEntity, IForceRender, ExtendedScreenHandlerFactory<BlockPos> {
+@EnvironmentInterface(value = EnvType.CLIENT,
+                      itf = IClientLoadableBlockEntity.class)
+public class RoomControllerBlockEntity extends BetterBlockEntity implements IClientLoadableBlockEntity, IForceRender, ExtendedScreenHandlerFactory<BoxUpdatePayload> {
 	public static final Identifier ID = Identifier.of("betterperf", "room_controller");
-	private final @NotNull BoxPropertyDelegate delegate;
 	public byte minX;
 	public byte minY;
 	public byte minZ;
 	public byte maxX;
 	public byte maxY;
 	public byte maxZ;
+
 	private BlockState variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
 
 	public RoomControllerBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		super(BetterMod.ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, pos, state, 1);
-		delegate = new BoxPropertyDelegate(this, pos);
 		this.minX = 0;
 		this.minY = 0;
 		this.minZ = 0;
@@ -62,10 +63,9 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	}
 
 
-
 	@Override
 	public @NotNull ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-		return new RoomControllerScreenHandler(syncId, playerInventory, ScreenHandlerContext.create(world, pos));
+		return new RoomControllerScreenHandler(syncId, playerInventory, this);
 	}
 
 	@Contract(value = " -> !null",
@@ -78,11 +78,16 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	@Override
 	public void markDirty() {
 		super.markDirty();
-		this.setVariantState(getVariantState());
+		if (!variantState.isOf(Block.getBlockFromItem(getStack(0).getItem()))) {
+			setVariantState(Block.getBlockFromItem(getStack(0).getItem()).getDefaultState());
+		}
+		if (hasWorld()) {
+			getWorld().updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+		}
 	}
 
 	private void readFromNBTBB(NbtElement tag) {
-		switch(tag) {
+		switch (tag) {
 			case NbtCompound nbtCompound -> {
 				if (nbtCompound.getType("nx") == NbtElement.INT_TYPE) {
 					this.minX = (byte) (nbtCompound.getInt("nx") - pos.getX());
@@ -138,12 +143,6 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 		return 1;
 	}
 
-	@Contract(pure = true)
-	@Override
-	public @NotNull BoxPropertyDelegate getPropertyDelegate() {
-		return delegate;
-	}
-
 	@Override
 	@Nullable
 	public Object getRenderData() {
@@ -156,7 +155,7 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	}
 
 	public void setVariantState(@NotNull BlockState state) {
-		if(state.isAir()) {
+		if (state.isAir()) {
 			this.variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
 		} else {
 			this.variantState = state;
@@ -167,27 +166,13 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	@Override
 	public boolean isValid(int slot, ItemStack item) {
 		Block b = Block.getBlockFromItem(item.getItem());
-		if (b == Blocks.AIR || b instanceof BlockEntityProvider || RenderLayers.getBlockLayer(b.getDefaultState()).isTranslucent()) {
+		if (b == Blocks.AIR || b instanceof BlockEntityProvider) {
 			return false;
 		}
 		return super.isValid(slot, item);
 	}
 
-	@Contract(pure = true)
-	@Override
-	public void onClientLoad(World world, BlockPos pos, BlockState state) {
-//		RoomTracker.addRoom(
-//				this.getUUID(),
-//				minX + pos.getX(),
-//				minY + pos.getY(),
-//				minZ + pos.getZ(),
-//				maxX + pos.getX(),
-//				maxY + pos.getY(),
-//				maxZ + pos.getZ()
-//		);
-	}
-
-	@Override
+	@Environment(EnvType.CLIENT)
 	public void onClientUnload(World world, BlockPos pos, BlockState state) {
 		RoomTracker.removeRoom(this.getUUID());
 	}
@@ -202,18 +187,18 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 			setVariantState(NbtHelper.toBlockState(registryEntryLookup, NBT.getCompound("state")));
 		}
 		updateRoom();
+		markDirty();
 	}
 
 	public void updateRoom() {
 		if (world instanceof ClientWorld) {
-			RoomTracker.updateRoom(
-					this.getUUID(),
-					minX + pos.getX(),
-					minY + pos.getY(),
-					minZ + pos.getZ(),
-					maxX + pos.getX(),
-					maxY + pos.getY(),
-					maxZ + pos.getZ()
+			RoomTracker.updateRoom(this.getUUID(),
+			                       minX + pos.getX(),
+			                       minY + pos.getY(),
+			                       minZ + pos.getZ(),
+			                       maxX + pos.getX(),
+			                       maxY + pos.getY(),
+			                       maxZ + pos.getZ()
 			);
 		}
 	}
@@ -223,7 +208,6 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 		return createNbt(registryLookup);
 	}
 
-
 	@Contract(" -> new")
 	@Override
 	public @NotNull Packet<ClientPlayPacketListener> toUpdatePacket() {
@@ -231,8 +215,15 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 	}
 
 	@Override
-	public BlockPos getScreenOpeningData(ServerPlayerEntity player) {
-		return pos;
+	public BoxUpdatePayload getScreenOpeningData(ServerPlayerEntity player) {
+		return new BoxUpdatePayload(
+				pos,
+				new BoxUpdatePayload.Vec3b(minX, minY, minZ),
+				new BoxUpdatePayload.Vec3b(maxX, maxY, maxZ),
+				variantState.isOf(BetterMod.ROOM_CONTROLLER_BLOCK)
+				? Blocks.AIR.getDefaultState()
+				: variantState
+		);
 	}
 
 	@Override
@@ -241,6 +232,7 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements Prop
 		NBT.put("state", NbtHelper.fromBlockState(variantState));
 		super.writeNbt(NBT, registryLookup);
 	}
+
 	@Override
 	public boolean forceRender() {
 		return true;

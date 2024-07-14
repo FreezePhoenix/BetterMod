@@ -52,6 +52,5 @@ public abstract class BetterExtractingHopperBlockEntity<T extends BetterExtracti
 		if(activated) {
 			setCooldown(MAX_COOLDOWN);
 		}
-		LAST_VERSION = VERSION;
 	}
 }

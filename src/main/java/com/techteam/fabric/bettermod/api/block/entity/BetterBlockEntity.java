@@ -30,9 +30,6 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity {
 	public SlottedStorage<ItemVariant> SELF;
 	protected final int size;
 
-	public int VERSION = 0;
-	public int LAST_VERSION = -1;
-
 	// Unused for most.
 	private UUID uuid = UUID.randomUUID();
 
@@ -41,8 +38,6 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity {
 		this.size = size;
 		this.inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
 		this.SELF = InventoryStorage.of(BetterBlockEntity.this, null);
-//		ChunkData a;
-//		a.isVisibleThrough()
 	}
 
 	public void dropItems() {

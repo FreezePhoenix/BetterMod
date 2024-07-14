@@ -4,6 +4,7 @@ import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
 import com.techteam.fabric.bettermod.impl.client.gui.BetterBookshelfScreenHandler;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.block.entity.StructureBlockBlockEntityRenderer;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,18 +19,15 @@ import org.jetbrains.annotations.NotNull;
 public class BetterBookshelfBlockEntity extends BetterBlockEntity {
 	public static final Identifier ID = Identifier.of("minecraft", "bookshelf");
 
-	public BetterBookshelfBlockEntity(@NotNull BlockPos pos, BlockState state) {
+	public BetterBookshelfBlockEntity(BlockPos pos, BlockState state) {
         super(BetterMod.BOOKSHELF_BLOCK_ENTITY_TYPE, pos, state, 16);
     }
 
-    @Contract("_, _, _ -> new")
     @Override
     public @NotNull ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
         return new BetterBookshelfScreenHandler(syncId, playerInventory, this);
     }
 
-    @Contract(value = " -> !null",
-              pure = true)
     @Override
     public Text getContainerName() {
         return Text.translatable("block.minecraft.bookshelf");
