@@ -1,24 +1,22 @@
 package com.techteam.fabric.bettermod.impl.util;
 
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
 import net.minecraft.util.TypeFilter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 /**
  * @param <B> The base class shared between possible union inputs. You should make this as specific as possible.
  * @param <T> A common class shared between possible union outputs. You should make this as specific as possible.
  */
-public final class  TypeFilterUnion<B, T extends B> implements TypeFilter<B, T> {
+public final class TypeFilterUnion<B, T extends B> implements TypeFilter<B, T> {
 	private final TypeFilter<B, ? extends T>[] filters;
 	private final Class<B> klass;
 	private final int size;
 
 	@Contract(pure = true)
-	private TypeFilterUnion(final Class<B> klass, final TypeFilter<B, ? extends T> @NotNull [] filters) {
+	private TypeFilterUnion(Class<B> klass, TypeFilter<B, ? extends T> @NotNull [] filters) {
 		this.filters = filters;
 		this.klass = klass;
 		this.size = filters.length;
@@ -35,10 +33,6 @@ public final class  TypeFilterUnion<B, T extends B> implements TypeFilter<B, T> 
 		return null;
 	}
 
-	public void forEach(final @NotNull Consumer<TypeFilter<B, ? extends T>> consumer) {
-		for (int i = 0; i < size; i++) consumer.accept(filters[i]);
-	}
-
 	@Contract(pure = true)
 	@Override
 	public Class<? extends B> getBaseClass() {
@@ -46,7 +40,7 @@ public final class  TypeFilterUnion<B, T extends B> implements TypeFilter<B, T> 
 	}
 
 	public static final class Builder<B, T extends B> {
-		private final ObjectArrayList<TypeFilter<B, ? extends T>> filters = new ObjectArrayList<>();
+		private final ReferenceArrayList<TypeFilter<B, ? extends T>> filters = new ReferenceArrayList<>();
 		private final Class<B> klass;
 
 		private Builder(final Class<B> klass) {
@@ -59,17 +53,15 @@ public final class  TypeFilterUnion<B, T extends B> implements TypeFilter<B, T> 
 			return new Builder<>(klass);
 		}
 
-		@Contract(value = "_ -> this",
-		          mutates = "this")
-		public @NotNull Builder<B, T> add(final TypeFilter<B, ? extends T> filter) {
+		@Contract(value = "_ -> this")
+		public <C extends T> Builder<B, T> add(final TypeFilter<B, C> filter) {
 			filters.add(filter);
 			return this;
 		}
 
 		@Contract(" -> new")
-		@SuppressWarnings("unchecked")
 		public @NotNull TypeFilterUnion<B, T> build() {
-			return new TypeFilterUnion<>(klass, filters.toArray(TypeFilter[]::new));
+			return new TypeFilterUnion<>(klass, filters.elements());
 		}
 	}
 }

@@ -166,7 +166,7 @@ public abstract class MixinMathHelper {
 	@Contract(pure = true)
 	@Overwrite
 	public static int ceilLog2(int value) {
-		if(value == 0) {
+		if (value == 0) {
 			return 0;
 		}
 		return 32 - Integer.numberOfLeadingZeros(value - 1);

@@ -16,6 +16,7 @@ public interface HopperBlockEntityInvoker {
 	static Inventory invokeGetBlockInventoryAt(World world, BlockPos pos, BlockState state) {
 		return null;
 	}
+
 	@Invoker("canExtract")
 	static boolean invokeCanExtract(Inventory toInventory, Inventory fromInventory, ItemStack stack, int slot, Direction facing) {
 		return false;

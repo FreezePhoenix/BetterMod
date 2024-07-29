@@ -12,14 +12,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = TickOnInterval.class, remap = false)
+@Mixin(value = TickOnInterval.class,
+       remap = false)
 public class TickOnIntervalMixin implements SleepingBlockEntity {
 	@Unique
 	private WrappedBlockEntityTickInvokerAccessor tickWrapper = null;
 	@Unique
 	private BlockEntityTickInvoker sleepingTicker = null;
 
-	@Shadow @Final
+	@Shadow
+	@Final
 	protected int MAX_COOLDOWN;
 	@Shadow
 	protected long LAST_TICK;
@@ -48,6 +50,7 @@ public class TickOnIntervalMixin implements SleepingBlockEntity {
 		this.tickWrapper = tickWrapper;
 		this.lithium$setSleepingTicker(null);
 	}
+
 	public BlockEntityTickInvoker lithium$getSleepingTicker() {
 		return this.sleepingTicker;
 	}

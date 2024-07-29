@@ -6,17 +6,21 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 public interface IServerLoadableBlockEntity {
-    default void onServerLoad(ServerWorld world, BlockPos pos, BlockState state) {};
-    default void onServerUnload(ServerWorld world, BlockPos pos, BlockState state) {};
+	default void onServerLoad(ServerWorld world, BlockPos pos, BlockState state) {
+	}
 
-    static void onLoad(BlockEntity blockEntity, ServerWorld world) {
-        if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
-            loadableBlockEntity.onServerLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
-        }
-    }
-    static void onUnLoad(BlockEntity blockEntity, ServerWorld world) {
-        if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
-            loadableBlockEntity.onServerUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
-        }
-    }
+	default void onServerUnload(ServerWorld world, BlockPos pos, BlockState state) {
+	}
+
+	static void onLoad(BlockEntity blockEntity, ServerWorld world) {
+		if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
+			loadableBlockEntity.onServerLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
+		}
+	}
+
+	static void onUnLoad(BlockEntity blockEntity, ServerWorld world) {
+		if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
+			loadableBlockEntity.onServerUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
+		}
+	}
 }

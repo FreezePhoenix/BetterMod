@@ -11,7 +11,6 @@ import com.techteam.fabric.bettermod.impl.util.Texts;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvironmentInterface;
-import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -19,6 +18,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtByteArray;
 import net.minecraft.nbt.NbtCompound;
@@ -50,7 +50,7 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements ICli
 	public byte maxY;
 	public byte maxZ;
 
-	private BlockState variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
+	private BlockState variantState = Blocks.AIR.getDefaultState();
 
 	public RoomControllerBlockEntity(@NotNull BlockPos pos, BlockState state) {
 		super(BetterMod.ROOM_CONTROLLER_BLOCK_ENTITY_TYPE, pos, state, 1);
@@ -79,10 +79,10 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements ICli
 	public void markDirty() {
 		super.markDirty();
 		if (!variantState.isOf(Block.getBlockFromItem(getStack(0).getItem()))) {
-			setVariantState(Block.getBlockFromItem(getStack(0).getItem()).getDefaultState());
+			this.setVariantState(Block.getBlockFromItem(getStack(0).getItem()).getDefaultState());
 		}
-		if (hasWorld()) {
-			getWorld().updateListeners(getPos(), getCachedState(), getCachedState(), 0);
+		if (this.world != null) {
+			this.world.updateListeners(this.pos, this.getCachedState(), this.getCachedState(), 0);
 		}
 	}
 
@@ -125,7 +125,7 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements ICli
 	}
 
 	public boolean disguised() {
-		return !getVariantState().isOf(BetterMod.ROOM_CONTROLLER_BLOCK);
+		return !this.getVariantState().isAir();
 	}
 
 	public void setBounds(byte minX, byte minY, byte minZ, byte maxX, byte maxY, byte maxZ) {
@@ -155,21 +155,16 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements ICli
 	}
 
 	public void setVariantState(@NotNull BlockState state) {
-		if (state.isAir()) {
-			this.variantState = BetterMod.ROOM_CONTROLLER_BLOCK.getDefaultState();
-		} else {
-			this.variantState = state;
-		}
+		this.variantState = state;
 	}
 
 	@Contract(pure = true)
 	@Override
 	public boolean isValid(int slot, ItemStack item) {
-		Block b = Block.getBlockFromItem(item.getItem());
-		if (b == Blocks.AIR || b instanceof BlockEntityProvider) {
-			return false;
+		if (item.getItem() instanceof BlockItem blockItem && !(blockItem.getBlock() instanceof BlockEntityProvider)) {
+			return super.isValid(slot, item);
 		}
-		return super.isValid(slot, item);
+		return false;
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -180,32 +175,32 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements ICli
 	@Override
 	public void readNbt(@NotNull NbtCompound NBT, RegistryWrapper.WrapperLookup registryLookup) {
 		super.readNbt(NBT, registryLookup);
-		NbtElement tag = NBT.get("room");
-		readFromNBTBB(tag);
+		this.readFromNBTBB(NBT.get("room"));
 		if (NBT.contains("state")) {
 			RegistryWrapper<Block> registryEntryLookup = registryLookup.getWrapperOrThrow(RegistryKeys.BLOCK);
 			setVariantState(NbtHelper.toBlockState(registryEntryLookup, NBT.getCompound("state")));
 		}
-		updateRoom();
-		markDirty();
+		this.updateRoom();
+		this.markDirty();
 	}
 
 	public void updateRoom() {
 		if (world instanceof ClientWorld) {
-			RoomTracker.updateRoom(this.getUUID(),
-			                       minX + pos.getX(),
-			                       minY + pos.getY(),
-			                       minZ + pos.getZ(),
-			                       maxX + pos.getX(),
-			                       maxY + pos.getY(),
-			                       maxZ + pos.getZ()
+			RoomTracker.updateRoom(
+					this.getUUID(),
+					minX + pos.getX(),
+					minY + pos.getY(),
+					minZ + pos.getZ(),
+					maxX + pos.getX(),
+					maxY + pos.getY(),
+					maxZ + pos.getZ()
 			);
 		}
 	}
 
 	@Override
 	public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup registryLookup) {
-		return createNbt(registryLookup);
+		return this.createNbt(registryLookup);
 	}
 
 	@Contract(" -> new")
@@ -220,16 +215,18 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements ICli
 				pos,
 				new BoxUpdatePayload.Vec3b(minX, minY, minZ),
 				new BoxUpdatePayload.Vec3b(maxX, maxY, maxZ),
-				variantState.isOf(BetterMod.ROOM_CONTROLLER_BLOCK)
+				this.disguised()
 				? Blocks.AIR.getDefaultState()
-				: variantState
+				: this.getVariantState()
 		);
 	}
 
 	@Override
 	public void writeNbt(@NotNull NbtCompound NBT, RegistryWrapper.WrapperLookup registryLookup) {
-		NBT.put("room", writeToNBTBB());
-		NBT.put("state", NbtHelper.fromBlockState(variantState));
+		NBT.put("room", this.writeToNBTBB());
+		if (this.disguised()) {
+			NBT.put("state", NbtHelper.fromBlockState(this.getVariantState()));
+		}
 		super.writeNbt(NBT, registryLookup);
 	}
 

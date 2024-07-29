@@ -51,7 +51,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
@@ -64,7 +63,6 @@ import java.util.Set;
 public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static final PacketCodec<ByteBuf, BlockState> BLOCK_STATE = PacketCodecs.entryOf(Block.STATE_IDS);
-	public static final PacketCodec<ByteBuf, BlockPos> BLOCK_POS = BlockPos.PACKET_CODEC;
 	public static BetterModConfig CONFIG;
 	public static BlockEntityType<BetterBookshelfBlockEntity> BOOKSHELF_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
@@ -80,18 +78,19 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
 	public static Collection<ItemStack> ITEMS = new ArrayList<>();
 
-	private static final ItemGroup ITEM_GROUP = FabricItemGroup.builder()
-	                                                           .icon(() -> new ItemStack(ROOM_CONTROLLER_BLOCK.asItem()))
-	                                                           .displayName(Text.translatable("bettermod.item_group"))
-	                                                           .entries((context, entries) -> entries.addAll(ITEMS))
-	                                                           .build();
-	public static PacketCodec<RegistryByteBuf, BoxUpdatePayload.Vec3b> VEC3B = PacketCodec.tuple(PacketCodecs.BYTE,
-	                                                                                             BoxUpdatePayload.Vec3b::x,
-	                                                                                             PacketCodecs.BYTE,
-	                                                                                             BoxUpdatePayload.Vec3b::y,
-	                                                                                             PacketCodecs.BYTE,
-	                                                                                             BoxUpdatePayload.Vec3b::z,
-	                                                                                             BoxUpdatePayload.Vec3b::new
+	public static final ItemGroup ITEM_GROUP = FabricItemGroup.builder()
+	                                                          .icon(() -> new ItemStack(ROOM_CONTROLLER_BLOCK.asItem()))
+	                                                          .displayName(Text.translatable("bettermod.item_group"))
+	                                                          .entries((context, entries) -> entries.addAll(ITEMS))
+	                                                          .build();
+	public static PacketCodec<RegistryByteBuf, BoxUpdatePayload.Vec3b> VEC3B = PacketCodec.tuple(
+			PacketCodecs.BYTE,
+			BoxUpdatePayload.Vec3b::x,
+			PacketCodecs.BYTE,
+			BoxUpdatePayload.Vec3b::y,
+			PacketCodecs.BYTE,
+			BoxUpdatePayload.Vec3b::z,
+			BoxUpdatePayload.Vec3b::new
 	);
 
 	@Contract("_, _ -> param2")
@@ -103,15 +102,18 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	}
 
 	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block) {
-		BlockEntityType<E> blockEntityType = Registry.register(Registries.BLOCK_ENTITY_TYPE,
-		                                                       ID,
-		                                                       new BlockEntityType<>(block::createBlockEntity,
-		                                                                             Set.of(block),
-		                                                                             null
-		                                                       )
+		BlockEntityType<E> blockEntityType = Registry.register(
+				Registries.BLOCK_ENTITY_TYPE,
+				ID,
+				new BlockEntityType<>(
+						block::createBlockEntity,
+						Set.of(block),
+						null
+				)
 		);
-		ItemStorage.SIDED.registerForBlockEntity((betterBlockEntity, direction) -> betterBlockEntity.SELF,
-		                                         blockEntityType
+		ItemStorage.SIDED.registerForBlockEntity(
+				(betterBlockEntity, direction) -> betterBlockEntity.SELF,
+				blockEntityType
 		);
 		return blockEntityType;
 	}
@@ -154,18 +156,22 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 			LOGGER.error("BetterBookshelves was not successful! This is a bug!");
 		}
 
-		ROOM_CONTROLLER_BLOCK = registerBlock(RoomControllerBlock.ID,
-		                                      new RoomControllerBlock(AbstractBlock.Settings.copy(Blocks.GLASS)
-		                                                                                    .dynamicBounds())
+		ROOM_CONTROLLER_BLOCK = registerBlock(
+				RoomControllerBlock.ID,
+				new RoomControllerBlock(AbstractBlock.Settings.copy(Blocks.GLASS)
+				                                              .dynamicBounds())
 		);
-		BIT_HOPPER_BLOCK = registerBlock(BitHopperBlock.ID,
-		                                 new BitHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
+		BIT_HOPPER_BLOCK = registerBlock(
+				BitHopperBlock.ID,
+				new BitHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
 		);
-		STICK_HOPPER_BLOCK = registerBlock(StickHopperBlock.ID,
-		                                   new StickHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
+		STICK_HOPPER_BLOCK = registerBlock(
+				StickHopperBlock.ID,
+				new StickHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
 		);
-		PULL_HOPPER_BLOCK = registerBlock(PullHopperBlock.ID,
-		                                  new PullHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
+		PULL_HOPPER_BLOCK = registerBlock(
+				PullHopperBlock.ID,
+				new PullHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER))
 		);
 
 		ROOM_CONTROLLER_BLOCK_ENTITY_TYPE = registerBlockEntityType(RoomControllerBlock.ID, ROOM_CONTROLLER_BLOCK);
@@ -173,12 +179,14 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(StickHopperBlockEntity.ID, STICK_HOPPER_BLOCK);
 		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(PullHopperBlockEntity.ID, PULL_HOPPER_BLOCK);
 
-		BOOKSHELF_SCREEN_HANDLER_TYPE = registerScreenHandler(BetterBookshelfBlock.ID,
-		                                                      BetterBookshelfScreenHandler::new
+		BOOKSHELF_SCREEN_HANDLER_TYPE = registerScreenHandler(
+				BetterBookshelfBlock.ID,
+				BetterBookshelfScreenHandler::new
 		);
-		ROOM_CONTROLLER_SCREEN_HANDLER_TYPE = registerExtendedScreenHandler(RoomControllerBlock.ID,
-		                                                                    RoomControllerScreenHandler::new,
-		                                                                    BoxUpdatePayload.CODEC
+		ROOM_CONTROLLER_SCREEN_HANDLER_TYPE = registerExtendedScreenHandler(
+				RoomControllerBlock.ID,
+				RoomControllerScreenHandler::new,
+				BoxUpdatePayload.CODEC
 		);
 		HOPPER_SCREEN_HANDLER_TYPE = registerScreenHandler(PullHopperBlock.ID, HopperScreenHandler::new);
 	}
@@ -190,7 +198,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 			if (view != null) {
 				Object attachedData = view.getBlockEntityRenderData(pos);
 				if (attachedData instanceof BlockState mimicState) {
-					if (mimicState.getBlock() != BetterMod.ROOM_CONTROLLER_BLOCK) {
+					if (!mimicState.isAir()) {
 						var deferred_provider = ColorProviderRegistry.BLOCK.get(mimicState.getBlock());
 						if (deferred_provider != null) {
 							return deferred_provider.getColor(mimicState, view, pos, tintIndex);

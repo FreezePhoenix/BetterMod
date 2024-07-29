@@ -15,12 +15,13 @@ import java.util.List;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class MixinClientPlayerEntity implements IRoomCaching {
-    @Shadow
-    @Final
-    private List<ClientPlayerTickable> tickables;
-    @Inject(at = @At(value = "TAIL"),
-            method = "<init>(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/ClientPlayNetworkHandler;Lnet/minecraft/stat/StatHandler;Lnet/minecraft/client/recipebook/ClientRecipeBook;ZZ)V")
-    private void addTickHooks(CallbackInfo info) {
-        tickables.add(RoomTracker.bind(this));
-    }
+	@Shadow
+	@Final
+	private List<ClientPlayerTickable> tickables;
+
+	@Inject(at = @At(value = "TAIL"),
+	        method = "<init>(Lnet/minecraft/client/MinecraftClient;Lnet/minecraft/client/world/ClientWorld;Lnet/minecraft/client/network/ClientPlayNetworkHandler;Lnet/minecraft/stat/StatHandler;Lnet/minecraft/client/recipebook/ClientRecipeBook;ZZ)V")
+	private void addTickHooks(CallbackInfo info) {
+		tickables.add(RoomTracker.bind(this));
+	}
 }

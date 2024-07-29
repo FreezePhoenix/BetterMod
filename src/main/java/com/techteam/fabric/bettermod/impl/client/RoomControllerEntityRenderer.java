@@ -14,32 +14,33 @@ import org.jetbrains.annotations.NotNull;
 
 @Environment(EnvType.CLIENT)
 public final class RoomControllerEntityRenderer implements BlockEntityRenderer<RoomControllerBlockEntity> {
-    @Contract(pure = true)
-    public RoomControllerEntityRenderer(BlockEntityRendererFactory.Context ignoredContext) {}
+	@Contract(pure = true)
+	public RoomControllerEntityRenderer(BlockEntityRendererFactory.Context ignoredContext) {
+	}
 
 
-    @Override
-    public boolean rendersOutsideBoundingBox(RoomControllerBlockEntity blockEntity) {
-        return blockEntity.disguised();
-    }
+	@Override
+	public boolean rendersOutsideBoundingBox(RoomControllerBlockEntity blockEntity) {
+		return blockEntity.disguised();
+	}
 
-    @Override
-    public void render(@NotNull RoomControllerBlockEntity blockEntity, float tickDelta, @NotNull MatrixStack matrices, @NotNull VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        if (!blockEntity.disguised()) {
-            WorldRenderer.drawBox(
-                    matrices,
-                    vertexConsumers.getBuffer(RenderLayer.getLines()),
-                    (blockEntity.minX) - 0.001,
-                    (blockEntity.minY) - 0.001,
-                    (blockEntity.minZ) - 0.001,
-                    (blockEntity.maxX) + 0.001,
-                    (blockEntity.maxY) + 0.001,
-                    (blockEntity.maxZ) + 0.001,
-                    1f,
-                    1f,
-                    1f,
-                    1f
-            );
-        }
-    }
+	@Override
+	public void render(@NotNull RoomControllerBlockEntity blockEntity, float tickDelta, @NotNull MatrixStack matrices, @NotNull VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		if (!blockEntity.disguised()) {
+			WorldRenderer.drawBox(
+					matrices,
+					vertexConsumers.getBuffer(RenderLayer.getLines()),
+					(blockEntity.minX) - 0.001,
+					(blockEntity.minY) - 0.001,
+					(blockEntity.minZ) - 0.001,
+					(blockEntity.maxX) + 0.001,
+					(blockEntity.maxY) + 0.001,
+					(blockEntity.maxZ) + 0.001,
+					1f,
+					1f,
+					1f,
+					1f
+			);
+		}
+	}
 }

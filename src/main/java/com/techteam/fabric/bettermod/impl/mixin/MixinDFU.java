@@ -23,7 +23,8 @@ public abstract class MixinDFU extends Schema {
 		throw new UnsupportedOperationException();
 	}
 
-	@ModifyReturnValue(method="registerBlockEntities", at = @At("RETURN"))
+	@ModifyReturnValue(method = "registerBlockEntities",
+	                   at = @At("RETURN"))
 	private Map<String, Supplier<TypeTemplate>> onRegisterBlockEntities(Map<String, Supplier<TypeTemplate>> map, Schema schema) {
 		method_5273(schema, map, BitHopperBlockEntity.ID.toString());
 		method_5273(schema, map, PullHopperBlockEntity.ID.toString());

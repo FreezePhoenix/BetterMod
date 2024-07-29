@@ -12,15 +12,16 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import java.util.Objects;
-
 @Mixin(BlockEntityRenderDispatcher.class)
 public abstract class MixinBlockEntityRenderDispatcher {
-    @Shadow public World world;
-    @WrapMethod(method = "render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V")
-    private void wrapRenderForProfiling(@NotNull BlockEntity blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, @NotNull Operation<Void> original) {
-        world.getProfiler().push(Objects.requireNonNull(BlockEntityType.getId(blockEntity.getType())).toString());
-        original.call(blockEntity, tickDelta, matrices, vertexConsumers);
-        world.getProfiler().pop();
-    }
+	@Shadow
+	public World world;
+
+	@WrapMethod(method = "render(Lnet/minecraft/block/entity/BlockEntity;FLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;)V")
+	private void wrapRenderForProfiling(@NotNull BlockEntity blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, @NotNull Operation<Void> original) {
+		var profiler = this.world.getProfiler();
+		profiler.push(() -> BlockEntityType.getId(blockEntity.getType()).toString());
+		original.call(blockEntity, tickDelta, matrices, vertexConsumers);
+		profiler.pop();
+	}
 }

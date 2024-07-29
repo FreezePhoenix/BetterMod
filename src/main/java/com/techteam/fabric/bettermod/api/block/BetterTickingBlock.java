@@ -15,14 +15,16 @@ public abstract class BetterTickingBlock<E extends BetterBlockEntity & ITickable
 	public BetterTickingBlock(@NotNull Settings settings) {
 		super(settings);
 	}
+
 	@Contract(pure = true)
 	@NotNull
 	@Override
 	public final <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
 		return BetterTickingBlock::tick;
 	}
+
 	static <T extends BlockEntity> void tick(World world, BlockPos pos, BlockState state, T blockEntity) {
-		if(blockEntity instanceof ITickable tickable) {
+		if (blockEntity instanceof ITickable tickable) {
 			tickable.tick(world, pos, state);
 		}
 	}

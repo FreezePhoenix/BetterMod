@@ -1,16 +1,11 @@
 package com.techteam.fabric.bettermod.api.block.entity;
 
-import me.jellysquid.mods.lithium.api.inventory.LithiumInventory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
-import net.minecraft.client.render.chunk.ChunkBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
@@ -22,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
 import java.util.UUID;
 
 public abstract class BetterBlockEntity extends LootableContainerBlockEntity {
@@ -51,7 +45,7 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity {
 
 	@Override
 	public void readNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		if(tag.containsUuid(Entity.UUID_KEY)) {
+		if (tag.containsUuid(Entity.UUID_KEY)) {
 			uuid = tag.getUuid(Entity.UUID_KEY);
 		}
 		this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);

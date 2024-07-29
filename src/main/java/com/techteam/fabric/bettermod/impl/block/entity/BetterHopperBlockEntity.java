@@ -72,7 +72,6 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 	}
 
 
-
 	@Override
 	public void scheduledTick(World world, BlockPos pos, BlockState blockState) {
 		boolean activated = false;

@@ -15,16 +15,16 @@ import java.util.Iterator;
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
 	@ModifyExpressionValue(slice = @Slice(from = @At(value = "INVOKE_STRING",
-	                                    target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-	                                    args = "ldc=blockentities"),
-	                         to = @At(value = "INVOKE_STRING",
-									  target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
-									  args = "ldc=destroyProgress")),
-	          at = @At(ordinal = 0,
-					   value = "INVOKE",
-					   target = "Ljava/util/List;iterator()Ljava/util/Iterator;"),
-	          method = "render")
+	                                                 target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+	                                                 args = "ldc=blockentities"),
+	                                      to = @At(value = "INVOKE_STRING",
+	                                               target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V",
+	                                               args = "ldc=destroyProgress")),
+	                       at = @At(ordinal = 0,
+	                                value = "INVOKE",
+	                                target = "Ljava/util/List;iterator()Ljava/util/Iterator;"),
+	                       method = "render")
 	private @NotNull Iterator<BlockEntity> iteratorIntercept(final @NotNull Iterator<BlockEntity> iterator) {
-		return Iterators.filter(iterator,RenderHooks::shouldRenderTileEntity);
+		return Iterators.filter(iterator, RenderHooks::shouldRenderTileEntity);
 	}
 }

@@ -1,0 +1,11 @@
+{
+  "values": [
+    {
+      "id": "#minecraft:bookshelf_books",
+      "required": false
+    },
+    "minecraft:paper",
+    "minecraft:filled_map",
+    "minecraft:map"
+  ]
+}

@@ -9,19 +9,20 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 public final class BetterBookshelfBlock extends BetterBlock<BetterBookshelfBlockEntity> {
-    public static final Identifier ID = Identifier.of("minecraft", "bookshelf");
-    public static final MapCodec<BetterBookshelfBlock> CODEC = BetterBookshelfBlock.createCodec(BetterBookshelfBlock::new);
-    @Override
-    protected MapCodec<BetterBookshelfBlock> getCodec() {
-        return CODEC;
-    }
+	public static final Identifier ID = Identifier.of("minecraft", "bookshelf");
+	public static final MapCodec<BetterBookshelfBlock> CODEC = BetterBookshelfBlock.createCodec(BetterBookshelfBlock::new);
 
-    public BetterBookshelfBlock(Settings settings) {
-        super(settings);
-    }
+	@Override
+	protected MapCodec<BetterBookshelfBlock> getCodec() {
+		return CODEC;
+	}
 
-    @Override
-    public BetterBookshelfBlockEntity createBlockEntity(@NotNull BlockPos pos, BlockState state) {
-        return new BetterBookshelfBlockEntity(pos, state);
-    }
+	public BetterBookshelfBlock(Settings settings) {
+		super(settings);
+	}
+
+	@Override
+	public BetterBookshelfBlockEntity createBlockEntity(@NotNull BlockPos pos, BlockState state) {
+		return new BetterBookshelfBlockEntity(pos, state);
+	}
 }

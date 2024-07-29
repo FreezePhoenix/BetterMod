@@ -265,14 +265,16 @@ public abstract class BetterExtractingHopperBlockEntityMixin extends BetterHoppe
 			}
 
 			if (listenToExtractTracker) {
-				((InventoryChangeTracker) this.extractBlockInventory).listenForContentChangesOnce(this.extractStackList,
-				                                                                                  this
+				((InventoryChangeTracker) this.extractBlockInventory).listenForContentChangesOnce(
+						this.extractStackList,
+						this
 				);
 			}
 
 			if (listenToInsertTracker) {
-				((InventoryChangeTracker) this.insertBlockInventory).listenForContentChangesOnce(this.insertStackList,
-				                                                                                 this
+				((InventoryChangeTracker) this.insertBlockInventory).listenForContentChangesOnce(
+						this.insertStackList,
+						this
 				);
 			}
 
@@ -320,11 +322,12 @@ public abstract class BetterExtractingHopperBlockEntityMixin extends BetterHoppe
 			               ? availableSlots[i]
 			               : i;
 			ItemStack itemStack = fromStackList.get(fromSlot);
-			if (!itemStack.isEmpty() && HopperBlockEntityInvoker.invokeCanExtract(this,
-			                                                                      from,
-			                                                                      itemStack,
-			                                                                      fromSlot,
-			                                                                      Direction.DOWN
+			if (!itemStack.isEmpty() && HopperBlockEntityInvoker.invokeCanExtract(
+					this,
+					from,
+					itemStack,
+					fromSlot,
+					Direction.DOWN
 			)) {
 				//calling removeStack is necessary due to its side effects (markDirty in LootableContainerBlockEntity)
 				ItemStack takenItem = from.removeStack(fromSlot, 1);

@@ -8,5 +8,6 @@
 	"text.autoconfig.bettermod.option.LogRoomTransitions.@Tooltip": "Prints to the log file when an entity enters or exits a room. Intended for debug only.",
 	"text.autoconfig.bettermod.option.LogRoomAllocations": "Log Room Allocations",
 	"text.autoconfig.bettermod.option.LogRoomAllocations.@Tooltip": "Prints to the log file when a room is created or destroyed. Intended for debug only.",
-	"text.autoconfig.bettermod.title": "BetterMod Options"
+	"text.autoconfig.bettermod.title": "BetterMod Options",
+	"tag.item.bettermod.shelvable": "Shelvable"
 }

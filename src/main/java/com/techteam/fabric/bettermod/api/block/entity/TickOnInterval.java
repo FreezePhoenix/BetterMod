@@ -1,18 +1,12 @@
 package com.techteam.fabric.bettermod.api.block.entity;
 
-import me.jellysquid.mods.lithium.common.block.entity.SleepingBlockEntity;
-import me.jellysquid.mods.lithium.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.BlockEntityTickInvoker;
 import org.jetbrains.annotations.NotNull;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public abstract class TickOnInterval<T extends BetterBlockEntity> extends BetterBlockEntity implements ITickable {
 	private static final String DELAY_ID = "TickOnInterval::cooldown";
@@ -27,9 +21,10 @@ public abstract class TickOnInterval<T extends BetterBlockEntity> extends Better
 
 	/**
 	 * Update the block entity.
-	 * @param world The world the block entity is in.
-	 * @param pos The block globalPos.
-	 * @param blockState  The block state.
+	 *
+	 * @param world      The world the block entity is in.
+	 * @param pos        The block globalPos.
+	 * @param blockState The block state.
 	 * @return Whether the BE should go back on cooldown.
 	 */
 

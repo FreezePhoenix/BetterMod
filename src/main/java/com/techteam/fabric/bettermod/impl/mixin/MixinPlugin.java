@@ -2,24 +2,24 @@ package com.techteam.fabric.bettermod.impl.mixin;
 
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Set;
 
 public class MixinPlugin implements IMixinConfigPlugin {
-	private static final String MIXIN_PACKAGE_ROOT = "com.techteam.fabric.bettermod.mixin";
-	private static final String MIXIN_PACKAGE_ROOT_LITHIUM = "com.techteam.fabric.bettermod.mixin.lithium.";
+	private static final String MIXIN_PACKAGE_ROOT = "com.techteam.fabric.bettermod.impl.mixin";
+	private static final String MIXIN_PACKAGE_ROOT_LITHIUM = "com.techteam.fabric.bettermod.impl.mixin.lithium.";
 
 	private final Logger logger = LogManager.getLogger("BetterMod");
 	private boolean LITHIUM_PRESENT = false;
 
 	@Override
 	public void onLoad(String mixinPackage) {
-		if(FabricLoader.getInstance().isModLoaded("lithium")) {
+		if (FabricLoader.getInstance().isModLoaded("lithium")) {
 			logger.info("BetterMod has detected Lithium. Lithium will be used to improve performance.");
 			LITHIUM_PRESENT = true;
 		}
@@ -32,7 +32,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-		if(mixinClassName.startsWith(MIXIN_PACKAGE_ROOT_LITHIUM)) {
+		if (mixinClassName.startsWith(MIXIN_PACKAGE_ROOT_LITHIUM)) {
 			return LITHIUM_PRESENT;
 		}
 		return true;

@@ -16,15 +16,20 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class MixinEntityRenderDispatcher {
-    @Shadow private World world;
-    @WrapMethod(method = "render")
-    private void wrapRenderForProfiling(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Operation<Void> original) {
-        this.world.getProfiler().push(EntityType.getId(entity.getType()).toString());
-        original.call(entity, x, y, z, yaw, tickDelta, matrices, vertexConsumers, light);
-        this.world.getProfiler().pop();
-    }
-    @ModifyReturnValue(method = "shouldRender", at = @At("RETURN"))
-    private boolean shouldRenderHook(boolean returnValue, final Entity entity) {
-        return returnValue && RenderHooks.shouldRenderEntity(entity);
-    }
+	@Shadow
+	private World world;
+
+	@WrapMethod(method = "render")
+	private void wrapRenderForProfiling(Entity entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, Operation<Void> original) {
+		var profiler = this.world.getProfiler();
+		profiler.push(() -> EntityType.getId(entity.getType()).toString());
+		original.call(entity, x, y, z, yaw, tickDelta, matrices, vertexConsumers, light);
+		profiler.pop();
+	}
+
+	@ModifyReturnValue(method = "shouldRender",
+	                   at = @At("RETURN"))
+	private boolean shouldRenderHook(boolean returnValue, Entity entity) {
+		return returnValue && RenderHooks.shouldRenderEntity(entity);
+	}
 }

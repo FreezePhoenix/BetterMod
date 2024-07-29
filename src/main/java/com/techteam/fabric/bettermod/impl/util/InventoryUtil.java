@@ -32,7 +32,7 @@ public class InventoryUtil {
 	public static boolean handleTransfer(@NotNull Storage<ItemVariant> from, @NotNull Storage<ItemVariant> to) {
 		for (StorageView<ItemVariant> view : from) {
 			if (view.isResourceBlank()) continue;
-			if(handle(to, view)) {
+			if (handle(to, view)) {
 				return true;
 			}
 		}
@@ -44,7 +44,7 @@ public class InventoryUtil {
 			if (view.isResourceBlank() || view.getAmount() <= 1) {
 				continue;
 			}
-			if(handle(to, view)) {
+			if (handle(to, view)) {
 				return true;
 			}
 		}
@@ -56,7 +56,7 @@ public class InventoryUtil {
 			if (view.isResourceBlank() || view.getCapacity() <= 1) {
 				continue;
 			}
-			if(handle(to, view)) {
+			if (handle(to, view)) {
 				return true;
 			}
 		}
@@ -66,7 +66,11 @@ public class InventoryUtil {
 	private static boolean handle(Storage<ItemVariant> to, StorageView<ItemVariant> view) {
 		ItemVariant resource = view.getResource();
 		try (Transaction transferTransaction = Transaction.openOuter()) {
-			if (to.insert(resource, 1, transferTransaction) == 1 && view.extract(resource, 1, transferTransaction) == 1) {
+			if (to.insert(resource, 1, transferTransaction) == 1 && view.extract(
+					resource,
+					1,
+					transferTransaction
+			) == 1) {
 				transferTransaction.commit();
 				return true;
 			}

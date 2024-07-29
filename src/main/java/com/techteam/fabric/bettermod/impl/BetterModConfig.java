@@ -10,6 +10,7 @@ public class BetterModConfig implements ConfigData {
 	public boolean LogRoomTransitions = false;
 	@ConfigEntry.Gui.Tooltip
 	public boolean LogRoomAllocations = false;
+
 	@Override
 	public void validatePostLoad() {
 		BetterMod.CONFIG = this;

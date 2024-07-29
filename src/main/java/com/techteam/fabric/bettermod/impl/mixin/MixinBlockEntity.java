@@ -10,7 +10,9 @@ import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(BlockEntity.class)
 public abstract class MixinBlockEntity implements IRoomCaching {
-	@Shadow public abstract BlockPos getPos();
+	@Shadow
+	public abstract BlockPos getPos();
+
 	@Unique
 	private RoomTracker.Room CURRENT_ROOM;
 	@Unique
@@ -39,6 +41,7 @@ public abstract class MixinBlockEntity implements IRoomCaching {
 	public void betterMod$setRoom(RoomTracker.Room room) {
 		this.CURRENT_ROOM = room;
 	}
+
 	@Unique
 	@Override
 	public BlockPos betterMod$blockPos() {

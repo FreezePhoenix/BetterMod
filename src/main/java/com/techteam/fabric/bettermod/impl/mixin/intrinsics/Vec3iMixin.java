@@ -7,11 +7,14 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Vec3i.class)
 public abstract class Vec3iMixin {
-	@Shadow private int x;
+	@Shadow
+	private int x;
 
-	@Shadow private int y;
+	@Shadow
+	private int y;
 
-	@Shadow private int z;
+	@Shadow
+	private int z;
 
 	/**
 	 * @author Aria
@@ -24,6 +27,7 @@ public abstract class Vec3iMixin {
 		double dz = z - this.z;
 		return Math.fma(dz, dz, Math.fma(dy, dy, dx * dx));
 	}
+
 	/**
 	 * @author Aria
 	 * @reason Use Intrinsics. Avoid floating point operations.
@@ -35,6 +39,7 @@ public abstract class Vec3iMixin {
 		int dz = this.z - vec.getZ();
 		return ((dx * dx) + dy * y) + dz * dz;
 	}
+
 	/**
 	 * @author Aria
 	 * @reason Avoid floating point operations.

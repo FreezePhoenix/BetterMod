@@ -21,11 +21,11 @@ public final class RenderHooks {
 
 	public static boolean shouldRenderTileEntity(final BlockEntity blockEntity) {
 		IRoomCaching cache = (IRoomCaching) blockEntity;
-		if(cache.forceRender()) {
+		if (cache.forceRender()) {
 			return true;
 		}
 		RoomTracker.Room currentRoom = RoomTracker.getActiveRoom();
-		if(currentRoom == null) {
+		if (currentRoom == null) {
 			return RoomTracker.getOrUpdateRoom(cache) == null;
 		} else {
 			return currentRoom.contains(cache.betterMod$blockPos());

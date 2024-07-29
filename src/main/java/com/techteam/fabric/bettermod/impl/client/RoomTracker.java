@@ -1,7 +1,7 @@
 package com.techteam.fabric.bettermod.impl.client;
 
-import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
+import com.techteam.fabric.bettermod.impl.BetterMod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.ClientPlayerTickable;
@@ -45,37 +45,37 @@ public final class RoomTracker {
 
 	public static @Nullable Room getOrUpdateRoom(@NotNull IRoomCaching roomCaching) {
 		Room cachedRoom = roomCaching.betterMod$getRoom();
-		if(cachedRoom == null) {
-			if(roomCaching.betterMod$getStamp() == nullRoomStamp) {
+		if (cachedRoom == null) {
+			if (roomCaching.betterMod$getStamp() == nullRoomStamp) {
 				// null room cannot be removed.
 				return null;
 			} else {
 				cachedRoom = getRoomForPos(roomCaching.betterMod$blockPos());
 				roomCaching.betterMod$setRoom(cachedRoom);
-				if(cachedRoom == null) {
+				if (cachedRoom == null) {
 					roomCaching.betterMod$setStamp(nullRoomStamp);
 				} else {
 					roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
 				}
 			}
-		}  else {
-			if(roomCaching.betterMod$getStamp() == cachedRoom.modificationStamp) {
+		} else {
+			if (roomCaching.betterMod$getStamp() == cachedRoom.modificationStamp) {
 				// Even if the entity is still in the room, the room may be removed. If it is removed, recalculate which room they should be in.
-				if(cachedRoom.removed) {
+				if (cachedRoom.removed) {
 					cachedRoom = getRoomForPos(roomCaching.betterMod$blockPos());
 					roomCaching.betterMod$setRoom(cachedRoom);
-					if(cachedRoom == null) {
+					if (cachedRoom == null) {
 						roomCaching.betterMod$setStamp(nullRoomStamp);
 					} else {
 						roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
 					}
 				}
-			} else if(cachedRoom.contains(roomCaching.betterMod$blockPos())) {
+			} else if (cachedRoom.contains(roomCaching.betterMod$blockPos())) {
 				roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
 			} else {
 				cachedRoom = getRoomForPos(roomCaching.betterMod$blockPos());
 				roomCaching.betterMod$setRoom(cachedRoom);
-				if(cachedRoom == null) {
+				if (cachedRoom == null) {
 					roomCaching.betterMod$setStamp(nullRoomStamp);
 				} else {
 					roomCaching.betterMod$setStamp(cachedRoom.modificationStamp);
@@ -84,6 +84,7 @@ public final class RoomTracker {
 		}
 		return cachedRoom;
 	}
+
 	public static @Nullable Room getRoomForPos(@NotNull Vec3i pos) {
 		final int x = pos.getX(), y = pos.getY(), z = pos.getZ();
 		try {
@@ -101,61 +102,49 @@ public final class RoomTracker {
 
 	public static void removeRoom(@NotNull UUID uuid) {
 		ROOM_HASH_MAP_LOCK.writeLock().lock();
-		UUID_ROOM_HASH_MAP.remove(uuid).markRemoved();
-		ROOM_HASH_MAP_LOCK.readLock().lock();
-		ROOM_HASH_MAP_LOCK.writeLock().unlock();
+		var removedRoom = UUID_ROOM_HASH_MAP.remove(uuid);
+		if (removedRoom == null) {
+			if (BetterMod.CONFIG.LogRoomAllocations) {
+				BetterMod.LOGGER.info("Attempted to remove invalid room: {}", uuid);
+			}
+			ROOM_HASH_MAP_LOCK.writeLock().unlock();
+			return;
+		}
+		removedRoom.markRemoved();
 		if (BetterMod.CONFIG.LogRoomAllocations) {
 			BetterMod.LOGGER.info("Room removed: {}. New room count: {}", uuid, UUID_ROOM_HASH_MAP.size());
 		}
-		ROOM_HASH_MAP_LOCK.readLock().unlock();
-	}
-
-	public static void addRoom(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-		ROOM_HASH_MAP_LOCK.writeLock().lock();
-		UUID_ROOM_HASH_MAP.put(id, new Room(id, minX, minY, minZ, maxX, maxY, maxZ));
-		ROOM_HASH_MAP_LOCK.readLock().lock();
 		ROOM_HASH_MAP_LOCK.writeLock().unlock();
-		if (BetterMod.CONFIG.LogRoomAllocations) {
-			BetterMod.LOGGER.info("Room added: {}. New room count: {}", id, UUID_ROOM_HASH_MAP.size());
-		}
-		ROOM_HASH_MAP_LOCK.readLock().unlock();
 	}
 
 	public static void updateRoom(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
 		ROOM_HASH_MAP_LOCK.writeLock().lock();
-		if(UUID_ROOM_HASH_MAP.containsKey(id)) {
-			UUID_ROOM_HASH_MAP.get(id).setBounds(minX, minY, minZ, maxX, maxY, maxZ);
-			if (BetterMod.CONFIG.LogRoomAllocations) {
-				BetterMod.LOGGER.info("Room updated: {}", id);
-			}
-		} else {
-			UUID_ROOM_HASH_MAP.put(id, new Room(id, minX, minY, minZ, maxX, maxY, maxZ));
-			if (BetterMod.CONFIG.LogRoomAllocations) {
-				BetterMod.LOGGER.info("Room added: {}. New room count: {}", id, UUID_ROOM_HASH_MAP.size());
-			}
-		}
+		UUID_ROOM_HASH_MAP.computeIfAbsent(id, Room::new).setBounds(minX, minY, minZ, maxX, maxY, maxZ);
 		ROOM_HASH_MAP_LOCK.writeLock().unlock();
 	}
 
 	@Environment(EnvType.CLIENT)
 	static public final class Room {
 		private final UUID id;
-		public int minX;
-		public int minY;
-		public int minZ;
-		public int maxX;
-		public int maxY;
-		public int maxZ;
+		public int minX = 0;
+		public int minY = 0;
+		public int minZ = 0;
+		public int maxX = 0;
+		public int maxY = 0;
+		public int maxZ = 0;
 		private int modificationStamp = 0;
 		public boolean removed = false;
+
 		public int getStamp() {
 			return modificationStamp;
 		}
 
 		@Contract(pure = true)
-		public Room(@NotNull UUID id, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+		public Room(@NotNull UUID id) {
 			this.id = id;
-			this.setBounds(minX, minY, minZ, maxX, maxY, maxZ);
+			if (BetterMod.CONFIG.LogRoomAllocations) {
+				BetterMod.LOGGER.info("Room created: {}", id);
+			}
 		}
 
 		@Contract(pure = true)
@@ -198,6 +187,7 @@ public final class RoomTracker {
 			this.maxY = maxY;
 			this.maxZ = maxZ;
 		}
+
 		public void markRemoved() {
 			// When the room's bounds are changed, we need to increment the stamps for this room.
 			this.modificationStamp++;

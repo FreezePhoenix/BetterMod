@@ -8,9 +8,14 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Vec2f.class)
 public abstract class Vec2fMixin {
-	@Shadow @Final public float x;
+	@Shadow
+	@Final
+	public float x;
 
-	@Shadow @Final public float y;
+	@Shadow
+	@Final
+	public float y;
+
 	/**
 	 * @author Aria
 	 * @reason Use Intrinsics
@@ -19,6 +24,7 @@ public abstract class Vec2fMixin {
 	public float dot(Vec2f vec) {
 		return Math.fma(this.y, vec.y, this.x * vec.x);
 	}
+
 	/**
 	 * @author Aria
 	 * @reason Use Intrinsics

@@ -1,6 +1,5 @@
 package com.techteam.fabric.bettermod.impl.client;
 
-import com.techteam.fabric.bettermod.impl.BetterMod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
@@ -28,7 +27,7 @@ public final class RoomControllerModel extends ForwardingBakedModel {
 	public void emitBlockQuads(BlockRenderView blockView, BlockState blockState, BlockPos blockPos, Supplier<Random> randomSupplier, RenderContext renderContext) {
 		Object attachedData = blockView.getBlockEntityRenderData(blockPos);
 		if (attachedData instanceof BlockState mimicState) {
-			if (!mimicState.isOf(BetterMod.ROOM_CONTROLLER_BLOCK)) {
+			if (!mimicState.isAir()) {
 				BLOCK_MODELS.getModel(mimicState)
 				            .emitBlockQuads(blockView, mimicState, blockPos, randomSupplier, renderContext);
 				return;

@@ -2,8 +2,8 @@ package com.techteam.fabric.bettermod.impl.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
+import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.client.RoomTracker;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -21,16 +21,21 @@ public abstract class MixinEntity implements IRoomCaching {
 	@Shadow
 	private World world;
 
-	@Shadow public abstract UUID getUuid();
+	@Shadow
+	public abstract UUID getUuid();
 
-	@Shadow public abstract BlockPos getBlockPos();
+	@Shadow
+	public abstract BlockPos getBlockPos();
 
 	@Unique
 	private RoomTracker.Room CURRENT_ROOM;
 	@Unique
 	private int stamp;
 
-	@WrapOperation(method = "setPos", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/Entity;blockPos:Lnet/minecraft/util/math/BlockPos;", opcode = Opcodes.PUTFIELD))
+	@WrapOperation(method = "setPos",
+	               at = @At(value = "FIELD",
+	                        target = "Lnet/minecraft/entity/Entity;blockPos:Lnet/minecraft/util/math/BlockPos;",
+	                        opcode = Opcodes.PUTFIELD))
 	private void onUpdateEntityPosition(Entity instance, BlockPos value, Operation<Void> original) {
 		original.call(instance, value);
 		if (this.forceRender()) {

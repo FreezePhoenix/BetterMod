@@ -22,7 +22,7 @@ public abstract class BetterExtractingHopperBlockEntity<T extends BetterExtracti
 
 	public boolean extract() {
 		Storage<ItemVariant> PULL_TARGET = PULL_TARGET_CACHE.find(Direction.DOWN);
-		if(PULL_TARGET != null) {
+		if (PULL_TARGET != null) {
 			return InventoryUtil.handleTransferStackable(PULL_TARGET, SELF);
 		}
 		return false;
@@ -41,15 +41,15 @@ public abstract class BetterExtractingHopperBlockEntity<T extends BetterExtracti
 	@Override
 	public void scheduledTick(World world, BlockPos pos, BlockState blockState) {
 		boolean activated = false;
-		if(!isEmpty()) {
+		if (!isEmpty()) {
 			activated = this.insert();
 		}
 
-		if(!isFull()){
+		if (!isFull()) {
 			activated |= this.extract();
 		}
 
-		if(activated) {
+		if (activated) {
 			setCooldown(MAX_COOLDOWN);
 		}
 	}
