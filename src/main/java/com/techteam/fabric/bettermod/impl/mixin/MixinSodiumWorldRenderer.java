@@ -26,7 +26,7 @@ public abstract class MixinSodiumWorldRenderer {
 			),
 			method = "renderBlockEntities(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/BufferBuilderStorage;Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;FLnet/minecraft/client/render/VertexConsumerProvider$Immediate;DDDLnet/minecraft/client/render/block/entity/BlockEntityRenderDispatcher;)V"
 	)
-	private boolean shouldRender(MatrixStack bufferBuilder, BufferBuilderStorage entry, Long2ObjectMap<SortedSet<BlockBreakingInfo>> transformer, float stage, VertexConsumerProvider.Immediate matrices, double bufferBuilders, double blockBreakingProgressions, double tickDelta, BlockEntityRenderDispatcher immediate, BlockEntity blockEntity) {
-		return RenderHooks.shouldRenderTileEntity(blockEntity);
+	private boolean shouldRender(MatrixStack matrices, BufferBuilderStorage bufferBuilders, Long2ObjectMap<SortedSet<BlockBreakingInfo>> blockBreakingProgressions, float tickDelta, VertexConsumerProvider.Immediate immediate, double x, double y, double z, BlockEntityRenderDispatcher dispatcher, BlockEntity entity) {
+		return RenderHooks.shouldRenderTileEntity(entity);
 	}
 }
