@@ -11,8 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = BetterBlockEntity.class,
-       remap = false)
+@Mixin(value = BetterBlockEntity.class)
 public abstract class BetterBlockEntityMixin implements LithiumInventory {
 	@Shadow
 	protected DefaultedList<ItemStack> inventory;
@@ -28,8 +27,7 @@ public abstract class BetterBlockEntityMixin implements LithiumInventory {
 	@SuppressWarnings("UnresolvedMixinReference")
 	@Inject(
 			method = "setHeldStacks",
-			at = @At("RETURN"),
-			remap = true
+			at = @At("RETURN")
 	)
 	private void emitStackListReplaced(DefaultedList<ItemStack> inventory, CallbackInfo callbackInfo) {
 		if (this instanceof InventoryChangeEmitter inventoryChangeEmitter) {

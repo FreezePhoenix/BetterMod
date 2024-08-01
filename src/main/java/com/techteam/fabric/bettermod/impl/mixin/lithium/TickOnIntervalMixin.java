@@ -12,23 +12,23 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = TickOnInterval.class,
-       remap = false)
+@Mixin(value = TickOnInterval.class)
 public class TickOnIntervalMixin implements SleepingBlockEntity {
 	@Unique
 	private WrappedBlockEntityTickInvokerAccessor tickWrapper = null;
 	@Unique
 	private BlockEntityTickInvoker sleepingTicker = null;
 
-	@Shadow
+	@Shadow(remap = false)
 	@Final
 	protected int MAX_COOLDOWN;
-	@Shadow
+	@Shadow(remap = false)
 	protected long LAST_TICK;
 
 	@Inject(
 			method = "setCooldown",
-			at = @At("HEAD")
+			at = @At("HEAD"),
+			remap = false
 	)
 	public void setCooldownHook(int cooldown, CallbackInfo callbackInfo) {
 		if (cooldown == MAX_COOLDOWN - 1) {

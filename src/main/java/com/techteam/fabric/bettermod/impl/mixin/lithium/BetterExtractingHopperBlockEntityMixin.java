@@ -31,8 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
-@Mixin(value = BetterExtractingHopperBlockEntity.class,
-       remap = false)
+@Mixin(value = BetterExtractingHopperBlockEntity.class)
 public abstract class BetterExtractingHopperBlockEntityMixin extends BetterHopperBlockEntityMixin<PullHopperBlockEntity> {
 	@Unique
 	@NotNull
@@ -54,7 +53,7 @@ public abstract class BetterExtractingHopperBlockEntityMixin extends BetterHoppe
 	}
 
 	@SuppressWarnings("UnresolvedMixinReference")
-	@WrapMethod(method = "extract")
+	@WrapMethod(method = "extract", remap = false)
 	public boolean extractHook(Operation<Boolean> fallback) {
 		var extractInventory = getExtractBlockInventory(world);
 		return lithiumExtract(extractInventory, fallback::call);

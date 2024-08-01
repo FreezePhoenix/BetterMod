@@ -34,8 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
-@Mixin(value = BetterHopperBlockEntity.class,
-       remap = false)
+@Mixin(value = BetterHopperBlockEntity.class)
 public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEntity<T>> extends TickOnInterval<T> implements LithiumInventory, SleepingBlockEntity, UpdateReceiver, InventoryChangeListener, InventoryChangeTracker {
 	@Unique
 	protected long insertStackListModCount;
@@ -70,14 +69,15 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 		super(blockEntityType, blockPos, blockState, size, MAX_COOLDOWN);
 	}
 
-	@WrapMethod(method = "insert")
+	@WrapMethod(method = "insert", remap = false)
 	public boolean insertHook(Operation<Boolean> fallback) {
 		return lithiumInsert(getInsertBlockInventory(world), fallback::call);
 	}
 
 
 	@Inject(method = "scheduledTick",
-	        at = @At("TAIL"))
+	        at = @At("TAIL")
+	)
 	public void scheduledTickHook(World world, BlockPos pos, BlockState blockState, CallbackInfo callbackInfo) {
 		this.checkSleepingConditions();
 	}

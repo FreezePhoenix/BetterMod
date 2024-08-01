@@ -22,8 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = BetterHopperBlock.class,
-       remap = false)
+@Mixin(value = BetterHopperBlock.class)
 public abstract class BetterHopperBlockMixin<T extends BetterHopperBlockEntity<T>> extends BetterBlock<T> {
 	public BetterHopperBlockMixin(@NotNull Settings settings) {
 		super(settings);
@@ -31,7 +30,8 @@ public abstract class BetterHopperBlockMixin<T extends BetterHopperBlockEntity<T
 
 	@SuppressWarnings("UnresolvedMixinReference")
 	@Inject(method = "getStateForNeighborUpdate",
-	        at = @At("HEAD"))
+	        at = @At("HEAD")
+	)
 	private void notifyOnNeighborUpdate(BlockState myBlockState, Direction direction, BlockState newState, WorldAccess world, BlockPos myPos, BlockPos posFrom, CallbackInfoReturnable<BlockState> ci) {
 		//invalidate cache when composters change state
 		if (!world.isClient() && newState.getBlock() instanceof InventoryProvider) {
@@ -41,7 +41,8 @@ public abstract class BetterHopperBlockMixin<T extends BetterHopperBlockEntity<T
 
 	@SuppressWarnings("UnresolvedMixinReference")
 	@Inject(method = "neighborUpdate",
-	        at = @At(value = "HEAD"))
+	        at = @At(value = "HEAD")
+	)
 	private void updateBlockEntity(BlockState myBlockState, World world, BlockPos myPos, Block block, BlockPos posFrom, boolean moved, CallbackInfo ci) {
 		//invalidate cache when the block is replaced
 		if (!world.isClient()) {
