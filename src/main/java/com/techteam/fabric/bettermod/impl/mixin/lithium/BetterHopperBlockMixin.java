@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = BetterHopperBlock.class)
+@Mixin(BetterHopperBlock.class)
 public abstract class BetterHopperBlockMixin<T extends BetterHopperBlockEntity<T>> extends BetterBlock<T> {
 	public BetterHopperBlockMixin(@NotNull Settings settings) {
 		super(settings);

@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.impl.mixin;
+package com.techteam.fabric.bettermod.impl.mixin.client;
 
 import com.techteam.fabric.bettermod.api.hooks.IRoomCaching;
 import com.techteam.fabric.bettermod.impl.client.RoomTracker;

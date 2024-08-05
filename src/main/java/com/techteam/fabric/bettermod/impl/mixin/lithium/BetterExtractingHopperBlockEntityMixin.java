@@ -32,7 +32,7 @@ import java.util.Objects;
 import java.util.function.BooleanSupplier;
 
 @Mixin(value = BetterExtractingHopperBlockEntity.class)
-public abstract class BetterExtractingHopperBlockEntityMixin extends BetterHopperBlockEntityMixin<PullHopperBlockEntity> {
+public abstract class BetterExtractingHopperBlockEntityMixin<T extends BetterExtractingHopperBlockEntity<T>> extends BetterHopperBlockEntityMixin<T> {
 	@Unique
 	@NotNull
 	private HopperCachingState.BlockInventory extractionMode = HopperCachingState.BlockInventory.UNKNOWN;
@@ -48,8 +48,8 @@ public abstract class BetterExtractingHopperBlockEntityMixin extends BetterHoppe
 	@Unique
 	private @Nullable LithiumStackList extractStackList;
 
-	public BetterExtractingHopperBlockEntityMixin(BlockEntityType<PullHopperBlockEntity> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size, int MAX_COOLDOWN) {
-		super(blockEntityType, blockPos, blockState, size, MAX_COOLDOWN);
+	public BetterExtractingHopperBlockEntityMixin(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
+		super(blockEntityType, blockPos, blockState, size);
 	}
 
 	@SuppressWarnings("UnresolvedMixinReference")

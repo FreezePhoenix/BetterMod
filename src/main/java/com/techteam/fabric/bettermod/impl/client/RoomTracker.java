@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+@Environment(EnvType.CLIENT)
 public final class RoomTracker {
 	private static final HashMap<UUID, Room> UUID_ROOM_HASH_MAP = new HashMap<>();
 	private static final Collection<Room> ROOM_COLLECTION = UUID_ROOM_HASH_MAP.values();
@@ -23,8 +24,6 @@ public final class RoomTracker {
 	private static @Nullable Room currentRoom = null;
 	private static int nullRoomStamp = 0;
 
-	@Environment(EnvType.CLIENT)
-	@Contract("_ -> new")
 	public static @NotNull RoomTrackerTicker bind(@NotNull IRoomCaching playerEntity) {
 		if (BetterMod.CONFIG.LogRoomAllocations) {
 			BetterMod.LOGGER.info("Bound new RoomTrackerTicker to player.");
@@ -38,7 +37,6 @@ public final class RoomTracker {
 		return nullRoomStamp;
 	}
 
-	@Contract(pure = true)
 	public static @Nullable Room getActiveRoom() {
 		return currentRoom;
 	}
@@ -123,7 +121,6 @@ public final class RoomTracker {
 		ROOM_HASH_MAP_LOCK.writeLock().unlock();
 	}
 
-	@Environment(EnvType.CLIENT)
 	static public final class Room {
 		private final UUID id;
 		public int minX = 0;
@@ -139,7 +136,6 @@ public final class RoomTracker {
 			return modificationStamp;
 		}
 
-		@Contract(pure = true)
 		public Room(@NotNull UUID id) {
 			this.id = id;
 			if (BetterMod.CONFIG.LogRoomAllocations) {
@@ -203,16 +199,13 @@ public final class RoomTracker {
 		}
 	}
 
-	@Environment(EnvType.CLIENT)
 	static public final class RoomTrackerTicker implements ClientPlayerTickable {
 		private final IRoomCaching clientPlayer;
 
-		@Contract(pure = true)
 		RoomTrackerTicker(IRoomCaching player) {
 			this.clientPlayer = player;
 		}
 
-		@Override
 		public void tick() {
 			currentRoom = getOrUpdateRoom(clientPlayer);
 		}

@@ -17,13 +17,13 @@
     "lithium.TickOnIntervalMixin"
   ],
   "client": [
-    "MixinBlockEntity",
-    "MixinBlockEntityRenderDispatcher",
-    "MixinClientPlayerEntity",
-    "MixinEntity",
-    "MixinEntityRenderDispatcher",
-    "MixinSodiumWorldRenderer",
-    "MixinWorldRenderer"
+    "client.MixinBlockEntity",
+    "client.MixinBlockEntityRenderDispatcher",
+    "client.MixinClientPlayerEntity",
+    "client.MixinEntity",
+    "client.MixinEntityRenderDispatcher",
+    "client.MixinSodiumWorldRenderer",
+    "client.MixinWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

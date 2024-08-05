@@ -20,13 +20,13 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<T>> extends TickOnInterval<T> implements IServerLoadableBlockEntity {
-
+	public static final int MAX_COOLDOWN = 8;
 	protected BlockPos insertionPos;
 	protected Direction facing;
 	protected BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
 
 	public BetterHopperBlockEntity(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState) {
-		super(blockEntityType, blockPos, blockState, 5, 8);
+		super(blockEntityType, blockPos, blockState, 5);
 		facing = blockState.get(Properties.HOPPER_FACING);
 		insertionPos = pos.offset(facing);
 	}
@@ -60,9 +60,9 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 			if (result) {
 				if (PUSH_TARGET_EMPTY && PUSH_TARGET_CACHE.getBlockEntity() instanceof BetterExtractingHopperBlockEntity<?> extractingHopperBlockEntity) {
 					if (extractingHopperBlockEntity.LAST_TICK >= this.LAST_TICK) {
-						extractingHopperBlockEntity.setCooldown(MAX_COOLDOWN - 1);
+						extractingHopperBlockEntity.setCooldown(MAX_COOLDOWN - 1, true);
 					} else {
-						extractingHopperBlockEntity.setCooldown(MAX_COOLDOWN);
+						extractingHopperBlockEntity.setCooldown(MAX_COOLDOWN, false);
 					}
 				}
 			}
@@ -70,7 +70,6 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 		}
 		return false;
 	}
-
 
 	@Override
 	public void scheduledTick(World world, BlockPos pos, BlockState blockState) {
@@ -80,7 +79,7 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 			activated = this.insert();
 		}
 		if (activated) {
-			setCooldown(MAX_COOLDOWN);
+			setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN, false);
 		}
 	}
 }

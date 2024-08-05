@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.block.BlockModels;
@@ -27,9 +28,8 @@ public final class RoomControllerModel extends ForwardingBakedModel {
 	public void emitBlockQuads(BlockRenderView blockView, BlockState blockState, BlockPos blockPos, Supplier<Random> randomSupplier, RenderContext renderContext) {
 		Object attachedData = blockView.getBlockEntityRenderData(blockPos);
 		if (attachedData instanceof BlockState mimicState) {
-			if (!mimicState.isAir()) {
-				BLOCK_MODELS.getModel(mimicState)
-				            .emitBlockQuads(blockView, mimicState, blockPos, randomSupplier, renderContext);
+			if (mimicState.getRenderType() != BlockRenderType.INVISIBLE) {
+				BLOCK_MODELS.getModel(mimicState).emitBlockQuads(blockView, mimicState, blockPos, randomSupplier, renderContext);
 				return;
 			}
 		}

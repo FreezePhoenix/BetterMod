@@ -18,7 +18,7 @@ public interface IServerLoadableBlockEntity {
 		}
 	}
 
-	static void onUnLoad(BlockEntity blockEntity, ServerWorld world) {
+	static void onUnload(BlockEntity blockEntity, ServerWorld world) {
 		if (blockEntity instanceof IServerLoadableBlockEntity loadableBlockEntity) {
 			loadableBlockEntity.onServerUnload(world, blockEntity.getPos(), blockEntity.getCachedState());
 		}

@@ -18,9 +18,11 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
 public final class RoomControllerScreenHandler extends SyncedGuiDescription {
@@ -69,13 +71,12 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 		setTitleVisible(false);
 		root.setSize(176, 168 + 9 + 9);
 		{
-			WBoundSlider slider = SLIDERS[0] = new WBoundSlider(-63, 0, Axis.HORIZONTAL) {
+			WBoundSlider slider = SLIDERS[0] = new WBoundSlider(-63, 0, minX, Axis.HORIZONTAL) {
 				@Override
 				public void addTooltip(@NotNull TooltipBuilder tooltip) {
 					tooltip.add(Text.of("X-" + -value));
 				}
 			};
-			slider.setValue(minX);
 			slider.setValueChangeListener(value -> {
 				minX = (byte) value;
 				RoomControllerScreenHandler.this.sync();
@@ -83,13 +84,12 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 			root.add(slider, 0, 0, 77, 18);
 		}
 		{
-			WBoundSlider slider = SLIDERS[1] = new WBoundSlider(1, 64, Axis.HORIZONTAL) {
+			WBoundSlider slider = SLIDERS[1] = new WBoundSlider(1, 64, maxX, Axis.HORIZONTAL) {
 				@Override
 				public void addTooltip(@NotNull TooltipBuilder tooltip) {
 					tooltip.add(Text.of("X+" + (value - 1)));
 				}
 			};
-			slider.setValue(maxX);
 			slider.setValueChangeListener((value) -> {
 				maxX = (byte) value;
 				RoomControllerScreenHandler.this.sync();
@@ -97,13 +97,12 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 			root.add(slider, 85, 0, 77, 18);
 		}
 		{
-			WBoundSlider slider = SLIDERS[2] = new WBoundSlider(-63, 0, Axis.HORIZONTAL) {
+			WBoundSlider slider = SLIDERS[2] = new WBoundSlider(-63, 0, minY, Axis.HORIZONTAL) {
 				@Override
 				public void addTooltip(@NotNull TooltipBuilder tooltip) {
 					tooltip.add(Text.of("Y-" + -value));
 				}
 			};
-			slider.setValue(minY);
 			slider.setValueChangeListener((value) -> {
 				minY = (byte) value;
 				RoomControllerScreenHandler.this.sync();
@@ -111,13 +110,12 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 			root.add(slider, 0, 18, 68, 18);
 		}
 		{
-			WBoundSlider slider = SLIDERS[3] = new WBoundSlider(1, 64, Axis.HORIZONTAL) {
+			WBoundSlider slider = SLIDERS[3] = new WBoundSlider(1, 64, maxY, Axis.HORIZONTAL) {
 				@Override
 				public void addTooltip(@NotNull TooltipBuilder tooltip) {
 					tooltip.add(Text.of("Y+" + (value - 1)));
 				}
 			};
-			slider.setValue(maxY);
 			slider.setValueChangeListener((value) -> {
 				maxY = (byte) value;
 				RoomControllerScreenHandler.this.sync();
@@ -125,13 +123,12 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 			root.add(slider, 94, 18, 68, 18);
 		}
 		{
-			WBoundSlider slider = SLIDERS[4] = new WBoundSlider(-63, 0, Axis.HORIZONTAL) {
+			WBoundSlider slider = SLIDERS[4] = new WBoundSlider(-63, 0, minZ, Axis.HORIZONTAL) {
 				@Override
 				public void addTooltip(@NotNull TooltipBuilder tooltip) {
 					tooltip.add(Text.of("Z-" + -value));
 				}
 			};
-			slider.setValue(minZ);
 			slider.setValueChangeListener((value) -> {
 				minZ = (byte) value;
 				RoomControllerScreenHandler.this.sync();
@@ -139,13 +136,12 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 			root.add(slider, 0, 36, 77, 18);
 		}
 		{
-			WBoundSlider slider = SLIDERS[5] = new WBoundSlider(1, 64, Axis.HORIZONTAL) {
+			WBoundSlider slider = SLIDERS[5] = new WBoundSlider(1, 64, maxZ, Axis.HORIZONTAL) {
 				@Override
 				public void addTooltip(@NotNull TooltipBuilder tooltip) {
 					tooltip.add(Text.of("Z+" + (value - 1)));
 				}
 			};
-			slider.setValue(maxZ);
 			slider.setValueChangeListener((value) -> {
 				maxZ = (byte) value;
 				RoomControllerScreenHandler.this.sync();
@@ -180,13 +176,16 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 			}
 		};
 		slider.setValueChangeListener((value) -> {
-			selectedProperty = Iterables.get(state.getBlock().getStateManager().getProperties(), value, null);
+			selectedProperty = Iterables.get(state.getEntries().keySet(), value, null);
 			if (selectedProperty == null) {
-				slider2.setMaxValue(0);
-				return;
+				SLIDERS[7].setValues(0, 0, 0);
+			} else {
+				SLIDERS[7].setValues(
+						0,
+						selectedProperty.getValues().size() - 1,
+						RoomControllerScreenHandler.value(state, selectedProperty)
+				);
 			}
-			slider2.setMaxValue(selectedProperty.getValues().size() - 1);
-			slider2.setValue(RoomControllerScreenHandler.value(state, selectedProperty));
 		});
 		slider2.setValueChangeListener((value) -> {
 			if (selectedProperty != null) {
@@ -195,13 +194,13 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 			}
 		});
 		{
-			var properties = state.getBlock().getStateManager().getProperties();
+			var properties = state.getEntries();
 			if (properties.isEmpty()) {
 				selectedProperty = null;
 				slider.setValues(0, 0, 0);
 				slider2.setValues(0, 0, 0);
 			} else {
-				selectedProperty = Iterables.get(properties, 0);
+				selectedProperty = Iterables.get(properties.keySet(), 0);
 				slider.setValues(0, properties.size() - 1, 0);
 				slider2.setValues(
 						0,
@@ -212,16 +211,17 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 			}
 		}
 
-		slot.addChangeListener((__, ignoredInventory, index, stack) -> {
-			if (!state.isOf(Block.getBlockFromItem(stack.getItem()))) {
-				state = Block.getBlockFromItem(stack.getItem()).getDefaultState();
-				var properties = state.getBlock().getStateManager().getProperties();
+		slot.addChangeListener((ignoredSlot, ignoredInventory, index, stack) -> {
+			var blockItem = Block.getBlockFromItem(stack.getItem());
+			if (!state.isOf(blockItem)) {
+				state = blockItem.getDefaultState();
+				var properties = state.getEntries();
 				if (properties.isEmpty()) {
 					selectedProperty = null;
 					SLIDERS[6].setValues(0, 0, 0);
 					SLIDERS[7].setValues(0, 0, 0);
 				} else {
-					selectedProperty = Iterables.get(properties, 0);
+					selectedProperty = Iterables.get(properties.keySet(), 0);
 					SLIDERS[6].setValues(0, properties.size() - 1, 0);
 					SLIDERS[7].setValues(
 							0,
@@ -231,7 +231,6 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 				}
 				RoomControllerScreenHandler.this.sync();
 			}
-			ignoredInventory.markDirty();
 		});
 		root.add(slider, 0, 54, 176 - 14, 18);
 		root.add(slider2, 0, 54 + 18, 176 - 14, 18);
@@ -269,35 +268,33 @@ public final class RoomControllerScreenHandler extends SyncedGuiDescription {
 	}
 
 	public void update(BoxUpdatePayload payload) {
-		SLIDERS[0].setValue(minX = payload.min().x());
-		SLIDERS[1].setValue(maxX = payload.max().x());
-		SLIDERS[2].setValue(minY = payload.min().y());
-		SLIDERS[3].setValue(maxY = payload.max().y());
-		SLIDERS[4].setValue(minZ = payload.min().z());
-		SLIDERS[5].setValue(maxZ = payload.max().z());
+		SLIDERS[0].setValue(minX = (byte) MathHelper.clamp(payload.min().x(), -63, 0));
+		SLIDERS[1].setValue(maxX = (byte) MathHelper.clamp(payload.max().x(), 1, 64));
+		SLIDERS[2].setValue(minY = (byte) MathHelper.clamp(payload.min().y(), -63, 0));
+		SLIDERS[3].setValue(maxY = (byte) MathHelper.clamp(payload.max().y(), 1, 64));
+		SLIDERS[4].setValue(minZ = (byte) MathHelper.clamp(payload.min().z(), -63, 0));
+		SLIDERS[5].setValue(maxZ = (byte) MathHelper.clamp(payload.max().z(), 1, 64));
 		if (payload.state().isOf(state.getBlock())) {
-			BetterMod.LOGGER.info("{} {}", payload.state(), state);
 			state = payload.state();
 			if (selectedProperty != null) {
-				SLIDERS[7].setValue(RoomControllerScreenHandler.value(payload.state(), selectedProperty));
+				SLIDERS[7].setValue(RoomControllerScreenHandler.value(state, selectedProperty));
 			}
 		} else {
 			state = payload.state();
-			var properties = state.getBlock().getStateManager().getProperties();
+			var properties = state.getEntries();
 			if (properties.isEmpty()) {
 				selectedProperty = null;
 				SLIDERS[6].setValues(0, 0, 0);
 				SLIDERS[7].setValues(0, 0, 0);
 			} else {
-				selectedProperty = Iterables.get(properties, 0);
+				selectedProperty = Iterables.get(properties.keySet(), 0);
 				SLIDERS[6].setValues(0, properties.size() - 1, 0);
 				SLIDERS[7].setValues(
 						0,
 						selectedProperty.getValues().size() - 1,
-						RoomControllerScreenHandler.value(payload.state(), selectedProperty)
+						RoomControllerScreenHandler.value(state, selectedProperty)
 				);
 			}
 		}
-		state = payload.state();
 	}
 }

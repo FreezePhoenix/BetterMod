@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.impl.mixin;
+package com.techteam.fabric.bettermod.impl.mixin.client;
 
 import com.google.common.collect.Iterators;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.impl.mixin;
+package com.techteam.fabric.bettermod.impl.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;

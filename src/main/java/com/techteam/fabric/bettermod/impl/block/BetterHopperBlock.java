@@ -54,11 +54,13 @@ public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> ex
 
 	@Override
 	protected BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+		// Present for Lithium compat.
 		return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
 	}
 
 	@Override
 	protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+		// Present for Lithium compat.
 		super.neighborUpdate(state, world, pos, sourceBlock, sourcePos, notify);
 	}
 }

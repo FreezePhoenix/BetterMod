@@ -65,8 +65,8 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 
 
 	public BetterHopperBlockEntityMixin(BlockEntityType<T> blockEntityType,
-	                                    @NotNull BlockPos blockPos, BlockState blockState, int size, int MAX_COOLDOWN) {
-		super(blockEntityType, blockPos, blockState, size, MAX_COOLDOWN);
+	                                    @NotNull BlockPos blockPos, BlockState blockState, int size) {
+		super(blockEntityType, blockPos, blockState, size);
 	}
 
 	@WrapMethod(method = "insert", remap = false)
@@ -115,11 +115,12 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 						if (transferSuccess) {
 							if (insertInventoryWasEmptyHopperNotDisabled) {
 								BetterHopperBlockEntity<?> receivingHopper = (BetterHopperBlockEntity<?>) insertInventory;
-								int k = 8;
 								if (receivingHopper.LAST_TICK >= this.LAST_TICK) {
-									k = 7;
+									receivingHopper.setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN - 1, true);
+								} else {
+
+									receivingHopper.setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN, false);
 								}
-								receivingHopper.setCooldown(k);
 							}
 							if (insertInventoryHandlesModdedCooldown) {
 								((LithiumCooldownReceivingInventory) insertInventory).setTransferCooldown(this.LAST_TICK);

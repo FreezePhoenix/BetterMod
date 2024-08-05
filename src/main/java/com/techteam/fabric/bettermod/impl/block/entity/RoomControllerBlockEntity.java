@@ -11,6 +11,7 @@ import com.techteam.fabric.bettermod.impl.util.Texts;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvironmentInterface;
+import net.fabricmc.api.EnvironmentInterfaces;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -39,8 +40,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@EnvironmentInterface(value = EnvType.CLIENT,
-                      itf = IClientLoadableBlockEntity.class)
+@EnvironmentInterface(value = EnvType.CLIENT, itf = IClientLoadableBlockEntity.class)
+@EnvironmentInterface(value = EnvType.CLIENT, itf = IForceRender.class)
 public class RoomControllerBlockEntity extends BetterBlockEntity implements IClientLoadableBlockEntity, IForceRender, ExtendedScreenHandlerFactory<BoxUpdatePayload> {
 	public static final Identifier ID = Identifier.of("betterperf", "room_controller");
 	public byte minX;
@@ -167,11 +168,6 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements ICli
 		return false;
 	}
 
-	@Environment(EnvType.CLIENT)
-	public void onClientUnload(World world, BlockPos pos, BlockState state) {
-		RoomTracker.removeRoom(this.getUUID());
-	}
-
 	@Override
 	public void readNbt(@NotNull NbtCompound NBT, RegistryWrapper.WrapperLookup registryLookup) {
 		super.readNbt(NBT, registryLookup);
@@ -230,7 +226,12 @@ public class RoomControllerBlockEntity extends BetterBlockEntity implements ICli
 		super.writeNbt(NBT, registryLookup);
 	}
 
-	@Override
+	@Environment(EnvType.CLIENT)
+	public void onClientUnload(World world, BlockPos pos, BlockState state) {
+		RoomTracker.removeRoom(this.getUUID());
+	}
+
+	@Environment(EnvType.CLIENT)
 	public boolean forceRender() {
 		return true;
 	}

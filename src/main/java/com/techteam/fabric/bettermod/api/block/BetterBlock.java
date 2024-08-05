@@ -6,13 +6,14 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BetterBlock<E extends BetterBlockEntity> extends BlockWithEntity {
-
+@Must
 	public BetterBlock(@NotNull Settings settings) {
 		super(settings);
 	}
@@ -26,11 +27,9 @@ public abstract class BetterBlock<E extends BetterBlockEntity> extends BlockWith
 	}
 
 	@Override
-	public BlockState onBreak(@NotNull World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
-		if (worldIn.getBlockEntity(pos) instanceof BetterBlockEntity betterBlockEntity) {
-			betterBlockEntity.dropItems();
-		}
-		return super.onBreak(worldIn, pos, state, player);
+	protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+		ItemScatterer.onStateReplaced(state, newState, world, pos);
+		super.onStateReplaced(state, world, pos, newState, moved);
 	}
 
 	@Override
@@ -38,7 +37,9 @@ public abstract class BetterBlock<E extends BetterBlockEntity> extends BlockWith
 		if (world.isClient()) {
 			return ActionResult.SUCCESS;
 		} else {
-			player.openHandledScreen((BetterBlockEntity) world.getBlockEntity(pos));
+			if(world.getBlockEntity(pos) instanceof BetterBlockEntity betterBlockEntity) {
+				player.openHandledScreen(betterBlockEntity);
+			}
 			return ActionResult.CONSUME;
 		}
 	}

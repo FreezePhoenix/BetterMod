@@ -9,9 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 @Environment(EnvType.CLIENT)
 public final class BetterPerfModelLoadingPlugin implements ModelLoadingPlugin {
-	private static final ModelIdentifier ROOM_CONTROLLER_BLOCK_MODEL_ID = new ModelIdentifier(Identifier.of(
-			"betterperf",
-			"room_controller"
+	private static final ModelIdentifier ROOM_CONTROLLER_BLOCK_MODEL_ID = new ModelIdentifier(Identifier.of("betterperf",
+	                                                                                                        "room_controller"
 	), "");
 
 	@Override
@@ -20,12 +19,10 @@ public final class BetterPerfModelLoadingPlugin implements ModelLoadingPlugin {
 		pluginContext.modifyModelAfterBake().register((original, context) -> {
 			var ID = context.topLevelId();
 			// This is called for every model that is loaded, so make sure we only target ours
-			if (ROOM_CONTROLLER_BLOCK_MODEL_ID.equals(ID)) {
-				return new RoomControllerModel(original);
-			} else {
-				// If we don't modify the model we just return the original as-is
-				return original;
-			}
+			// If we don't modify the model we just return the original as-is
+			return ROOM_CONTROLLER_BLOCK_MODEL_ID.equals(ID)
+			       ? new RoomControllerModel(original)
+			       : original;
 		});
 	}
 }

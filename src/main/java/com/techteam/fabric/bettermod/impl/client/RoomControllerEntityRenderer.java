@@ -14,18 +14,18 @@ import org.jetbrains.annotations.NotNull;
 
 @Environment(EnvType.CLIENT)
 public final class RoomControllerEntityRenderer implements BlockEntityRenderer<RoomControllerBlockEntity> {
-	@Contract(pure = true)
 	public RoomControllerEntityRenderer(BlockEntityRendererFactory.Context ignoredContext) {
+
 	}
 
 
 	@Override
 	public boolean rendersOutsideBoundingBox(RoomControllerBlockEntity blockEntity) {
-		return blockEntity.disguised();
+		return !blockEntity.disguised();
 	}
 
 	@Override
-	public void render(@NotNull RoomControllerBlockEntity blockEntity, float tickDelta, @NotNull MatrixStack matrices, @NotNull VertexConsumerProvider vertexConsumers, int light, int overlay) {
+	public void render(RoomControllerBlockEntity blockEntity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		if (!blockEntity.disguised()) {
 			WorldRenderer.drawBox(
 					matrices,

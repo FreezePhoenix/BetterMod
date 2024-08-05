@@ -17,7 +17,6 @@ public interface IClientLoadableBlockEntity {
 	}
 
 	static void onLoad(BlockEntity blockEntity, ClientWorld world) {
-		// Unfortunately this event is triggered before the block entity actually reads its NBT...
 		if (blockEntity instanceof IClientLoadableBlockEntity loadableBlockEntity) {
 			loadableBlockEntity.onClientLoad(world, blockEntity.getPos(), blockEntity.getCachedState());
 		}

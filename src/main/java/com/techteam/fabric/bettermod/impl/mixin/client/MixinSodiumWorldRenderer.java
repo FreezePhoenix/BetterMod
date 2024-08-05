@@ -1,4 +1,4 @@
-package com.techteam.fabric.bettermod.impl.mixin;
+package com.techteam.fabric.bettermod.impl.mixin.client;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.techteam.fabric.bettermod.impl.hooks.RenderHooks;

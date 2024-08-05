@@ -1,8 +1,8 @@
 package com.techteam.fabric.bettermod.impl.network;
 
-import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.block.entity.RoomControllerBlockEntity;
 import com.techteam.fabric.bettermod.impl.client.gui.RoomControllerScreenHandler;
+import com.techteam.fabric.bettermod.impl.util.Codecs;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -17,6 +17,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 
 public record BoxUpdatePayload(BlockPos pos, Vec3b min, Vec3b max, BlockState state) implements CustomPayload {
 
@@ -26,9 +27,9 @@ public record BoxUpdatePayload(BlockPos pos, Vec3b min, Vec3b max, BlockState st
 	));
 	public static final PacketCodec<RegistryByteBuf, BoxUpdatePayload> CODEC = PacketCodec.tuple(
 			BlockPos.PACKET_CODEC, BoxUpdatePayload::pos,
-			BetterMod.VEC3B, BoxUpdatePayload::min,
-			BetterMod.VEC3B, BoxUpdatePayload::max,
-			BetterMod.BLOCK_STATE, BoxUpdatePayload::state,
+			Codecs.VEC3B, BoxUpdatePayload::min,
+			Codecs.VEC3B, BoxUpdatePayload::max,
+			Codecs.BLOCK_STATE, BoxUpdatePayload::state,
 			BoxUpdatePayload::new
 	);
 
@@ -69,12 +70,12 @@ public record BoxUpdatePayload(BlockPos pos, Vec3b min, Vec3b max, BlockState st
 
 	private static void handle(BoxUpdatePayload payload, ServerPlayNetworking.Context context) {
 		context.server().execute(() -> {
-			byte minX = payload.min().x();
-			byte minY = payload.min().y();
-			byte minZ = payload.min().z();
-			byte maxX = payload.max().x();
-			byte maxY = payload.max().y();
-			byte maxZ = payload.max().z();
+			byte minX = (byte) MathHelper.clamp(payload.min().x(), -63, 0);
+			byte minY = (byte) MathHelper.clamp(payload.min().y(), -63, 0);
+			byte minZ = (byte) MathHelper.clamp(payload.min().z(), -63, 0);
+			byte maxX = (byte) MathHelper.clamp(payload.max().x(), 1, 64);
+			byte maxY = (byte) MathHelper.clamp(payload.max().y(), 1, 64);
+			byte maxZ = (byte) MathHelper.clamp(payload.max().z(), 1, 64);
 			BlockState state = payload.state();
 			ServerWorld world = context.player().getServerWorld();
 			if (world != null) {

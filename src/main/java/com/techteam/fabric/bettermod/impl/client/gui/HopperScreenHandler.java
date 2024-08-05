@@ -13,9 +13,9 @@ import org.jetbrains.annotations.NotNull;
 public class HopperScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 5;
 
-	public HopperScreenHandler(ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, Inventory inventory) {
+	public HopperScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
 
-		super(type, syncId, playerInventory, inventory, null);
+		super(BetterMod.HOPPER_SCREEN_HANDLER_TYPE, syncId, playerInventory, inventory, null);
 		WPlainPanel root = new WPlainPanel();
 		setRootPanel(root);
 		root.setSize(176, 131);
@@ -32,14 +32,5 @@ public class HopperScreenHandler extends SyncedGuiDescription {
 
 	public HopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory) {
 		this(syncId, playerInventory, new SimpleInventory(INVENTORY_SIZE));
-	}
-
-	public HopperScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, Inventory inventory) {
-		this(
-				BetterMod.HOPPER_SCREEN_HANDLER_TYPE,
-				syncId,
-				playerInventory,
-				inventory
-		);
 	}
 }

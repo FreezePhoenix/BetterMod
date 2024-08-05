@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
-public class BitHopperBlockEntity extends BetterHopperBlockEntity<BitHopperBlockEntity> implements IServerLoadableBlockEntity {
+public class BitHopperBlockEntity extends BetterHopperBlockEntity<BitHopperBlockEntity> {
 	public static final Identifier ID = Identifier.of("bettermod", "bit_hopper");
 
 	public BitHopperBlockEntity(@NotNull BlockPos blockPos, BlockState blockState) {

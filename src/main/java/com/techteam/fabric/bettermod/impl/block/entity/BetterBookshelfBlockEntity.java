@@ -33,6 +33,6 @@ public class BetterBookshelfBlockEntity extends BetterBlockEntity {
 
 	@Override
 	public boolean isValid(int slot, @NotNull ItemStack stack) {
-		return stack.isIn(ItemTagKeys.SHELVABLE) && super.isValid(slot, stack);
+		return stack.isIn(ItemTagKeys.SHELVABLE);
 	}
 }

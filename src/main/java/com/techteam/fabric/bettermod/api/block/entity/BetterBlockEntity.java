@@ -3,6 +3,8 @@ package com.techteam.fabric.bettermod.api.block.entity;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.LootableContainerBlockEntity;
@@ -14,12 +16,14 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public abstract class BetterBlockEntity extends LootableContainerBlockEntity {
+public abstract class BetterBlockEntity extends LootableContainerBlockEntity implements SidedStorageBlockEntity {
 	protected DefaultedList<ItemStack> inventory;
 	public SlottedStorage<ItemVariant> SELF;
 	protected final int size;
@@ -32,10 +36,6 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity {
 		this.size = size;
 		this.inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
 		this.SELF = InventoryStorage.of(BetterBlockEntity.this, null);
-	}
-
-	public void dropItems() {
-		ItemScatterer.spawn(world, pos, inventory);
 	}
 
 	@Contract(pure = true)
@@ -77,5 +77,10 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity {
 	@Override
 	public int size() {
 		return size;
+	}
+
+	@Override
+	public @Nullable Storage<ItemVariant> getItemStorage(@Nullable Direction side) {
+		return SELF;
 	}
 }
