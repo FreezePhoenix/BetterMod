@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BetterBlock<E extends BetterBlockEntity> extends BlockWithEntity {
-@Must
+
 	public BetterBlock(@NotNull Settings settings) {
 		super(settings);
 	}
