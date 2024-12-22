@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.8.9'
 	id 'maven-publish'
 }
 
@@ -21,24 +21,27 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation "io.github.cottonmc:LibGui:11.0.0+1.21"
-	include "io.github.cottonmc:LibGui:11.0.0+1.21"
+	// https://github.com/CottonMC/LibGui/wiki/Setup
+	modImplementation "io.github.cottonmc:LibGui:12.0.1+1.21.2"
+	include "io.github.cottonmc:LibGui:12.0.1+1.21.2"
 
 	// When these things change, we want to recompile our mod, and others that depend on it.
 
-	modApi "me.shedaniel.cloth:cloth-config-fabric:15.0.127"
-	modApi "maven.modrinth:modmenu:11.0.1"
+	// https://linkie.shedaniel.dev/?loader=fabric&version=1.21.4
+	modApi "me.shedaniel.cloth:cloth-config-fabric:17.0.144"
+	modApi "maven.modrinth:modmenu:13.0.0-beta.1"
 
-	modImplementation 'maven.modrinth:continuity:3.0.0-beta.5+1.21'
-	modImplementation 'maven.modrinth:sodium:mc1.21-0.5.11'
-	modImplementation 'maven.modrinth:indium:1.0.34+mc1.21'
+//	modImplementation 'maven.modrinth:continuity:3.0.0-beta.5+1.21'
+	modImplementation 'maven.modrinth:sodium:mc1.21.4-0.6.5-fabric'
+	// Indium is no longer required.
+//	modImplementation 'maven.modrinth:indium:1.0.35+mc1.21'
 
-	modImplementation 'maven.modrinth:lithium:mc1.21-0.12.7'
-	modImplementation 'maven.modrinth:entityculling:Bu3hSiJb'
-	modImplementation 'maven.modrinth:spark:1.10.73-fabric'
-	modImplementation 'maven.modrinth:fabric-permissions-api:0.3.1'
-	implementation "io.github.llamalad7:mixinextras-fabric:0.4.0-beta.2"
-	annotationProcessor "io.github.llamalad7:mixinextras-fabric:0.4.0-beta.2"
+	modImplementation 'maven.modrinth:lithium:mc1.21.4-0.14.3-fabric'
+//	modImplementation 'maven.modrinth:entityculling:Bu3hSiJb'
+//	modImplementation 'maven.modrinth:spark:1.10.121-fabric'
+//	modImplementation 'maven.modrinth:fabric-permissions-api:0.3.1'
+
+	annotationProcessor(implementation "io.github.llamalad7:mixinextras-fabric:0.4.0-beta.2")
 
 	implementation "org.joml:joml:1.10.4"
 }

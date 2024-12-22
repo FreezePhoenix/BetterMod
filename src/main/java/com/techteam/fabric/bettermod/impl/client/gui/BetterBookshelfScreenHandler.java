@@ -14,10 +14,6 @@ import org.jetbrains.annotations.NotNull;
 public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 	private static final int INVENTORY_SIZE = 16;
 
-	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory) {
-		this(syncId, playerInventory, new SimpleInventory(INVENTORY_SIZE));
-	}
-
 	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, Inventory inventory) {
 		super(
 				BetterMod.BOOKSHELF_SCREEN_HANDLER_TYPE,
@@ -35,5 +31,9 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 		root.add(slot, 16, 17);
 		root.add(this.createPlayerInventoryPanel(), 7, 55);
 		root.validate(this);
+	}
+
+	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory) {
+		this(syncId, playerInventory, new SimpleInventory(INVENTORY_SIZE));
 	}
 }

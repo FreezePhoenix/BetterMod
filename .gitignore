@@ -21,7 +21,7 @@ classes/
 .settings/
 .vscode/
 bin/
-src/main/generated/.cache/*
+src/main/generated/.cache/
 .classpath
 .project
 

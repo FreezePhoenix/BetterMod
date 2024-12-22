@@ -3,10 +3,6 @@ package com.techteam.fabric.bettermod.impl.util;
 import net.minecraft.text.Text;
 
 public class Texts {
-	public static final Text ROOM_CONTROLLER = Text.translatableWithFallback(
-			"block.bettermod.room_controller",
-			"Room Controller"
-	);
 	public static final Text STICK_HOPPER = Text.translatableWithFallback("block.bettermod.stickhopper",
 	                                                                      "Stick Hopper");
 	public static final Text PULL_HOPPER = Text.translatableWithFallback("block.bettermod.pullhopper", "Pull Hopper");

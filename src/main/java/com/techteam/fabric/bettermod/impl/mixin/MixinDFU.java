@@ -19,18 +19,17 @@ public abstract class MixinDFU extends Schema {
 	}
 
 	@Shadow
-	protected static void method_5273(Schema schema, Map<String, Supplier<TypeTemplate>> map, String name) {
+	protected static void registerInventory(Schema schema, Map<String, Supplier<TypeTemplate>> map, String name) {
 		throw new UnsupportedOperationException();
 	}
 
 	@ModifyReturnValue(method = "registerBlockEntities",
 	                   at = @At("RETURN"))
 	private Map<String, Supplier<TypeTemplate>> onRegisterBlockEntities(Map<String, Supplier<TypeTemplate>> map, Schema schema) {
-		method_5273(schema, map, BitHopperBlockEntity.ID.toString());
-		method_5273(schema, map, PullHopperBlockEntity.ID.toString());
-		method_5273(schema, map, StickHopperBlockEntity.ID.toString());
-		method_5273(schema, map, RoomControllerBlockEntity.ID.toString());
-		method_5273(schema, map, BetterBookshelfBlockEntity.ID.toString());
+		registerInventory(schema, map, BitHopperBlockEntity.ID.toString());
+		registerInventory(schema, map, PullHopperBlockEntity.ID.toString());
+		registerInventory(schema, map, StickHopperBlockEntity.ID.toString());
+		registerInventory(schema, map, BetterBookshelfBlockEntity.ID.toString());
 		return map;
 	}
 }

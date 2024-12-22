@@ -5,7 +5,6 @@
   "plugin": "com.techteam.fabric.bettermod.impl.mixin.MixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinArgb",
     "MixinBlocks",
     "MixinDFU",
     "MixinMobSpawnerLogic",
@@ -15,15 +14,6 @@
     "lithium.BetterHopperBlockMixin",
     "lithium.HopperBlockEntityInvoker",
     "lithium.TickOnIntervalMixin"
-  ],
-  "client": [
-    "client.MixinBlockEntity",
-    "client.MixinBlockEntityRenderDispatcher",
-    "client.MixinClientPlayerEntity",
-    "client.MixinEntity",
-    "client.MixinEntityRenderDispatcher",
-    "client.MixinSodiumWorldRenderer",
-    "client.MixinWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

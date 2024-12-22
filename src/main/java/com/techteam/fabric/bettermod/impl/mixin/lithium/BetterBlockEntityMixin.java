@@ -1,8 +1,8 @@
 package com.techteam.fabric.bettermod.impl.mixin.lithium;
 
 import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
-import me.jellysquid.mods.lithium.api.inventory.LithiumInventory;
-import me.jellysquid.mods.lithium.common.block.entity.inventory_change_tracking.InventoryChangeEmitter;
+import net.caffeinemc.mods.lithium.api.inventory.LithiumInventory;
+import net.caffeinemc.mods.lithium.common.block.entity.inventory_change_tracking.InventoryChangeEmitter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,7 +24,6 @@ public abstract class BetterBlockEntityMixin implements LithiumInventory {
 		this.inventory = newInventory;
 	}
 
-	@SuppressWarnings("UnresolvedMixinReference")
 	@Inject(
 			method = "setHeldStacks",
 			at = @At("RETURN")

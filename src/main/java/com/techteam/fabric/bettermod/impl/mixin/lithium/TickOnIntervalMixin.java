@@ -1,8 +1,8 @@
 package com.techteam.fabric.bettermod.impl.mixin.lithium;
 
 import com.techteam.fabric.bettermod.api.block.entity.TickOnInterval;
-import me.jellysquid.mods.lithium.common.block.entity.SleepingBlockEntity;
-import me.jellysquid.mods.lithium.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
+import net.caffeinemc.mods.lithium.common.block.entity.SleepingBlockEntity;
+import net.caffeinemc.mods.lithium.mixin.world.block_entity_ticking.sleeping.WrappedBlockEntityTickInvokerAccessor;
 import net.minecraft.world.chunk.BlockEntityTickInvoker;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +19,7 @@ public class TickOnIntervalMixin implements SleepingBlockEntity {
 	@Unique
 	private BlockEntityTickInvoker sleepingTicker = null;
 	@Shadow(remap = false)
-	protected long LAST_TICK;
+	public long LAST_TICK;
 
 	@Inject(
 			method = "setCooldown",

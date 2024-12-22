@@ -5,12 +5,12 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.techteam.fabric.bettermod.api.block.entity.TickOnInterval;
 import com.techteam.fabric.bettermod.impl.block.entity.BetterHopperBlockEntity;
 import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
-import me.jellysquid.mods.lithium.api.inventory.LithiumCooldownReceivingInventory;
-import me.jellysquid.mods.lithium.api.inventory.LithiumInventory;
-import me.jellysquid.mods.lithium.common.block.entity.SleepingBlockEntity;
-import me.jellysquid.mods.lithium.common.block.entity.inventory_change_tracking.InventoryChangeListener;
-import me.jellysquid.mods.lithium.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
-import me.jellysquid.mods.lithium.common.hopper.*;
+import net.caffeinemc.mods.lithium.api.inventory.LithiumCooldownReceivingInventory;
+import net.caffeinemc.mods.lithium.api.inventory.LithiumInventory;
+import net.caffeinemc.mods.lithium.common.block.entity.SleepingBlockEntity;
+import net.caffeinemc.mods.lithium.common.block.entity.inventory_change_tracking.InventoryChangeListener;
+import net.caffeinemc.mods.lithium.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
+import net.caffeinemc.mods.lithium.common.hopper.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.block.entity.BlockEntity;
@@ -64,21 +64,20 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 	ReferenceArraySet<InventoryChangeListener> inventoryHandlingTypeListeners = null;
 
 
-	public BetterHopperBlockEntityMixin(BlockEntityType<T> blockEntityType,
-	                                    @NotNull BlockPos blockPos, BlockState blockState, int size) {
+	public BetterHopperBlockEntityMixin(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState, size);
 	}
 
-	@WrapMethod(method = "insert", remap = false)
+	@WrapMethod(method = "insert",
+	            remap = false)
 	public boolean insertHook(Operation<Boolean> fallback) {
 		return lithiumInsert(getInsertBlockInventory(world), fallback::call);
 	}
 
 
 	@Inject(method = "scheduledTick",
-	        at = @At("TAIL")
-	)
-	public void scheduledTickHook(World world, BlockPos pos, BlockState blockState, CallbackInfo callbackInfo) {
+	        at = @At("TAIL"))
+	private void scheduledTickHook(World world, BlockPos pos, BlockState blockState, CallbackInfo callbackInfo) {
 		this.checkSleepingConditions();
 	}
 
@@ -100,17 +99,15 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 				//noinspection ForLoopReplaceableByForEach
 				for (int i = 0; i < size; ++i) {
 					ItemStack transferStack = hopperStackList.get(i);
-					if (!transferStack.isEmpty() && HopperBlockEntityInvoker.invokeCanExtract(
-							insertInventory,
-							this,
-							transferStack,
-							size,
-							facing
+					if (!transferStack.isEmpty() && HopperBlockEntityInvoker.invokeCanExtract(insertInventory,
+					                                                                          this,
+					                                                                          transferStack,
+					                                                                          size,
+					                                                                          facing
 					)) {
-						boolean transferSuccess = HopperHelper.tryMoveSingleItem(
-								insertInventory,
-								transferStack,
-								fromDirection
+						boolean transferSuccess = HopperHelper.tryMoveSingleItem(insertInventory,
+						                                                         transferStack,
+						                                                         fromDirection
 						);
 						if (transferSuccess) {
 							if (insertInventoryWasEmptyHopperNotDisabled) {
@@ -339,6 +336,12 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 		}
 	}
 
+	public void lithium$invalidateCacheOnUndirectedNeighborUpdate() {
+		if (this.insertionMode == HopperCachingState.BlockInventory.NO_BLOCK_INVENTORY || this.insertionMode == HopperCachingState.BlockInventory.BLOCK_STATE) {
+			this.invalidateBlockInsertionData();
+		}
+	}
+
 	public void lithium$invalidateCacheOnNeighborUpdate(Direction fromDirection) {
 		if (this.getCachedState().get(HopperBlock.FACING) == fromDirection) {
 			this.lithium$invalidateCacheOnNeighborUpdate(false);
@@ -366,45 +369,41 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 
 	@Unique
 	private void checkSleepingConditions() {
-		if (!(this.cooldown > 0)) {
-			if (this.isSleeping()) {
-				return;
-			}
+		if (this.cooldown > 0) {
+			return;
+		}
+		if (this.isSleeping()) {
+			return;
+		}
+		if (!this.shouldCheckSleep) {
+			this.shouldCheckSleep = true;
+			return;
+		}
+		boolean listenToInsertTracker = false;
 
-			if (!this.shouldCheckSleep) {
-				this.shouldCheckSleep = true;
-				return;
-			}
+		LithiumStackList thisStackList = InventoryHelper.getLithiumStackList(this);
 
-			boolean listenToInsertTracker = false;
-			LithiumStackList thisStackList = InventoryHelper.getLithiumStackList(this);
-			Inventory blockInventory;
-
-			if (this.insertionMode != HopperCachingState.BlockInventory.BLOCK_STATE && 0 < thisStackList.getOccupiedSlots()) {
-				if (this.insertionMode == HopperCachingState.BlockInventory.REMOVAL_TRACKING_BLOCK_ENTITY) {
-					blockInventory = this.insertBlockInventory;
-					if (this.insertStackList == null || !(blockInventory instanceof InventoryChangeTracker)) {
-						return;
-					}
-
+		if (this.insertionMode != HopperCachingState.BlockInventory.BLOCK_STATE && 0 < thisStackList.getOccupiedSlots()) {
+			if (this.insertionMode == HopperCachingState.BlockInventory.REMOVAL_TRACKING_BLOCK_ENTITY) {
+				Inventory blockInventory = this.insertBlockInventory;
+				if (this.insertStackList != null && blockInventory instanceof InventoryChangeTracker) {
 					listenToInsertTracker = true;
 				} else {
-					if (this.insertionMode != HopperCachingState.BlockInventory.NO_BLOCK_INVENTORY) {
-						return;
-					}
+					return;
 				}
+			} else {
+				return;
 			}
-
-			if (listenToInsertTracker) {
-				((InventoryChangeTracker) this.insertBlockInventory).listenForContentChangesOnce(
-						this.insertStackList,
-						this
-				);
-			}
-
-			this.listenForContentChangesOnce(thisStackList, this);
-			this.lithium$startSleeping();
 		}
+
+		if (listenToInsertTracker) {
+			((InventoryChangeTracker) this.insertBlockInventory).listenForContentChangesOnce(
+					this.insertStackList,
+					this
+			);
+		}
+		this.listenForContentChangesOnce(thisStackList, this);
+		this.lithium$startSleeping();
 	}
 
 	public boolean lithium$handleComparatorAdded(Inventory inventory) {

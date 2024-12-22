@@ -3,11 +3,10 @@ package com.techteam.fabric.bettermod.impl.mixin.lithium;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.techteam.fabric.bettermod.impl.block.entity.BetterExtractingHopperBlockEntity;
-import com.techteam.fabric.bettermod.impl.block.entity.PullHopperBlockEntity;
-import me.jellysquid.mods.lithium.api.inventory.LithiumInventory;
-import me.jellysquid.mods.lithium.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
-import me.jellysquid.mods.lithium.common.block.entity.inventory_comparator_tracking.ComparatorTracker;
-import me.jellysquid.mods.lithium.common.hopper.*;
+import net.caffeinemc.mods.lithium.api.inventory.LithiumInventory;
+import net.caffeinemc.mods.lithium.common.block.entity.inventory_change_tracking.InventoryChangeTracker;
+import net.caffeinemc.mods.lithium.common.block.entity.inventory_comparator_tracking.ComparatorTracker;
+import net.caffeinemc.mods.lithium.common.hopper.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HopperBlock;
 import net.minecraft.block.entity.BlockEntity;
@@ -52,14 +51,12 @@ public abstract class BetterExtractingHopperBlockEntityMixin<T extends BetterExt
 		super(blockEntityType, blockPos, blockState, size);
 	}
 
-	@SuppressWarnings("UnresolvedMixinReference")
 	@WrapMethod(method = "extract", remap = false)
 	public boolean extractHook(Operation<Boolean> fallback) {
 		var extractInventory = getExtractBlockInventory(world);
 		return lithiumExtract(extractInventory, fallback::call);
 	}
 
-	@SuppressWarnings("UnresolvedMixinReference")
 	@Inject(method = "scheduledTick",
 	        at = @At("RETURN"))
 	public void scheduledTickHook(World world, BlockPos pos, BlockState blockState, CallbackInfo callbackInfo) {
@@ -75,7 +72,15 @@ public abstract class BetterExtractingHopperBlockEntityMixin<T extends BetterExt
 		} else if (this.insertionMode == HopperCachingState.BlockInventory.NO_BLOCK_INVENTORY || this.insertionMode == HopperCachingState.BlockInventory.BLOCK_STATE) {
 			this.invalidateBlockInsertionData();
 		}
+	}
 
+	public void lithium$invalidateCacheOnUndirectedNeighborUpdate() {
+		if (this.extractionMode == HopperCachingState.BlockInventory.NO_BLOCK_INVENTORY || this.extractionMode == HopperCachingState.BlockInventory.BLOCK_STATE) {
+			this.invalidateBlockExtractionData();
+		}
+		if (this.insertionMode == HopperCachingState.BlockInventory.NO_BLOCK_INVENTORY || this.insertionMode == HopperCachingState.BlockInventory.BLOCK_STATE) {
+			this.invalidateBlockInsertionData();
+		}
 	}
 
 	public void lithium$invalidateCacheOnNeighborUpdate(Direction fromDirection) {

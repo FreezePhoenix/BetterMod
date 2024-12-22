@@ -6,10 +6,6 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 
 @Config(name = "bettermod")
 public class BetterModConfig implements ConfigData {
-	@ConfigEntry.Gui.Tooltip
-	public boolean LogRoomTransitions = false;
-	@ConfigEntry.Gui.Tooltip
-	public boolean LogRoomAllocations = false;
 
 	@Override
 	public void validatePostLoad() {

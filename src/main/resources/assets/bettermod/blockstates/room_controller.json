@@ -1,7 +1,7 @@
 {
 	"variants": {
 		"": {
-			"model": "betterperf:block/room_controller"
+			"model": "bettermod:block/room_controller"
 		}
 	}
 }
