@@ -1,23 +1,25 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "bettermod:block/stickhop_down"
-  },
-  "variants": {
-    "facing=down": {
-      "model": "bettermod:block/stickhop_down"
-    },
-    "facing=north": {
-      "model": "bettermod:block/stickhop_side"
-    },
-    "facing=south": {
-      "model": "bettermod:block/stickhop_side", "y": 180
-    },
-    "facing=west": {
-      "model": "bettermod:block/stickhop_side", "y": 270
-    },
-    "facing=east": {
-      "model": "bettermod:block/stickhop_side", "y": 90
-    }
-  }
+	"defaults": {
+		"model": "bettermod:block/stickhop_down"
+	},
+	"variants": {
+		"facing=down": {
+			"model": "bettermod:block/stickhop_down"
+		},
+		"facing=north": {
+			"model": "bettermod:block/stickhop_side"
+		},
+		"facing=south": {
+			"model": "bettermod:block/stickhop_side",
+			"y": 180
+		},
+		"facing=west": {
+			"model": "bettermod:block/stickhop_side",
+			"y": 270
+		},
+		"facing=east": {
+			"model": "bettermod:block/stickhop_side",
+			"y": 90
+		}
+	}
 }

@@ -1,23 +1,25 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "bettermod:block/pullhop_down"
-  },
-  "variants": {
-    "facing=down": {
-      "model": "bettermod:block/pullhop_down"
-    },
-    "facing=north": {
-      "model": "bettermod:block/pullhop_side"
-    },
-    "facing=south": {
-      "model": "bettermod:block/pullhop_side", "y": 180
-    },
-    "facing=west": {
-      "model": "bettermod:block/pullhop_side", "y": 270
-    },
-    "facing=east": {
-      "model": "bettermod:block/pullhop_side", "y": 90
-    }
-  }
+	"defaults": {
+		"model": "bettermod:block/pullhop_down"
+	},
+	"variants": {
+		"facing=down": {
+			"model": "bettermod:block/pullhop_down"
+		},
+		"facing=north": {
+			"model": "bettermod:block/pullhop_side"
+		},
+		"facing=south": {
+			"model": "bettermod:block/pullhop_side",
+			"y": 180
+		},
+		"facing=west": {
+			"model": "bettermod:block/pullhop_side",
+			"y": 270
+		},
+		"facing=east": {
+			"model": "bettermod:block/pullhop_side",
+			"y": 90
+		}
+	}
 }
