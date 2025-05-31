@@ -5,6 +5,7 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
@@ -27,9 +28,9 @@ public abstract class BetterBlock<E extends BetterBlockEntity> extends BlockWith
 	}
 
 	@Override
-	protected void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-		ItemScatterer.onStateReplaced(state, newState, world, pos);
-		super.onStateReplaced(state, world, pos, newState, moved);
+	protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+		ItemScatterer.onStateReplaced(state, world, pos);
+		super.onStateReplaced(state, world, pos, moved);
 	}
 
 	@Override

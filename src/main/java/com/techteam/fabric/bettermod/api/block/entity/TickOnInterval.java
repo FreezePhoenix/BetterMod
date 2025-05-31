@@ -39,7 +39,7 @@ public abstract class TickOnInterval<T extends BetterBlockEntity> extends Better
 
 	@Override
 	public void readNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		this.cooldown = tag.getInt(COOLDOWN_ID);
+		this.cooldown = tag.getInt(COOLDOWN_ID, 0);
 		super.readNbt(tag, registryLookup);
 	}
 

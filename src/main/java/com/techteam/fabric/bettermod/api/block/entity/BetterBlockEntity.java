@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.Uuids;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -45,9 +46,7 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity imp
 
 	@Override
 	public void readNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		if (tag.containsUuid(Entity.UUID_KEY)) {
-			uuid = tag.getUuid(Entity.UUID_KEY);
-		}
+		tag.get("UUID", Uuids.INT_STREAM_CODEC).ifPresent(uuid -> this.uuid = uuid);
 		this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
 		if (!this.readLootTable(tag)) {
 			Inventories.readNbt(tag, this.getHeldStacks(), registryLookup);
@@ -57,7 +56,7 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity imp
 
 	@Override
 	public void writeNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		tag.putUuid(Entity.UUID_KEY, this.getUUID());
+		tag.put(Entity.UUID_KEY, Uuids.INT_STREAM_CODEC, this.getUUID());
 		if (!this.writeLootTable(tag)) {
 			Inventories.writeNbt(tag, this.getHeldStacks(), registryLookup);
 		}

@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.8.9'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -22,21 +22,21 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// https://github.com/CottonMC/LibGui/wiki/Setup
-	modImplementation "io.github.cottonmc:LibGui:12.0.1+1.21.2"
-	include "io.github.cottonmc:LibGui:12.0.1+1.21.2"
+	modImplementation "io.github.cottonmc:LibGui:13.1.0+1.21.5"
+	include "io.github.cottonmc:LibGui:13.1.0+1.21.5"
 
 	// When these things change, we want to recompile our mod, and others that depend on it.
 
 	// https://linkie.shedaniel.dev/?loader=fabric&version=1.21.4
-	modApi "me.shedaniel.cloth:cloth-config-fabric:17.0.144"
-	modApi "maven.modrinth:modmenu:13.0.0-beta.1"
+	modApi "me.shedaniel.cloth:cloth-config-fabric:18.0.145"
+	modApi "maven.modrinth:modmenu:14.0.0-rc.2"
 
 //	modImplementation 'maven.modrinth:continuity:3.0.0-beta.5+1.21'
-	modImplementation 'maven.modrinth:sodium:mc1.21.4-0.6.6-fabric'
+	modImplementation 'maven.modrinth:sodium:mc1.21.5-0.6.13-fabric'
 	// Indium is no longer required.
 //	modImplementation 'maven.modrinth:indium:1.0.35+mc1.21'
 
-	modImplementation 'maven.modrinth:lithium:mc1.21.4-0.14.3-fabric'
+	modImplementation 'maven.modrinth:lithium:mc1.21.5-0.16.2-fabric'
 //	modImplementation 'maven.modrinth:entityculling:Bu3hSiJb'
 //	modImplementation 'maven.modrinth:spark:1.10.121-fabric'
 //	modImplementation 'maven.modrinth:fabric-permissions-api:0.3.1'

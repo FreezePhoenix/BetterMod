@@ -5,6 +5,7 @@ import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.techteam.fabric.bettermod.impl.block.entity.*;
 import net.minecraft.datafixer.schema.Schema1460;
+import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,10 +27,10 @@ public abstract class MixinDFU extends Schema {
 	@ModifyReturnValue(method = "registerBlockEntities",
 	                   at = @At("RETURN"))
 	private Map<String, Supplier<TypeTemplate>> onRegisterBlockEntities(Map<String, Supplier<TypeTemplate>> map, Schema schema) {
-		registerInventory(schema, map, BitHopperBlockEntity.ID.toString());
-		registerInventory(schema, map, PullHopperBlockEntity.ID.toString());
-		registerInventory(schema, map, StickHopperBlockEntity.ID.toString());
-		registerInventory(schema, map, BetterBookshelfBlockEntity.ID.toString());
+		registerInventory(schema, map, "bettermod:bit_hopper");
+		registerInventory(schema, map, "bettermod:pull_hopper");
+		registerInventory(schema, map, "bettermod:stick_hopper");
+		registerInventory(schema, map, "minecraft:bookshelf");
 		return map;
 	}
 }

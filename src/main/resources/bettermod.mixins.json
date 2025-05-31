@@ -7,7 +7,6 @@
   "mixins": [
     "MixinBlocks",
     "MixinDFU",
-    "MixinMobSpawnerLogic",
     "lithium.BetterBlockEntityMixin",
     "lithium.BetterExtractingHopperBlockEntityMixin",
     "lithium.BetterHopperBlockEntityMixin",
