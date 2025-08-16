@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "bettermod",
-	"version": "1.7.15",
+	"version": "1.7.19",
 
 	"name": "BetterMod",
 	"description": "Improve your MC world! Put items in Bookshelves! Use Room Controllers!",
@@ -36,6 +36,6 @@
 	"depends": {
 		"fabricloader": ">=0.15.11",
 		"fabric": "*",
-		"minecraft": "1.21.5"
+		"minecraft": "1.21.8"
 	}
 }

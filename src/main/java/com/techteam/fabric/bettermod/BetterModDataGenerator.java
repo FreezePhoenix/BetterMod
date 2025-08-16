@@ -42,7 +42,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void configure(RegistryWrapper.WrapperLookup arg) {
-			getOrCreateTagBuilder(SHELVABLE_ITEMS)
+			valueLookupBuilder(SHELVABLE_ITEMS)
 					.addOptionalTag(ItemTags.BOOKSHELF_BOOKS)
 					.add(Items.PAPER)
 					.add(Items.FILLED_MAP)

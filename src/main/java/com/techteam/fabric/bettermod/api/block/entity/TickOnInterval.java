@@ -6,6 +6,8 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
@@ -32,15 +34,15 @@ public abstract class TickOnInterval<T extends BetterBlockEntity> extends Better
 	public abstract void scheduledTick(World world, BlockPos pos, BlockState blockState);
 
 	@Override
-	public void writeNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		tag.putInt(COOLDOWN_ID, cooldown);
-		super.writeNbt(tag, registryLookup);
+	public void writeData(WriteView view) {
+		super.writeData(view);
+		view.putInt(COOLDOWN_ID, cooldown);;
 	}
 
 	@Override
-	public void readNbt(@NotNull NbtCompound tag, RegistryWrapper.WrapperLookup registryLookup) {
-		this.cooldown = tag.getInt(COOLDOWN_ID, 0);
-		super.readNbt(tag, registryLookup);
+	public void readData(ReadView view) {
+		super.readData(view);
+		this.cooldown = view.getInt(COOLDOWN_ID, 0);
 	}
 
 	public void setCooldown(int cooldown, boolean special) {

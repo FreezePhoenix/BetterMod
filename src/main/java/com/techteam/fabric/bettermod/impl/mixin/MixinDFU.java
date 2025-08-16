@@ -27,6 +27,7 @@ public abstract class MixinDFU extends Schema {
 	@ModifyReturnValue(method = "registerBlockEntities",
 	                   at = @At("RETURN"))
 	private Map<String, Supplier<TypeTemplate>> onRegisterBlockEntities(Map<String, Supplier<TypeTemplate>> map, Schema schema) {
+
 		registerInventory(schema, map, "bettermod:bit_hopper");
 		registerInventory(schema, map, "bettermod:pull_hopper");
 		registerInventory(schema, map, "bettermod:stick_hopper");
