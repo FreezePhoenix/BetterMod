@@ -51,13 +51,11 @@ public abstract class TickOnInterval<T extends BetterBlockEntity> extends Better
 
 	@Override
 	public final void tick(World world, BlockPos pos, BlockState blockState) {
-		if (!world.isClient()) {
-			cooldown--;
-			LAST_TICK = world.getTime();
-			if (!(cooldown > 0)) {
-				cooldown = 0;
-				scheduledTick(world, pos, blockState);
-			}
+		cooldown--;
+		LAST_TICK = world.getTime();
+		if (!(cooldown > 0)) {
+			cooldown = 0;
+			scheduledTick(world, pos, blockState);
 		}
 	}
 }

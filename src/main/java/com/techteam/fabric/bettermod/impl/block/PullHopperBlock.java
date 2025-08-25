@@ -1,6 +1,7 @@
 package com.techteam.fabric.bettermod.impl.block;
 
 import com.mojang.serialization.MapCodec;
+import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.block.entity.PullHopperBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -161,10 +162,5 @@ public final class PullHopperBlock extends BetterHopperBlock<PullHopperBlockEnti
 			case EAST -> EAST_RAYCAST_SHAPE;
 			default -> DOWN_RAYCAST_SHAPE;
 		};
-	}
-
-	@Override
-	public PullHopperBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-		return new PullHopperBlockEntity(pos, state);
 	}
 }

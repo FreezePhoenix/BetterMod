@@ -49,7 +49,7 @@ public abstract class BetterBlockEntity extends LootableContainerBlockEntity imp
 	@Override
 	protected void readData(ReadView view) {
 		super.readData(view);
-		view.read("UUID", Uuids.INT_STREAM_CODEC).ifPresent(uuid -> this.uuid = uuid);
+		view.read(Entity.UUID_KEY, Uuids.INT_STREAM_CODEC).ifPresent(uuid -> this.uuid = uuid);
 		this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
 		if (!this.readLootTable(view)) {
 			Inventories.readData(view, this.inventory);

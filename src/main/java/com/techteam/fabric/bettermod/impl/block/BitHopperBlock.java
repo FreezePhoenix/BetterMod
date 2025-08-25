@@ -1,6 +1,7 @@
 package com.techteam.fabric.bettermod.impl.block;
 
 import com.mojang.serialization.MapCodec;
+import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.block.entity.BitHopperBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -112,11 +113,5 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 			case EAST -> EAST_RAYCAST_SHAPE;
 			default -> DOWN_RAYCAST_SHAPE;
 		};
-	}
-
-
-	@Override
-	public BitHopperBlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-		return new BitHopperBlockEntity(pos, state);
 	}
 }

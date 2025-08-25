@@ -81,11 +81,12 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		return block;
 	}
 
-	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block) {
-		return Registry.register(
+	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block, FabricBlockEntityTypeBuilder.Factory<E> factory) {
+		return block.blockEntityType = Registry.register(
 				Registries.BLOCK_ENTITY_TYPE,
 				ID,
-				FabricBlockEntityTypeBuilder.create(block::createBlockEntity, block).build()
+
+				FabricBlockEntityTypeBuilder.create(factory, block).build()
 		);
 	}
 
@@ -114,7 +115,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 		if (Blocks.BOOKSHELF instanceof BetterBookshelfBlock betterBookshelfBlock) {
 			LOGGER.info("BetterBookshelves was successful!");
-			BOOKSHELF_BLOCK_ENTITY_TYPE = registerBlockEntityType(BetterBookshelfBlock.ID, betterBookshelfBlock);
+			BOOKSHELF_BLOCK_ENTITY_TYPE = registerBlockEntityType(BetterBookshelfBlock.ID, betterBookshelfBlock, BetterBookshelfBlockEntity::new);
 		} else {
 			LOGGER.error("BetterBookshelves was not successful! This is a bug!");
 		}
@@ -127,18 +128,18 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 				BitHopperBlock.ID,
 				new BitHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER).registryKey( RegistryKey.of(RegistryKeys.BLOCK,BitHopperBlock.ID)))
 		);
-		STICK_HOPPER_BLOCK = registerBlock(
-				StickHopperBlock.ID,
-				new StickHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER).registryKey( RegistryKey.of(RegistryKeys.BLOCK,StickHopperBlock.ID)))
-		);
 		PULL_HOPPER_BLOCK = registerBlock(
 				PullHopperBlock.ID,
 				new PullHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER).registryKey( RegistryKey.of(RegistryKeys.BLOCK,PullHopperBlock.ID)))
 		);
+		STICK_HOPPER_BLOCK = registerBlock(
+				StickHopperBlock.ID,
+				new StickHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER).registryKey( RegistryKey.of(RegistryKeys.BLOCK,StickHopperBlock.ID)))
+		);
 
-		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(BitHopperBlockEntity.ID, BIT_HOPPER_BLOCK);
-		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(StickHopperBlockEntity.ID, STICK_HOPPER_BLOCK);
-		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(PullHopperBlockEntity.ID, PULL_HOPPER_BLOCK);
+		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(BitHopperBlockEntity.ID, BIT_HOPPER_BLOCK, BitHopperBlockEntity::new);
+		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(PullHopperBlockEntity.ID, PULL_HOPPER_BLOCK, PullHopperBlockEntity::new);
+		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(StickHopperBlockEntity.ID, STICK_HOPPER_BLOCK, StickHopperBlockEntity::new);
 
 		BOOKSHELF_SCREEN_HANDLER_TYPE = registerScreenHandler(
 				BetterBookshelfBlock.ID,

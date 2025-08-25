@@ -5,7 +5,7 @@
   "plugin": "com.techteam.fabric.bettermod.impl.mixin.MixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinBlocks",
+    "bookshelf.MixinBlocks",
     "MixinDFU",
     "lithium.BetterBlockEntityMixin",
     "lithium.BetterExtractingHopperBlockEntityMixin",

@@ -1,6 +1,7 @@
 package com.techteam.fabric.bettermod.impl.block;
 
 import com.mojang.serialization.MapCodec;
+import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.block.entity.StickHopperBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -150,11 +151,5 @@ public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEn
 			case EAST -> EAST_RAYCAST_SHAPE;
 			default -> DOWN_RAYCAST_SHAPE;
 		};
-	}
-
-	@Contract("_, _ -> new")
-	@Override
-	public @NotNull StickHopperBlockEntity createBlockEntity(@NotNull BlockPos pos, BlockState state) {
-		return new StickHopperBlockEntity(pos, state);
 	}
 }
