@@ -1,8 +1,6 @@
 package com.techteam.fabric.bettermod.impl.block.entity;
 
 import com.techteam.fabric.bettermod.api.block.entity.TickOnInterval;
-import com.techteam.fabric.bettermod.api.block.entity.loadable.IServerLoadableBlockEntity;
-import com.techteam.fabric.bettermod.impl.client.gui.HopperScreenHandler;
 import com.techteam.fabric.bettermod.impl.util.InventoryUtil;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
@@ -11,6 +9,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.screen.HopperScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
@@ -19,7 +18,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<T>> extends TickOnInterval<T> implements IServerLoadableBlockEntity {
+public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<T>> extends TickOnInterval<T> {
 	public static final int MAX_COOLDOWN = 8;
 	protected BlockPos insertionPos;
 	protected Direction facing;
@@ -45,8 +44,11 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 	}
 
 	@Override
-	public void onServerLoad(ServerWorld world, BlockPos pos, BlockState state) {
-		PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, insertionPos);
+	public void setWorld(World world) {
+		super.setWorld(world);
+		if (world instanceof ServerWorld serverWorld) {
+			PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, serverWorld, insertionPos);
+		}
 	}
 
 	public boolean insert() {

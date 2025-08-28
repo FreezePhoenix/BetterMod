@@ -1,19 +1,12 @@
 package com.techteam.fabric.bettermod.api.block.entity;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.block.HopperBlock;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.HopperBlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.IntSupplier;
 
 public abstract class TickOnInterval<T extends BetterBlockEntity> extends BetterBlockEntity implements ITickable {
 	private static final String COOLDOWN_ID = "TickOnInterval::cooldown";
@@ -36,7 +29,7 @@ public abstract class TickOnInterval<T extends BetterBlockEntity> extends Better
 	@Override
 	public void writeData(WriteView view) {
 		super.writeData(view);
-		view.putInt(COOLDOWN_ID, cooldown);;
+		view.putInt(COOLDOWN_ID, cooldown);
 	}
 
 	@Override

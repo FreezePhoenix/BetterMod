@@ -69,14 +69,14 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 	}
 
 	@WrapMethod(method = "insert",
-	            remap = false)
+				remap = false)
 	public boolean insertHook(Operation<Boolean> fallback) {
 		return lithiumInsert(getInsertBlockInventory(world), fallback::call);
 	}
 
 
 	@Inject(method = "scheduledTick",
-	        at = @At("TAIL"))
+			at = @At("TAIL"))
 	private void scheduledTickHook(World world, BlockPos pos, BlockState blockState, CallbackInfo callbackInfo) {
 		this.checkSleepingConditions();
 	}
@@ -91,23 +91,25 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 		if (this.insertInventory != insertInventory || hopperStackList.getModCount() != this.myModCountAtLastInsert || this.insertStackList == null || this.insertStackList.getModCount() != this.insertStackListModCount) {
 			boolean insertInventoryWasEmptyHopperNotDisabled = insertInventory instanceof BetterHopperBlockEntity<?> && this.insertStackList != null && this.insertStackList.getOccupiedSlots() == 0;
 			boolean insertInventoryHandlesModdedCooldown = ((LithiumCooldownReceivingInventory) insertInventory).canReceiveTransferCooldown() && this.insertStackList != null
-			                                               ? this.insertStackList.getOccupiedSlots() == 0
-			                                               : insertInventory.isEmpty();
+														   ? this.insertStackList.getOccupiedSlots() == 0
+														   : insertInventory.isEmpty();
 			if (!(this.insertInventory == insertInventory && this.insertStackList.getFullSlots() == this.insertStackList.size())) {
 				Direction fromDirection = this.facing.getOpposite();
 				int size = hopperStackList.size();
 				//noinspection ForLoopReplaceableByForEach
 				for (int i = 0; i < size; ++i) {
 					ItemStack transferStack = hopperStackList.get(i);
-					if (!transferStack.isEmpty() && HopperBlockEntityInvoker.invokeCanExtract(insertInventory,
-					                                                                          this,
-					                                                                          transferStack,
-					                                                                          size,
-					                                                                          facing
+					if (!transferStack.isEmpty() && HopperBlockEntityInvoker.invokeCanExtract(
+							insertInventory,
+							this,
+							transferStack,
+							size,
+							facing
 					)) {
-						boolean transferSuccess = HopperHelper.tryMoveSingleItem(insertInventory,
-						                                                         transferStack,
-						                                                         fromDirection
+						boolean transferSuccess = HopperHelper.tryMoveSingleItem(
+								insertInventory,
+								transferStack,
+								fromDirection
 						);
 						if (transferSuccess) {
 							if (insertInventoryWasEmptyHopperNotDisabled) {
@@ -222,8 +224,8 @@ public abstract class BetterHopperBlockEntityMixin<T extends BetterHopperBlockEn
 			} else {
 				this.insertBlockInventory = insertInventory;
 				this.insertionMode = insertInventory instanceof BlockStateOnlyInventory
-				                     ? HopperCachingState.BlockInventory.BLOCK_STATE
-				                     : HopperCachingState.BlockInventory.UNKNOWN;
+									 ? HopperCachingState.BlockInventory.BLOCK_STATE
+									 : HopperCachingState.BlockInventory.UNKNOWN;
 			}
 		} else {
 			this.insertBlockInventory = insertInventory;

@@ -1,7 +1,6 @@
 package com.techteam.fabric.bettermod.impl.block;
 
 import com.mojang.serialization.MapCodec;
-import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.block.entity.StickHopperBlockEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -37,93 +36,102 @@ public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEn
 	);
 	private static final VoxelShape DOWN_SHAPE = VoxelShapes.union(
 			DEFAULT_SHAPE,
-			Block.createCuboidShape(6.0,
-			                        0.0,
-			                        6.0,
-			                        10.0,
-			                        4.0,
-			                        10.0
+			Block.createCuboidShape(
+					6.0,
+					0.0,
+					6.0,
+					10.0,
+					4.0,
+					10.0
 			)
 	);
 	private static final VoxelShape EAST_SHAPE = VoxelShapes.union(
 			DEFAULT_SHAPE,
-			Block.createCuboidShape(12.0,
-			                        4.0,
-			                        6.0,
-			                        16.0,
-			                        8.0,
-			                        10.0
+			Block.createCuboidShape(
+					12.0,
+					4.0,
+					6.0,
+					16.0,
+					8.0,
+					10.0
 			)
 	);
 	private static final VoxelShape NORTH_SHAPE = VoxelShapes.union(
 			DEFAULT_SHAPE,
-			Block.createCuboidShape(6.0,
-			                        4.0,
-			                        0.0,
-			                        10.0,
-			                        8.0,
-			                        4.0
+			Block.createCuboidShape(
+					6.0,
+					4.0,
+					0.0,
+					10.0,
+					8.0,
+					4.0
 			)
 	);
 	private static final VoxelShape SOUTH_SHAPE = VoxelShapes.union(
 			DEFAULT_SHAPE,
-			Block.createCuboidShape(6.0,
-			                        4.0,
-			                        12.0,
-			                        10.0,
-			                        8.0,
-			                        16.0
+			Block.createCuboidShape(
+					6.0,
+					4.0,
+					12.0,
+					10.0,
+					8.0,
+					16.0
 			)
 	);
 	private static final VoxelShape WEST_SHAPE = VoxelShapes.union(
 			DEFAULT_SHAPE,
-			Block.createCuboidShape(0.0,
-			                        4.0,
-			                        6.0,
-			                        4.0,
-			                        8.0,
-			                        10.0
+			Block.createCuboidShape(
+					0.0,
+					4.0,
+					6.0,
+					4.0,
+					8.0,
+					10.0
 			)
 	);
 	private static final VoxelShape DOWN_RAYCAST_SHAPE = INSIDE_SHAPE;
 	private static final VoxelShape EAST_RAYCAST_SHAPE = VoxelShapes.union(
 			INSIDE_SHAPE,
-			Block.createCuboidShape(12.0,
-			                        8.0,
-			                        6.0,
-			                        16.0,
-			                        10.0,
-			                        10.0
+			Block.createCuboidShape(
+					12.0,
+					8.0,
+					6.0,
+					16.0,
+					10.0,
+					10.0
 			)
 	);
 	private static final VoxelShape NORTH_RAYCAST_SHAPE = VoxelShapes.union(
 			INSIDE_SHAPE,
-			Block.createCuboidShape(6.0,
-			                        8.0,
-			                        0.0,
-			                        10.0,
-			                        10.0,
-			                        4.0
+			Block.createCuboidShape(
+					6.0,
+					8.0,
+					0.0,
+					10.0,
+					10.0,
+					4.0
 			)
 	);
 	private static final VoxelShape SOUTH_RAYCAST_SHAPE = VoxelShapes.union(
 			INSIDE_SHAPE,
-			Block.createCuboidShape(6.0,
-			                        8.0,
-			                        12.0,
-			                        10.0,
-			                        10.0,
-			                        16.0
+			Block.createCuboidShape(
+					6.0,
+					8.0,
+					12.0,
+					10.0,
+					10.0,
+					16.0
 			)
 	);
 	private static final VoxelShape WEST_RAYCAST_SHAPE = VoxelShapes.union(
 			INSIDE_SHAPE,
-			Block.createCuboidShape(0.0,
-			                        8.0,
-			                        6.0,
-			                        4.0,
-			                        10.0,
-			                        10.0
+			Block.createCuboidShape(
+					0.0,
+					8.0,
+					6.0,
+					4.0,
+					10.0,
+					10.0
 			)
 	);
 

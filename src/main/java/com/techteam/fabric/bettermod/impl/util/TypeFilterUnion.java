@@ -48,7 +48,7 @@ public final class TypeFilterUnion<B, T extends B> implements TypeFilter<B, T> {
 		}
 
 		@Contract(value = "_ -> new",
-		          pure = true)
+				  pure = true)
 		public static <B, T extends B> @NotNull Builder<B, T> create(final Class<B> klass) {
 			return new Builder<>(klass);
 		}

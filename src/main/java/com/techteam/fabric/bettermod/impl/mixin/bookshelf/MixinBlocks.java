@@ -21,11 +21,11 @@ public abstract class MixinBlocks {
 	}
 
 	@Redirect(method = "<clinit>",
-	          at = @At(value = "INVOKE",
-	                   target = "Lnet/minecraft/block/Blocks;register(Ljava/lang/String;Lnet/minecraft/block/AbstractBlock$Settings;)Lnet/minecraft/block/Block;",
-	                   ordinal = 0),
-	          slice = @Slice(from = @At(value = "CONSTANT",
-	                                    args = "stringValue=bookshelf")))
+			  at = @At(value = "INVOKE",
+					   target = "Lnet/minecraft/block/Blocks;register(Ljava/lang/String;Lnet/minecraft/block/AbstractBlock$Settings;)Lnet/minecraft/block/Block;",
+					   ordinal = 0),
+			  slice = @Slice(from = @At(value = "CONSTANT",
+										args = "stringValue=bookshelf")))
 	private static Block blockConstructHook(String id, AbstractBlock.Settings settings) {
 		return register(id, BetterBookshelfBlock::new, settings);
 	}

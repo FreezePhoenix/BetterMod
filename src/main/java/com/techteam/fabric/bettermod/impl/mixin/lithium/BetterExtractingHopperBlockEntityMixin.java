@@ -47,18 +47,20 @@ public abstract class BetterExtractingHopperBlockEntityMixin<T extends BetterExt
 	@Unique
 	private @Nullable LithiumStackList extractStackList;
 
+	@SuppressWarnings("unused")
 	public BetterExtractingHopperBlockEntityMixin(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState, size);
 	}
 
-	@WrapMethod(method = "extract", remap = false)
+	@WrapMethod(method = "extract",
+				remap = false)
 	public boolean extractHook(Operation<Boolean> fallback) {
 		var extractInventory = getExtractBlockInventory(world);
 		return lithiumExtract(extractInventory, fallback::call);
 	}
 
 	@Inject(method = "scheduledTick",
-	        at = @At("RETURN"))
+			at = @At("RETURN"))
 	public void scheduledTickHook(World world, BlockPos pos, BlockState blockState, CallbackInfo callbackInfo) {
 		this.checkSleepingConditions();
 	}
@@ -151,8 +153,8 @@ public abstract class BetterExtractingHopperBlockEntityMixin<T extends BetterExt
 			} else {
 				this.extractBlockInventory = extractInventory;
 				this.extractionMode = extractInventory instanceof BlockStateOnlyInventory
-				                      ? HopperCachingState.BlockInventory.BLOCK_STATE
-				                      : HopperCachingState.BlockInventory.UNKNOWN;
+									  ? HopperCachingState.BlockInventory.BLOCK_STATE
+									  : HopperCachingState.BlockInventory.UNKNOWN;
 			}
 		} else {
 			this.extractBlockInventory = extractInventory;
@@ -316,15 +318,15 @@ public abstract class BetterExtractingHopperBlockEntityMixin<T extends BetterExt
 		}
 
 		int[] availableSlots = from instanceof SidedInventory sidedInventory
-		                       ? sidedInventory.getAvailableSlots(Direction.DOWN)
-		                       : null;
+							   ? sidedInventory.getAvailableSlots(Direction.DOWN)
+							   : null;
 		int fromSize = availableSlots != null
-		               ? availableSlots.length
-		               : from.size();
+					   ? availableSlots.length
+					   : from.size();
 		for (int i = 0; i < fromSize; i++) {
 			int fromSlot = availableSlots != null
-			               ? availableSlots[i]
-			               : i;
+						   ? availableSlots[i]
+						   : i;
 			ItemStack itemStack = fromStackList.get(fromSlot);
 			if (!itemStack.isEmpty() && HopperBlockEntityInvoker.invokeCanExtract(
 					this,

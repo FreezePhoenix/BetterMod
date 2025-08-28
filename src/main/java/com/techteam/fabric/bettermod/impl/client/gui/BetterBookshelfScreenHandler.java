@@ -9,9 +9,11 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
+	public static final Identifier ID = Identifier.of("bettermod", "bookshelf");
 	private static final int INVENTORY_SIZE = 16;
 
 	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, Inventory inventory) {

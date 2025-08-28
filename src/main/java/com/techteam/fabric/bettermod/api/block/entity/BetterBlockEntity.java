@@ -11,11 +11,8 @@ import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
-import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.Uuids;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -28,7 +25,7 @@ import java.util.UUID;
 
 public abstract class BetterBlockEntity extends LootableContainerBlockEntity implements SidedStorageBlockEntity {
 	protected DefaultedList<ItemStack> inventory;
-	public SlottedStorage<ItemVariant> SELF;
+	public final SlottedStorage<ItemVariant> SELF;
 	protected final int size;
 
 	// Unused for most.

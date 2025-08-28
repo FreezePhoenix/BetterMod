@@ -29,9 +29,11 @@ public abstract class BetterExtractingHopperBlockEntity<T extends BetterExtracti
 	}
 
 	@Override
-	public void onServerLoad(ServerWorld world, BlockPos pos, BlockState state) {
-		super.onServerLoad(world, pos, state);
-		PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, pos.up());
+	public void setWorld(World world) {
+		super.setWorld(world);
+		if (world instanceof ServerWorld serverWorld) {
+			PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, serverWorld, pos.up());
+		}
 	}
 
 	public boolean isFull() {
