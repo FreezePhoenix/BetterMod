@@ -22,20 +22,20 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// https://github.com/CottonMC/LibGui/wiki/Setup
-	modImplementation "io.github.cottonmc:LibGui:14.0.0+1.21.6"
-	include "io.github.cottonmc:LibGui:14.0.0+1.21.6"
+	modImplementation "io.github.cottonmc:LibGui:15.0.0+1.21.9-rc1"
+	include "io.github.cottonmc:LibGui:15.0.0+1.21.9-rc1"
 
 	// When these things change, we want to recompile our mod, and others that depend on it.
 
 	// https://linkie.shedaniel.dev/?loader=fabric&version=1.21.4
-	modApi "maven.modrinth:modmenu:15.0.0-beta.3"
+	modApi "maven.modrinth:modmenu:16.0.0-rc.1"
 
 //	modImplementation 'maven.modrinth:continuity:3.0.0-beta.5+1.21'
-	modImplementation 'maven.modrinth:sodium:mc1.21.6-0.6.13-fabric'
+	modImplementation 'maven.modrinth:sodium:mc1.21.9-0.7.0-fabric'
 	// Indium is no longer required.
 //	modImplementation 'maven.modrinth:indium:1.0.35+mc1.21'
 
-	modImplementation 'maven.modrinth:lithium:mc1.21.8-0.18.0-fabric'
+	modImplementation 'maven.modrinth:lithium:mc1.21.9-0.19.1-fabric'
 
 	annotationProcessor(implementation "io.github.llamalad7:mixinextras-fabric:0.4.0-beta.2")
 }

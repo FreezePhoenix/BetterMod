@@ -51,8 +51,8 @@ public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> ex
 	}
 
 	@Override
-	protected int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-		return StorageUtil.calculateComparatorOutput(ItemStorage.SIDED.find(world, pos, null));
+	protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+		return StorageUtil.calculateComparatorOutput(ItemStorage.SIDED.find(world, pos, direction));
 	}
 
 	@Override
