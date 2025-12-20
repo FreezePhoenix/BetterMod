@@ -60,11 +60,11 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 			boolean PUSH_TARGET_EMPTY = !PUSH_TARGET.nonEmptyIterator().hasNext();
 			boolean result = InventoryUtil.handleTransfer(SELF, PUSH_TARGET);
 			if (result) {
-				if (PUSH_TARGET_EMPTY && PUSH_TARGET_CACHE.getBlockEntity() instanceof BetterExtractingHopperBlockEntity<?> extractingHopperBlockEntity) {
-					if (extractingHopperBlockEntity.LAST_TICK >= this.LAST_TICK) {
-						extractingHopperBlockEntity.setCooldown(MAX_COOLDOWN - 1, true);
+				if (PUSH_TARGET_EMPTY && PUSH_TARGET_CACHE.getBlockEntity() instanceof BetterExtractingHopperBlockEntity<?> destinationHopperBlockEntity) {
+					if (destinationHopperBlockEntity.LAST_TICK >= this.LAST_TICK) {
+						destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN - 1, true);
 					} else {
-						extractingHopperBlockEntity.setCooldown(MAX_COOLDOWN, false);
+						destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN, false);
 					}
 				}
 			}

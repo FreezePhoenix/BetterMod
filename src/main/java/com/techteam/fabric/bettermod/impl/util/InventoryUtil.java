@@ -29,6 +29,18 @@ public class InventoryUtil {
 		return false;
 	}
 
+	public static boolean handleTransferSticky(@NotNull Storage<ItemVariant> from, @NotNull Storage<ItemVariant> to) {
+		for (StorageView<ItemVariant> view : from) {
+			if (view.isResourceBlank() || view.getCapacity() <= 1 || view.getAmount() == 1) {
+				continue;
+			}
+			if (handle(to, view)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private static boolean handle(Storage<ItemVariant> to, StorageView<ItemVariant> view) {
 		ItemVariant resource = view.getResource();
 		try (Transaction transferTransaction = Transaction.openOuter()) {

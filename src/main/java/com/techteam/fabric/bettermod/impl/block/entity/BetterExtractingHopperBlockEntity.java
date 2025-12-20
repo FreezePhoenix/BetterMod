@@ -23,7 +23,7 @@ public abstract class BetterExtractingHopperBlockEntity<T extends BetterExtracti
 	public boolean extract() {
 		Storage<ItemVariant> PULL_TARGET = PULL_TARGET_CACHE.find(Direction.DOWN);
 		if (PULL_TARGET != null) {
-			return InventoryUtil.handleTransferStackable(PULL_TARGET, SELF);
+			return InventoryUtil.handleTransfer(PULL_TARGET, SELF);
 		}
 		return false;
 	}
