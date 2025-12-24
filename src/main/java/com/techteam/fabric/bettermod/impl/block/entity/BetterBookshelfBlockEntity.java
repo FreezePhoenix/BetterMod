@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
-public class BetterBookshelfBlockEntity extends BetterBlockEntity {
+public class BetterBookshelfBlockEntity extends BetterBlockEntity<BetterBookshelfBlockEntity> {
 	public static final Identifier ID = Identifier.of("minecraft", "bookshelf");
 
 	public BetterBookshelfBlockEntity(BlockPos pos, BlockState state) {

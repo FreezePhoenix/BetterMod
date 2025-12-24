@@ -2,23 +2,29 @@ package com.techteam.fabric.bettermod;
 
 import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.util.ItemTagKeys;
+import net.fabricmc.fabric.api.block.v1.BlockFunctionalityTags;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.tag.FabricTagKey;
+import net.minecraft.block.Blocks;
 import net.minecraft.data.recipe.RecipeExporter;
 import net.minecraft.data.recipe.RecipeGenerator;
 import net.minecraft.item.Items;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
 import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -38,7 +44,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		}
 
 		@Override
-		protected void configure(RegistryWrapper.WrapperLookup arg) {
+		protected void configure(RegistryWrapper.@NonNull WrapperLookup arg) {
 			valueLookupBuilder(ItemTagKeys.SHELVABLE)
 					.forceAddTag(ItemTags.BOOKSHELF_BOOKS)
 					.add(Items.PAPER)
@@ -67,6 +73,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 									 .apply(SetCountLootFunction.builder(new ConstantLootNumberProvider(4))))
 			).pool(
 					LootPool.builder().with(
+
 							ItemEntry.builder(Items.ENDER_PEARL))
 			));
 		}
@@ -78,10 +85,27 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		}
 
 		@Override
-		protected RecipeGenerator getRecipeGenerator(RegistryWrapper.WrapperLookup registryLookup, RecipeExporter exporter) {
+		protected @NonNull RecipeGenerator getRecipeGenerator(RegistryWrapper.@NonNull WrapperLookup registryLookup, @NonNull RecipeExporter exporter) {
 			return new RecipeGenerator(registryLookup, exporter) {
 				@Override
 				public void generate() {
+					createShaped(RecipeCategory.REDSTONE, BetterMod.SLING_MECHANISM)
+							.pattern("IRI")
+							.pattern(" I ")
+							.pattern(" I ")
+							.input('I', Items.STICK)
+							.input('R', Items.STRING)
+							.criterion(hasItem(Items.STRING), conditionsFromItem(Items.STRING))
+							.offerTo(exporter);
+					createShaped(RecipeCategory.REDSTONE, Blocks.DISPENSER)
+							.pattern("###")
+							.pattern("#X#")
+							.pattern("#R#")
+							.input('R', Items.REDSTONE)
+							.input('#', Blocks.COBBLESTONE)
+							.input('X', BetterMod.SLING_MECHANISM)
+							.criterion(hasItem(BetterMod.SLING_MECHANISM), conditionsFromItem(BetterMod.SLING_MECHANISM))
+							.offerTo(this.exporter);
 					createShaped(RecipeCategory.REDSTONE, BetterMod.BIT_HOPPER_BLOCK)
 							.pattern("   ")
 							.pattern("ICI")

@@ -23,40 +23,29 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public abstract class BetterBlockEntity extends LootableContainerBlockEntity implements SidedStorageBlockEntity {
+public abstract class BetterBlockEntity<T extends BetterBlockEntity<T>> extends LootableContainerBlockEntity implements SidedStorageBlockEntity {
 	protected DefaultedList<ItemStack> inventory;
 	public final SlottedStorage<ItemVariant> SELF;
-	protected final int size;
+	private final int size;
 
-	// Unused for most.
-	private UUID uuid = UUID.randomUUID();
-
-	public BetterBlockEntity(BlockEntityType<?> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
+	public BetterBlockEntity(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState);
 		this.size = size;
 		this.inventory = DefaultedList.ofSize(size, ItemStack.EMPTY);
-		this.SELF = InventoryStorage.of(BetterBlockEntity.this, null);
-	}
-
-	@Contract(pure = true)
-	public final UUID getUUID() {
-		return uuid;
+		this.SELF = InventoryStorage.of(this, null);
 	}
 
 	@Override
 	protected void readData(ReadView view) {
 		super.readData(view);
-		view.read(Entity.UUID_KEY, Uuids.INT_STREAM_CODEC).ifPresent(uuid -> this.uuid = uuid);
-		this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
 		if (!this.readLootTable(view)) {
-			Inventories.readData(view, this.inventory);
+			Inventories.readData(view, inventory);
 		}
 	}
 
 	@Override
 	public void writeData(WriteView view) {
 		super.writeData(view);
-		view.put(Entity.UUID_KEY, Uuids.INT_STREAM_CODEC, this.getUUID());
 		if (!this.writeLootTable(view)) {
 			Inventories.writeData(view, this.inventory);
 		}

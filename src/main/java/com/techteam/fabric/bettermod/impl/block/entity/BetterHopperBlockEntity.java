@@ -1,7 +1,7 @@
 package com.techteam.fabric.bettermod.impl.block.entity;
 
 import com.techteam.fabric.bettermod.api.block.entity.TickOnInterval;
-import com.techteam.fabric.bettermod.impl.util.InventoryUtil;
+import com.techteam.fabric.bettermod.impl.util.TransferType;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -30,6 +30,8 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 		insertionPos = pos.offset(facing);
 	}
 
+	protected abstract TransferType getInsertionTransferType();
+
 	@Override
 	public ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
 		return new HopperScreenHandler(syncId, playerInventory, this);
@@ -38,33 +40,25 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 	@Override
 	@SuppressWarnings("deprecation")
 	public void setCachedState(BlockState state) {
+		super.setCachedState(state);
 		facing = state.get(Properties.HOPPER_FACING);
 		insertionPos = pos.offset(facing);
-		super.setCachedState(state);
 	}
 
-	@Override
-	public void setWorld(World world) {
-		super.setWorld(world);
-		if (world instanceof ServerWorld serverWorld) {
-			PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, serverWorld, insertionPos);
-		}
-	}
-
-	public boolean insert() {
-		if (!insertionPos.equals(PUSH_TARGET_CACHE.getPos())) {
-			PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, insertionPos);
+	protected final boolean insert(ServerWorld world) {
+		if(PUSH_TARGET_CACHE == null || !insertionPos.equals(PUSH_TARGET_CACHE.getPos())) {
+			PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, insertionPos);
 		}
 		Storage<ItemVariant> PUSH_TARGET = PUSH_TARGET_CACHE.find(facing.getOpposite());
 		if (PUSH_TARGET != null) {
 			boolean PUSH_TARGET_EMPTY = !PUSH_TARGET.nonEmptyIterator().hasNext();
-			boolean result = InventoryUtil.handleTransfer(SELF, PUSH_TARGET);
+			boolean result = getInsertionTransferType().handle(SELF, PUSH_TARGET);
 			if (result) {
-				if (PUSH_TARGET_EMPTY && PUSH_TARGET_CACHE.getBlockEntity() instanceof BetterExtractingHopperBlockEntity<?> destinationHopperBlockEntity) {
+				if (PUSH_TARGET_EMPTY && PUSH_TARGET_CACHE.getBlockEntity() instanceof BetterHopperBlockEntity<?> destinationHopperBlockEntity) {
 					if (destinationHopperBlockEntity.LAST_TICK >= this.LAST_TICK) {
-						destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN - 1, true);
+						destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN - 1);
 					} else {
-						destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN, false);
+						destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN);
 					}
 				}
 			}
@@ -74,14 +68,9 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 	}
 
 	@Override
-	public void scheduledTick(World world, BlockPos pos, BlockState blockState) {
-		boolean activated = false;
-		// Push
-		if (!isEmpty()) {
-			activated = this.insert();
-		}
-		if (activated) {
-			setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN, false);
+	public void onCooldown(ServerWorld world, BlockPos pos, BlockState blockState) {
+		if (this.insert(world)) {
+			setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "bettermod",
-	"version": "1.7.24",
+	"version": "1.7.25",
 
 	"name": "BetterMod",
 	"description": "Improve your MC world! Put items in Bookshelves!",
@@ -22,12 +22,6 @@
 		],
 		"client": [
 			"com.techteam.fabric.bettermod.impl.BetterMod"
-		],
-		"modmenu": [
-			"com.techteam.fabric.bettermod.impl.BetterModModMenu"
-		],
-		"preLaunch": [
-			"com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
 		]
 	},
 	"mixins": [

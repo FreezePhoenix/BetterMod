@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "I": "minecraft:stick",
+    "R": "minecraft:string"
+  },
+  "pattern": [
+    "IRI",
+    " I ",
+    " I "
+  ],
+  "result": {
+    "count": 1,
+    "id": "bettermod:sling_mechanism"
+  }
+}

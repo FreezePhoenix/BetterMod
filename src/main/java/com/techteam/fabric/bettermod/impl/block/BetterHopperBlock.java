@@ -54,25 +54,4 @@ public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> ex
 	protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
 		return StorageUtil.calculateComparatorOutput(ItemStorage.SIDED.find(world, pos, direction));
 	}
-
-	@Override
-	protected BlockState getStateForNeighborUpdate(BlockState state, WorldView world, ScheduledTickView tickView, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, Random random) {
-		// Present for Lithium compatibility.
-		return super.getStateForNeighborUpdate(
-				state,
-				world,
-				tickView,
-				pos,
-				direction,
-				neighborPos,
-				neighborState,
-				random
-		);
-	}
-
-	@Override
-	protected void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, @Nullable WireOrientation wireOrientation, boolean notify) {
-		// Present for Lithium compatibility.
-		super.neighborUpdate(state, world, pos, sourceBlock, wireOrientation, notify);
-	}
 }

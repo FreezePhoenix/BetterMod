@@ -7,6 +7,7 @@
 	"item.bettermod.bithopper": "Bit Hopper",
 	"item.bettermod.pullhopper": "Pull Hopper",
 	"item.bettermod.stickhopper": "Stick Hopper",
+	"item.bettermod.sling_mechanism": "Sling Mechanism",
 	"bettermod.item_group": "Better Mod",
 	"text.autoconfig.bettermod.option.ReplaceVanillaBookshelf": "Replace Vanilla Bookshelf",
 	"text.autoconfig.bettermod.option.ReplaceVanillaBookshelf.@Tooltip": "Whether or not to replace the vanilla bookshelf with a container bookshelf",

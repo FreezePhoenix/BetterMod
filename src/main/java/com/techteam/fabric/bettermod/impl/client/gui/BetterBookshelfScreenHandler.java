@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +30,7 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 		setRootPanel(root);
 		root.setSize(176, 149);
 		WItemSlot slot = WItemSlot.of(blockInventory, 0, 8, 2);
-		slot.setInputFilter((ItemStack item) -> item.isIn(ItemTagKeys.SHELVABLE));
+		slot.setInputFilter(item -> item.isIn(ItemTagKeys.SHELVABLE));
 		root.add(slot, 16, 17);
 		root.add(this.createPlayerInventoryPanel(), 7, 55);
 		root.validate(this);

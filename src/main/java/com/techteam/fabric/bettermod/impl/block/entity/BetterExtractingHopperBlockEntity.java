@@ -1,6 +1,6 @@
 package com.techteam.fabric.bettermod.impl.block.entity;
 
-import com.techteam.fabric.bettermod.impl.util.InventoryUtil;
+import com.techteam.fabric.bettermod.impl.util.TransferType;
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
@@ -20,39 +20,23 @@ public abstract class BetterExtractingHopperBlockEntity<T extends BetterExtracti
 		super(blockEntityType, blockPos, blockState);
 	}
 
-	public boolean extract() {
+	protected final boolean extract(ServerWorld world) {
+		if(PULL_TARGET_CACHE == null) {
+			PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, pos.up());
+		}
 		Storage<ItemVariant> PULL_TARGET = PULL_TARGET_CACHE.find(Direction.DOWN);
 		if (PULL_TARGET != null) {
-			return InventoryUtil.handleTransfer(PULL_TARGET, SELF);
+			return getExtractionTransferType().handle(PULL_TARGET, SELF);
 		}
 		return false;
 	}
 
-	@Override
-	public void setWorld(World world) {
-		super.setWorld(world);
-		if (world instanceof ServerWorld serverWorld) {
-			PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, serverWorld, pos.up());
-		}
-	}
-
-	public boolean isFull() {
-		return false;
-	}
+	protected abstract TransferType getExtractionTransferType();
 
 	@Override
-	public void scheduledTick(World world, BlockPos pos, BlockState blockState) {
-		boolean activated = false;
-		if (!isEmpty()) {
-			activated = this.insert();
-		}
-
-		if (!isFull()) {
-			activated |= this.extract();
-		}
-
-		if (activated) {
-			setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN, false);
+	public void onCooldown(ServerWorld world, BlockPos pos, BlockState blockState) {
+		if (this.insert(world) | this.extract(world)) {
+			setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN);
 		}
 	}
 }

@@ -25,10 +25,10 @@ public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEn
 		return CODEC;
 	}
 
-	private static final VoxelShape TOP_SHAPE = Block.createCuboidShape(0.0, 10.0, 0.0, 16.0, 16.0, 16.0);
-	private static final VoxelShape MIDDLE_SHAPE = Block.createCuboidShape(4.0, 4.0, 4.0, 12.0, 10.0, 12.0);
+	private static final VoxelShape TOP_SHAPE = Block.createColumnShape(16.0, 10.0, 16.0);
+	private static final VoxelShape MIDDLE_SHAPE = Block.createColumnShape(8.0, 4.0, 10.0);
 	private static final VoxelShape OUTSIDE_SHAPE = VoxelShapes.union(MIDDLE_SHAPE, TOP_SHAPE);
-	private static final VoxelShape INSIDE_SHAPE = HopperBlock.createCuboidShape(2.0, 11.0, 2.0, 14.0, 16.0, 14.0);
+	private static final VoxelShape INSIDE_SHAPE = Block.createColumnShape(12.0, 11.0, 16.0);
 	private static final VoxelShape DEFAULT_SHAPE = VoxelShapes.combineAndSimplify(
 			OUTSIDE_SHAPE,
 			INSIDE_SHAPE,
@@ -36,14 +36,7 @@ public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEn
 	);
 	private static final VoxelShape DOWN_SHAPE = VoxelShapes.union(
 			DEFAULT_SHAPE,
-			Block.createCuboidShape(
-					6.0,
-					0.0,
-					6.0,
-					10.0,
-					4.0,
-					10.0
-			)
+			Block.createColumnShape(4.0, 0.0, 4.0)
 	);
 	private static final VoxelShape EAST_SHAPE = VoxelShapes.union(
 			DEFAULT_SHAPE,
@@ -64,7 +57,7 @@ public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEn
 					0.0,
 					10.0,
 					8.0,
-					4.0
+					8.0
 			)
 	);
 	private static final VoxelShape SOUTH_SHAPE = VoxelShapes.union(

@@ -21,10 +21,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -39,6 +36,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 
 public class BetterMod implements ModInitializer, ClientModInitializer {
@@ -59,42 +58,49 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
 	public static BlockEntityType<BetterBookshelfBlockEntity> BOOKSHELF_BLOCK_ENTITY_TYPE;
 	public static ScreenHandlerType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
+	public static Item SLING_MECHANISM;
 
-	public static <E extends BetterBlockEntity> BetterBlock<E> registerBlock(Identifier ID, BetterBlock<E> block) {
-		Registry.register(Registries.BLOCK, ID, block);
-		final BlockItem blockItem = Registry.register(
-				Registries.ITEM,
-				ID,
-				new BlockItem(
-						block,
-						new Item.Settings().registryKey(RegistryKey.of(
-								RegistryKeys.ITEM,
+	public static <T extends BetterBlock<E>, E extends BetterBlockEntity<E>> T registerBlock(Identifier ID, Function<AbstractBlock.Settings, T> factory, Block template) {
+		T block = Registry.register(
+				Registries.BLOCK, ID, factory.apply(
+						AbstractBlock.Settings.copy(template).registryKey(RegistryKey.of(
+								RegistryKeys.BLOCK,
 								ID
 						))
 				)
 		);
-		ITEMS.add(blockItem.getDefaultStack());
+		registerBlockItem(ID, block, BlockItem::new);
 		return block;
+	}
+
+	public static <T extends Item> T registerItem(Identifier ID, Function<Item.Settings, T> factory) {
+		T new_item = Registry.register(Registries.ITEM, ID, factory.apply(
+				new Item.Settings().registryKey(
+					RegistryKey.of(RegistryKeys.ITEM, ID)
+						)
+		));
+		ITEMS.add(new_item.getDefaultStack());
+		return new_item;
+	}
+
+	public static <T extends Item> T registerBlockItem(Identifier ID, Block block, BiFunction<Block, Item.Settings, T> factory) {
+		T new_item = Registry.register(Registries.ITEM, ID, factory.apply(
+				block,
+				new Item.Settings().registryKey(
+						RegistryKey.of(RegistryKeys.ITEM, ID)
+				)
+		));
+		ITEMS.add(new_item.getDefaultStack());
+		return new_item;
 	}
 
 	public static Block registerBlock(Identifier ID, Block block) {
 		Registry.register(Registries.BLOCK, ID, block);
-		final BlockItem blockItem = Registry.register(
-				Registries.ITEM,
-				ID,
-				new BlockItem(
-						block,
-						new Item.Settings().registryKey(RegistryKey.of(
-								RegistryKeys.ITEM,
-								ID
-						))
-				)
-		);
-		ITEMS.add(blockItem.getDefaultStack());
+		registerBlockItem(ID, block, BlockItem::new);
 		return block;
 	}
 
-	public static <E extends BetterBlockEntity> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block, FabricBlockEntityTypeBuilder.Factory<E> factory) {
+	public static <E extends BetterBlockEntity<E>> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block, FabricBlockEntityTypeBuilder.Factory<E> factory) {
 		return block.blockEntityType = Registry.register(
 				Registries.BLOCK_ENTITY_TYPE,
 				ID,
@@ -125,7 +131,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		} else {
 			LOGGER.error("BetterBookshelves was not successful! This is a bug!");
 		}
-
 		ROOM_CONTROLLER_BLOCK = registerBlock(
 				RoomControllerBlock.ID,
 				new RoomControllerBlock(AbstractBlock.Settings.copy(Blocks.GLASS)
@@ -134,30 +139,12 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 																	  RoomControllerBlock.ID
 															  )))
 		);
-		BIT_HOPPER_BLOCK = registerBlock(
-				BitHopperBlock.ID,
-				new BitHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER)
-														 .registryKey(RegistryKey.of(
-																 RegistryKeys.BLOCK,
-																 BitHopperBlock.ID
-														 )))
-		);
-		PULL_HOPPER_BLOCK = registerBlock(
-				PullHopperBlock.ID,
-				new PullHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER)
-														  .registryKey(RegistryKey.of(
-																  RegistryKeys.BLOCK,
-																  PullHopperBlock.ID
-														  )))
-		);
-		STICK_HOPPER_BLOCK = registerBlock(
-				StickHopperBlock.ID,
-				new StickHopperBlock(AbstractBlock.Settings.copy(Blocks.HOPPER)
-														   .registryKey(RegistryKey.of(
-																   RegistryKeys.BLOCK,
-																   StickHopperBlock.ID
-														   )))
-		);
+
+		SLING_MECHANISM = registerItem(Identifier.of("bettermod", "sling_mechanism"), Item::new);
+
+		BIT_HOPPER_BLOCK = registerBlock(BitHopperBlock.ID, BitHopperBlock::new, Blocks.HOPPER);
+		PULL_HOPPER_BLOCK = registerBlock(PullHopperBlock.ID, PullHopperBlock::new, Blocks.HOPPER);
+		STICK_HOPPER_BLOCK = registerBlock(StickHopperBlock.ID, StickHopperBlock::new, Blocks.HOPPER);
 
 		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				BitHopperBlockEntity.ID,

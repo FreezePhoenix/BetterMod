@@ -34,8 +34,6 @@ dependencies {
 	modImplementation 'maven.modrinth:sodium:mc1.21.11-0.8.1-fabric'
 	// Indium is no longer required.
 //	modImplementation 'maven.modrinth:indium:1.0.35+mc1.21'
-
-	annotationProcessor(implementation "io.github.llamalad7:mixinextras-fabric:0.4.0-beta.2")
 }
 
 processResources {
