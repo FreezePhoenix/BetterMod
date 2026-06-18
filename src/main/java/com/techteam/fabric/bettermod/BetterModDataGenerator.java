@@ -12,6 +12,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.references.ItemIds;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -41,11 +42,11 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.@NonNull Provider arg) {
-			valueLookupBuilder(ItemTagKeys.SHELVABLE)
+			builder(ItemTagKeys.SHELVABLE)
 					.forceAddTag(ItemTags.BOOKSHELF_BOOKS)
-					.add(Items.PAPER)
-					.add(Items.FILLED_MAP)
-					.add(Items.MAP);
+					.add(ItemIds.PAPER)
+					.add(ItemIds.FILLED_MAP)
+					.add(ItemIds.MAP);
 		}
 	}
 
