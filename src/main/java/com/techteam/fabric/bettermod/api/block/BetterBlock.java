@@ -1,43 +1,44 @@
 package com.techteam.fabric.bettermod.api.block;
 
 import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class BetterBlock<E extends BetterBlockEntity<E>> extends BlockWithEntity {
+public abstract class BetterBlock<E extends BetterBlockEntity<E>> extends BaseEntityBlock {
 
 	public BlockEntityType<E> blockEntityType;
 
-	public BetterBlock(@NotNull Settings settings) {
+	public BetterBlock(@NotNull Properties settings) {
 		super(settings);
 	}
 
 	@Override
-	public final E createBlockEntity(BlockPos pos, BlockState state) {
-		return blockEntityType.instantiate(pos, state);
+	public final E newBlockEntity(BlockPos pos, BlockState state) {
+		return blockEntityType.create(pos, state);
 	}
 
 	@Override
-	protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-		ItemScatterer.onStateReplaced(state, world, pos);
+	protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+		Containers.updateNeighboursAfterDestroy(state, world, pos);
 	}
 
 	@Override
-	public @NotNull ActionResult onUse(BlockState state, @NotNull World world, BlockPos pos, @NotNull PlayerEntity player, BlockHitResult hit) {
-		if (!world.isClient()) {
-			if (blockEntityType.get(world, pos) instanceof BetterBlockEntity<E> betterBlockEntity) {
-				player.openHandledScreen(betterBlockEntity);
+	public @NotNull InteractionResult useWithoutItem(BlockState state, @NotNull Level world, BlockPos pos, @NotNull Player player, BlockHitResult hit) {
+		if (!world.isClientSide()) {
+			if (blockEntityType.getBlockEntity(world, pos) instanceof BetterBlockEntity<E> betterBlockEntity) {
+				player.openMenu(betterBlockEntity);
 			}
 		}
 
-		return ActionResult.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

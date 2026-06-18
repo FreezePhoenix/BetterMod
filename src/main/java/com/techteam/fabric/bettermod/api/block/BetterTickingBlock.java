@@ -2,28 +2,28 @@ package com.techteam.fabric.bettermod.api.block;
 
 import com.techteam.fabric.bettermod.api.block.entity.BetterBlockEntity;
 import com.techteam.fabric.bettermod.api.block.entity.ITickable;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BetterTickingBlock<E extends BetterBlockEntity<E> & ITickable> extends BetterBlock<E> {
-	public BetterTickingBlock(@NotNull Settings settings) {
+	public BetterTickingBlock(@NotNull Properties settings) {
 		super(settings);
 	}
 
-	static <E extends BetterBlockEntity<E> & ITickable> void tick(World world, BlockPos pos, BlockState state, E blockEntity) {
-		blockEntity.tick((ServerWorld) world, pos, state);
+	static <E extends BetterBlockEntity<E> & ITickable> void tick(Level world, BlockPos pos, BlockState state, E blockEntity) {
+		blockEntity.tick((ServerLevel) world, pos, state);
 	}
 
 	@Override
-	public final <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-		return world.isClient()
+	public final <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+		return world.isClientSide()
 			   ? null
-			   : validateTicker(type, blockEntityType, BetterTickingBlock::tick);
+			   : createTickerHelper(type, blockEntityType, BetterTickingBlock::tick);
 	}
 }

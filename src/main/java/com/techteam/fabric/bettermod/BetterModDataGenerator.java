@@ -2,28 +2,24 @@ package com.techteam.fabric.bettermod;
 
 import com.techteam.fabric.bettermod.impl.BetterMod;
 import com.techteam.fabric.bettermod.impl.util.ItemTagKeys;
-import net.fabricmc.fabric.api.block.v1.BlockFunctionalityTags;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.tag.FabricTagKey;
-import net.minecraft.block.Blocks;
-import net.minecraft.data.recipe.RecipeExporter;
-import net.minecraft.data.recipe.RecipeGenerator;
-import net.minecraft.item.Items;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.entry.ItemEntry;
-import net.minecraft.loot.entry.LootPoolEntry;
-import net.minecraft.loot.function.SetCountLootFunction;
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
-import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.ItemTags;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CompletableFuture;
@@ -38,13 +34,13 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		pack.addProvider(BetterModRecipeGenerator::new);
 	}
 
-	private static class TagGenerator extends FabricTagProvider.ItemTagProvider {
-		public TagGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+	private static class TagGenerator extends FabricTagsProvider.ItemTagsProvider {
+		public TagGenerator(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 			super(output, registriesFuture);
 		}
 
 		@Override
-		protected void configure(RegistryWrapper.@NonNull WrapperLookup arg) {
+		protected void addTags(HolderLookup.@NonNull Provider arg) {
 			valueLookupBuilder(ItemTagKeys.SHELVABLE)
 					.forceAddTag(ItemTags.BOOKSHELF_BOOKS)
 					.add(Items.PAPER)
@@ -53,84 +49,84 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		}
 	}
 
-	private static class LootTableGenerator extends FabricBlockLootTableProvider {
-		protected LootTableGenerator(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+	private static class LootTableGenerator extends FabricBlockLootSubProvider {
+		protected LootTableGenerator(FabricPackOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 			super(dataOutput, registriesFuture);
 		}
 
 		@Override
 		public void generate() {
-			addDrop(BetterMod.BIT_HOPPER_BLOCK);
-			addDrop(BetterMod.PULL_HOPPER_BLOCK);
-			addDrop(BetterMod.STICK_HOPPER_BLOCK);
-			addDrop(BetterMod.ROOM_CONTROLLER_BLOCK, LootTable.builder().pool(
-					LootPool.builder().with(
-							ItemEntry.builder(Items.GOLD_INGOT)
-									 .apply(SetCountLootFunction.builder(new ConstantLootNumberProvider(4))))
-			).pool(
-					LootPool.builder().with(
-							ItemEntry.builder(Items.REDSTONE)
-									 .apply(SetCountLootFunction.builder(new ConstantLootNumberProvider(4))))
-			).pool(
-					LootPool.builder().with(
+			dropSelf(BetterMod.BIT_HOPPER_BLOCK);
+			dropSelf(BetterMod.PULL_HOPPER_BLOCK);
+			dropSelf(BetterMod.STICK_HOPPER_BLOCK);
+			add(BetterMod.ROOM_CONTROLLER_BLOCK, LootTable.lootTable().withPool(
+					LootPool.lootPool().add(
+							LootItem.lootTableItem(Items.GOLD_INGOT)
+									 .apply(SetItemCountFunction.setCount(new ConstantValue(4))))
+			).withPool(
+					LootPool.lootPool().add(
+							LootItem.lootTableItem(Items.REDSTONE)
+									 .apply(SetItemCountFunction.setCount(new ConstantValue(4))))
+			).withPool(
+					LootPool.lootPool().add(
 
-							ItemEntry.builder(Items.ENDER_PEARL))
+							LootItem.lootTableItem(Items.ENDER_PEARL))
 			));
 		}
 	}
 
 	private static class BetterModRecipeGenerator extends FabricRecipeProvider {
-		public BetterModRecipeGenerator(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
+		public BetterModRecipeGenerator(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 			super(output, registriesFuture);
 		}
 
 		@Override
-		protected @NonNull RecipeGenerator getRecipeGenerator(RegistryWrapper.@NonNull WrapperLookup registryLookup, @NonNull RecipeExporter exporter) {
-			return new RecipeGenerator(registryLookup, exporter) {
+		protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.@NonNull Provider registryLookup, @NonNull RecipeOutput exporter) {
+			return new RecipeProvider(registryLookup, exporter) {
 				@Override
-				public void generate() {
-					createShaped(RecipeCategory.REDSTONE, BetterMod.SLING_MECHANISM)
+				public void buildRecipes() {
+					shaped(RecipeCategory.REDSTONE, BetterMod.SLING_MECHANISM)
 							.pattern("IRI")
 							.pattern(" I ")
 							.pattern(" I ")
-							.input('I', Items.STICK)
-							.input('R', Items.STRING)
-							.criterion(hasItem(Items.STRING), conditionsFromItem(Items.STRING))
-							.offerTo(exporter);
-					createShaped(RecipeCategory.REDSTONE, Blocks.DISPENSER)
+							.define('I', Items.STICK)
+							.define('R', Items.STRING)
+							.unlockedBy(getHasName(Items.STRING), has(Items.STRING))
+							.save(output);
+					shaped(RecipeCategory.REDSTONE, Blocks.DISPENSER)
 							.pattern("###")
 							.pattern("#X#")
 							.pattern("#R#")
-							.input('R', Items.REDSTONE)
-							.input('#', Blocks.COBBLESTONE)
-							.input('X', BetterMod.SLING_MECHANISM)
-							.criterion(hasItem(BetterMod.SLING_MECHANISM), conditionsFromItem(BetterMod.SLING_MECHANISM))
-							.offerTo(this.exporter);
-					createShaped(RecipeCategory.REDSTONE, BetterMod.BIT_HOPPER_BLOCK)
+							.define('R', Items.REDSTONE)
+							.define('#', Blocks.COBBLESTONE)
+							.define('X', BetterMod.SLING_MECHANISM)
+							.unlockedBy(getHasName(BetterMod.SLING_MECHANISM), has(BetterMod.SLING_MECHANISM))
+							.save(this.output);
+					shaped(RecipeCategory.REDSTONE, BetterMod.BIT_HOPPER_BLOCK)
 							.pattern("   ")
 							.pattern("ICI")
 							.pattern(" I ")
-							.input('I', Items.IRON_INGOT)
-							.input('C', Items.CHEST)
-							.criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
-							.offerTo(exporter);
-					createShaped(RecipeCategory.REDSTONE, BetterMod.PULL_HOPPER_BLOCK)
+							.define('I', Items.IRON_INGOT)
+							.define('C', Items.CHEST)
+							.unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+							.save(output);
+					shaped(RecipeCategory.REDSTONE, BetterMod.PULL_HOPPER_BLOCK)
 							.pattern("ICI")
 							.pattern("I I")
 							.pattern(" I ")
-							.input('I', Items.IRON_INGOT)
-							.input('C', Items.CHEST)
-							.criterion(hasItem(Items.IRON_INGOT), conditionsFromItem(Items.IRON_INGOT))
-							.offerTo(exporter);
-					createShaped(RecipeCategory.REDSTONE, BetterMod.STICK_HOPPER_BLOCK)
+							.define('I', Items.IRON_INGOT)
+							.define('C', Items.CHEST)
+							.unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+							.save(output);
+					shaped(RecipeCategory.REDSTONE, BetterMod.STICK_HOPPER_BLOCK)
 							.pattern("ISI")
 							.pattern("ICI")
 							.pattern("SIS")
-							.input('I', Items.IRON_INGOT)
-							.input('C', Items.CHEST)
-							.input('S', Items.SLIME_BALL)
-							.criterion(hasItem(Items.SLIME_BALL), conditionsFromItem(Items.SLIME_BALL))
-							.offerTo(exporter);
+							.define('I', Items.IRON_INGOT)
+							.define('C', Items.CHEST)
+							.define('S', Items.SLIME_BALL)
+							.unlockedBy(getHasName(Items.SLIME_BALL), has(Items.SLIME_BALL))
+							.save(output);
 				}
 			};
 		}

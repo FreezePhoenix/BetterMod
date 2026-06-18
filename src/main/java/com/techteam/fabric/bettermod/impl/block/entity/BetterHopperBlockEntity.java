@@ -6,16 +6,15 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiCache;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.HopperScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.HopperMenu;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<T>> extends TickOnInterval<T> {
@@ -26,26 +25,26 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 
 	public BetterHopperBlockEntity(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState) {
 		super(blockEntityType, blockPos, blockState, 5);
-		facing = blockState.get(Properties.HOPPER_FACING);
-		insertionPos = pos.offset(facing);
+		facing = blockState.getValue(BlockStateProperties.FACING_HOPPER);
+		insertionPos = worldPosition.relative(facing);
 	}
 
 	protected abstract TransferType getInsertionTransferType();
 
 	@Override
-	public ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-		return new HopperScreenHandler(syncId, playerInventory, this);
+	public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {
+		return new HopperMenu(syncId, playerInventory, this);
 	}
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public void setCachedState(BlockState state) {
-		super.setCachedState(state);
-		facing = state.get(Properties.HOPPER_FACING);
-		insertionPos = pos.offset(facing);
+	public void setBlockState(BlockState state) {
+		super.setBlockState(state);
+		facing = state.getValue(BlockStateProperties.FACING_HOPPER);
+		insertionPos = worldPosition.relative(facing);
 	}
 
-	protected final boolean insert(ServerWorld world) {
+	protected final boolean insert(ServerLevel world) {
 		if(PUSH_TARGET_CACHE == null || !insertionPos.equals(PUSH_TARGET_CACHE.getPos())) {
 			PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, insertionPos);
 		}
@@ -68,7 +67,7 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 	}
 
 	@Override
-	public void onCooldown(ServerWorld world, BlockPos pos, BlockState blockState) {
+	public void onCooldown(ServerLevel world, BlockPos pos, BlockState blockState) {
 		if (this.insert(world)) {
 			setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN);
 		}

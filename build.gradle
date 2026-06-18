@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.14-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -16,22 +16,20 @@ fabricApi {
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// https://github.com/CottonMC/LibGui/wiki/Setup
-	modImplementation "io.github.cottonmc:LibGui:15.1.0+1.21.11"
-	include "io.github.cottonmc:LibGui:15.1.0+1.21.11"
+	implementation include ("io.github.cottonmc:LibGui:17.0.0+26.2")
 
 	// When these things change, we want to recompile our mod, and others that depend on it.
 
 	// https://linkie.shedaniel.dev/?loader=fabric&version=1.21.4
-	modApi "maven.modrinth:modmenu:17.0.0-alpha.1"
+	api "maven.modrinth:modmenu:20.0.0-beta.2"
 
 //	modImplementation 'maven.modrinth:continuity:3.0.0-beta.5+1.21'
-	modImplementation 'maven.modrinth:sodium:mc1.21.11-0.8.1-fabric'
+//	implementation 'maven.modrinth:sodium:mc1.21.11-0.8.1-fabric'
 	// Indium is no longer required.
 //	modImplementation 'maven.modrinth:indium:1.0.35+mc1.21'
 }
@@ -44,7 +42,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 jar {
@@ -56,23 +54,12 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 // configure the maven publication
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
 
 	// select the repositories you want to publish to
 	repositories {
@@ -82,7 +69,7 @@ publishing {
 repositories {
 	mavenLocal()
 	maven {
-		url "https://cursemaven.com"
+		url = "https://cursemaven.com"
 		content {
 			includeGroup "curse.maven"
 		}
@@ -91,10 +78,7 @@ repositories {
 		url = "https://api.modrinth.com/maven"
 	}
 	maven {
-    	url = "https://server.bbkr.space/artifactory/libs-release"
-	}
-	maven {
-		url 'https://jitpack.io'
+    	url = "https://staging.alexiil.uk/maven/"
 	}
 	maven {
 		url 'https://oss.sonatype.org/content/repositories/snapshots/'

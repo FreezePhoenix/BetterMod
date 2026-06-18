@@ -5,19 +5,17 @@ import com.techteam.fabric.bettermod.impl.util.ItemTagKeys;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
 import io.github.cottonmc.cotton.gui.widget.WItemSlot;
 import io.github.cottonmc.cotton.gui.widget.WPlainPanel;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.ItemTags;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
-	public static final Identifier ID = Identifier.of("bettermod", "bookshelf");
+	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "bookshelf");
 	private static final int INVENTORY_SIZE = 16;
 
-	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory, Inventory inventory) {
+	public BetterBookshelfScreenHandler(int syncId, @NotNull Inventory playerInventory, Container inventory) {
 		super(
 				BetterMod.BOOKSHELF_SCREEN_HANDLER_TYPE,
 				syncId,
@@ -30,13 +28,13 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 		setRootPanel(root);
 		root.setSize(176, 149);
 		WItemSlot slot = WItemSlot.of(blockInventory, 0, 8, 2);
-		slot.setInputFilter(item -> item.isIn(ItemTagKeys.SHELVABLE));
+		slot.setInputFilter(item -> item.is(ItemTagKeys.SHELVABLE));
 		root.add(slot, 16, 17);
 		root.add(this.createPlayerInventoryPanel(), 7, 55);
 		root.validate(this);
 	}
 
-	public BetterBookshelfScreenHandler(int syncId, @NotNull PlayerInventory playerInventory) {
-		this(syncId, playerInventory, new SimpleInventory(INVENTORY_SIZE));
+	public BetterBookshelfScreenHandler(int syncId, @NotNull Inventory playerInventory) {
+		this(syncId, playerInventory, new SimpleContainer(INVENTORY_SIZE));
 	}
 }

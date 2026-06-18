@@ -3,15 +3,15 @@ package com.techteam.fabric.bettermod.impl.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.templates.TypeTemplate;
-import net.minecraft.datafixer.schema.Schema1460;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.Map;
 import java.util.function.Supplier;
+import net.minecraft.util.datafix.schemas.V1460;
 
-@Mixin(Schema1460.class)
+@Mixin(V1460.class)
 public abstract class MixinDFU extends Schema {
 	public MixinDFU(int versionKey, Schema parent) {
 		super(versionKey, parent);
