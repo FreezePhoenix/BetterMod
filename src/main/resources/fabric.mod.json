@@ -1,12 +1,12 @@
 {
 	"schemaVersion": 1,
 	"id": "bettermod",
-	"version": "1.7.27",
+	"version": "2.0.0",
 
-	"name": "BetterMod",
+	"name": "Better Mod",
 	"description": "Improve your MC world! Put items in Bookshelves!",
 	"authors": [
-		"Tech Team"
+		"FreezePhoenix"
 	],
 	"contact": {},
 	"license": "ARR",
@@ -15,13 +15,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"fabric-datagen": [
-			"com.techteam.fabric.bettermod.BetterModDataGenerator"
+			"com.freezephoenix.fabric.bettermod.BetterModDataGenerator"
 		],
 		"main": [
-			"com.techteam.fabric.bettermod.impl.BetterMod"
+			"com.freezephoenix.fabric.bettermod.impl.BetterMod"
 		],
 		"client": [
-			"com.techteam.fabric.bettermod.impl.BetterMod"
+			"com.freezephoenix.fabric.bettermod.impl.BetterMod"
 		]
 	},
 	"mixins": [

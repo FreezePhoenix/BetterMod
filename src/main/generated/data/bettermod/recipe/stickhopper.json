@@ -4,10 +4,11 @@
   "key": {
     "C": "minecraft:chest",
     "I": "minecraft:iron_ingot",
+    "R": "minecraft:comparator",
     "S": "minecraft:slime_ball"
   },
   "pattern": [
-    "ISI",
+    "IRI",
     "ICI",
     "SIS"
   ],
