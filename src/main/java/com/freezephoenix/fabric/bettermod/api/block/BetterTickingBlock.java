@@ -9,10 +9,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class BetterTickingBlock<E extends BetterBlockEntity<E> & ITickable> extends BetterBlock<E> {
-	public BetterTickingBlock(@NotNull Properties settings) {
+	public BetterTickingBlock(Properties settings) {
 		super(settings);
 	}
 
@@ -21,7 +21,7 @@ public abstract class BetterTickingBlock<E extends BetterBlockEntity<E> & ITicka
 	}
 
 	@Override
-	public final <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+	public final <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
 		return world.isClientSide()
 			   ? null
 			   : createTickerHelper(type, blockEntityType, BetterTickingBlock::tick);

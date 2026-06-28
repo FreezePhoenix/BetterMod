@@ -15,15 +15,15 @@ import net.minecraft.world.inventory.HopperMenu;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<T>> extends TickOnInterval<T> {
 	public static final int MAX_COOLDOWN = 8;
 	protected BlockPos insertionPos;
 	protected Direction facing;
-	protected BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
+	protected @Nullable BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
 
-	public BetterHopperBlockEntity(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState) {
+	public BetterHopperBlockEntity(BlockEntityType<T> blockEntityType, BlockPos blockPos, BlockState blockState) {
 		super(blockEntityType, blockPos, blockState, 5);
 		facing = blockState.getValue(BlockStateProperties.FACING_HOPPER);
 		insertionPos = worldPosition.relative(facing);
@@ -32,23 +32,23 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 	protected abstract TransferType getTransferType();
 
 	@Override
-	public @NotNull AbstractContainerMenu createMenu(int syncId, @NotNull Inventory playerInventory) {
+	public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {
 		return new HopperMenu(syncId, playerInventory, this);
 	}
 
-	protected Storage<ItemVariant> getPushTarget(ServerLevel world) {
+	protected @Nullable Storage<ItemVariant> getPushTarget(ServerLevel world) {
 		if(PUSH_TARGET_CACHE == null || !insertionPos.equals(PUSH_TARGET_CACHE.getPos())) {
 			PUSH_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, insertionPos);
 		}
 		return PUSH_TARGET_CACHE.find(facing.getOpposite());
 	}
-	protected Storage<ItemVariant> getPullTarget(ServerLevel world) {
+	protected @Nullable Storage<ItemVariant> getPullTarget(ServerLevel world) {
 		return null;
 	}
 
 	@Override
 	@SuppressWarnings("deprecation")
-	public void setBlockState(@NotNull BlockState state) {
+	public void setBlockState(BlockState state) {
 		super.setBlockState(state);
 		facing = state.getValue(BlockStateProperties.FACING_HOPPER);
 		insertionPos = worldPosition.relative(facing);
@@ -59,12 +59,16 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 		final var PULL_TARGET = getPullTarget(world);
 		TransferType.TransferResult result = getTransferType().handle(PULL_TARGET, SELF, PUSH_TARGET);
 		if (result.inserted()) {
+			assert PUSH_TARGET != null;
 			boolean PUSH_TARGET_EMPTY = !PUSH_TARGET.nonEmptyIterator().hasNext();
-			if (PUSH_TARGET_EMPTY && PUSH_TARGET_CACHE.getBlockEntity() instanceof BetterHopperBlockEntity<?> destinationHopperBlockEntity) {
-				if (destinationHopperBlockEntity.LAST_TICK >= this.LAST_TICK) {
-					destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN - 1);
-				} else {
-					destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN);
+			if (PUSH_TARGET_EMPTY) {
+				assert PUSH_TARGET_CACHE != null;
+				if (PUSH_TARGET_CACHE.getBlockEntity() instanceof BetterHopperBlockEntity<?> destinationHopperBlockEntity) {
+					if (destinationHopperBlockEntity.LAST_TICK >= this.LAST_TICK) {
+						destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN - 1);
+					} else {
+						destinationHopperBlockEntity.setCooldown(MAX_COOLDOWN);
+					}
 				}
 			}
 		}

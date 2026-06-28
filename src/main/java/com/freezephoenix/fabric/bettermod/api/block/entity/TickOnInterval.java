@@ -6,14 +6,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.NotNull;
 
 public abstract class TickOnInterval<T extends BetterBlockEntity<T>> extends BetterBlockEntity<T> implements ITickable {
 	private static final String COOLDOWN_ID = "TickOnInterval::cooldown";
 	private int cooldown = 0;
 	public long LAST_TICK;
 
-	public TickOnInterval(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
+	public TickOnInterval(BlockEntityType<T> blockEntityType, BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState, size);
 	}
 

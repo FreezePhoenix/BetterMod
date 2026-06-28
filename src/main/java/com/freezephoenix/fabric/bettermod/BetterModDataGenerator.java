@@ -30,8 +30,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -50,16 +48,16 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 			super(output, registriesFuture);
 		}
 
-		protected @NotNull BlockItemTagAppender<Block> tag(final @NotNull TagKey<Block> tag) {
+		protected BlockItemTagAppender<Block> tag(final TagKey<Block> tag) {
 			return new BlockItemTagAppender<>(super.tag(tag)) {
-				protected @NotNull ResourceKey<Block> convertElement(final @NotNull BlockItemId element) {
+				protected ResourceKey<Block> convertElement(final BlockItemId element) {
 					return element.block();
 				}
 			};
 		}
 
 		@Override
-		protected void addTags(HolderLookup.@NonNull Provider arg) {
+		protected void addTags(HolderLookup.Provider arg) {
 			tag(BlockTags.MINEABLE_WITH_PICKAXE)
 					.add(StickHopperBlock.BlockItemID, PullHopperBlock.BlockItemID, BitHopperBlock.BlockItemID);
 		}
@@ -71,7 +69,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		}
 
 		@Override
-		protected void addTags(HolderLookup.@NonNull Provider arg) {
+		protected void addTags(HolderLookup.Provider arg) {
 			builder(ItemTagKeys.SHELVABLE)
 					.forceAddTag(ItemTags.BOOKSHELF_BOOKS)
 					.add(ItemIds.PAPER)
@@ -87,9 +85,10 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 
 		@Override
 		public void generate() {
-			dropSelf(BetterMod.BIT_HOPPER_BLOCK);
-			dropSelf(BetterMod.PULL_HOPPER_BLOCK);
-			dropSelf(BetterMod.STICK_HOPPER_BLOCK);
+			add(BetterMod.BIT_HOPPER_BLOCK, this::createNameableBlockEntityTable);
+			add(BetterMod.PULL_HOPPER_BLOCK, this::createNameableBlockEntityTable);
+			add(BetterMod.STICK_HOPPER_BLOCK, this::createNameableBlockEntityTable);
+			add(Blocks.BOOKSHELF, this::createNameableBlockEntityTable);
 			add(BetterMod.ROOM_CONTROLLER_BLOCK, LootTable.lootTable().withPool(
 					LootPool.lootPool().add(
 							LootItem.lootTableItem(Items.GOLD_INGOT)
@@ -112,7 +111,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		}
 
 		@Override
-		protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.@NonNull Provider registryLookup, @NonNull RecipeOutput exporter) {
+		protected RecipeProvider createRecipeProvider(HolderLookup.Provider registryLookup, RecipeOutput exporter) {
 			return new RecipeProvider(registryLookup, exporter) {
 				@Override
 				public void buildRecipes() {
@@ -164,7 +163,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		}
 
 		@Override
-		public @NotNull String getName() {
+		public String getName() {
 			return "BetterMod";
 		}
 	}

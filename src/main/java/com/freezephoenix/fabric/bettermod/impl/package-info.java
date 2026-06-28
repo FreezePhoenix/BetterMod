@@ -1,0 +1,1 @@
+package com.freezephoenix.fabric.bettermod.impl;

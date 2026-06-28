@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity> {
 	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "bithopper");
@@ -91,7 +90,7 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 	private static final VoxelShape WEST_RAYCAST_SHAPE = Block.box(0.0, 8.0, 6.0, 4.0, 10.0, 10.0);
 
 	@Override
-	protected @NotNull MapCodec<BitHopperBlock> codec() {
+	protected MapCodec<BitHopperBlock> codec() {
 		return CODEC;
 	}
 
@@ -100,7 +99,7 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 	}
 
 	@Override
-	public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		return switch (state.getValue(HopperBlock.FACING)) {
 			case NORTH -> NORTH_SHAPE;
 			case SOUTH -> SOUTH_SHAPE;
@@ -111,7 +110,7 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 	}
 
 	@Override
-	public @NotNull VoxelShape getInteractionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
+	public VoxelShape getInteractionShape(BlockState state, BlockGetter world, BlockPos pos) {
 		return switch (state.getValue(HopperBlock.FACING)) {
 			case NORTH -> NORTH_RAYCAST_SHAPE;
 			case SOUTH -> SOUTH_RAYCAST_SHAPE;

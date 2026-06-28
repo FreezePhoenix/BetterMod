@@ -9,17 +9,17 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 public abstract class BetterExtractingHopperBlockEntity<T extends BetterExtractingHopperBlockEntity<T>> extends BetterHopperBlockEntity<T> {
-	protected BlockApiCache<Storage<ItemVariant>, Direction> PULL_TARGET_CACHE;
+	protected @Nullable BlockApiCache<Storage<ItemVariant>, Direction> PULL_TARGET_CACHE;
 
-	public BetterExtractingHopperBlockEntity(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState) {
+	public BetterExtractingHopperBlockEntity(BlockEntityType<T> blockEntityType, BlockPos blockPos, BlockState blockState) {
 		super(blockEntityType, blockPos, blockState);
 	}
 
 	@Override
-	protected Storage<ItemVariant> getPullTarget(ServerLevel world) {
+	protected @Nullable Storage<ItemVariant> getPullTarget(ServerLevel world) {
 		if(PULL_TARGET_CACHE == null) {
 			PULL_TARGET_CACHE = BlockApiCache.create(ItemStorage.SIDED, world, worldPosition.above());
 		}

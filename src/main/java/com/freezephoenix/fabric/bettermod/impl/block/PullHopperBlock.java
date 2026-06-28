@@ -13,7 +13,6 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
 
 public final class PullHopperBlock extends BetterHopperBlock<PullHopperBlockEntity> {
 	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "pullhopper");
@@ -144,7 +143,7 @@ public final class PullHopperBlock extends BetterHopperBlock<PullHopperBlockEnti
 	);
 
 	@Override
-	protected @NotNull MapCodec<PullHopperBlock> codec() {
+	protected MapCodec<PullHopperBlock> codec() {
 		return CODEC;
 	}
 
@@ -153,7 +152,7 @@ public final class PullHopperBlock extends BetterHopperBlock<PullHopperBlockEnti
 	}
 
 	@Override
-	public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		return switch (state.getValue(HopperBlock.FACING)) {
 			case NORTH -> NORTH_SHAPE;
 			case SOUTH -> SOUTH_SHAPE;
@@ -164,7 +163,7 @@ public final class PullHopperBlock extends BetterHopperBlock<PullHopperBlockEnti
 	}
 
 	@Override
-	public @NotNull VoxelShape getInteractionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
+	public VoxelShape getInteractionShape(BlockState state, BlockGetter world, BlockPos pos) {
 		return switch (state.getValue(HopperBlock.FACING)) {
 			case NORTH -> NORTH_RAYCAST_SHAPE;
 			case SOUTH -> SOUTH_RAYCAST_SHAPE;

@@ -7,12 +7,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
 public class PullHopperBlockEntity extends BetterExtractingHopperBlockEntity<PullHopperBlockEntity> {
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "pull_hopper");
 
-	public PullHopperBlockEntity(@NotNull BlockPos blockPos, BlockState blockState) {
+	public PullHopperBlockEntity(BlockPos blockPos, BlockState blockState) {
 		super(BetterMod.PULL_HOPPER_BLOCK_ENTITY_TYPE, blockPos, blockState);
 	}
 

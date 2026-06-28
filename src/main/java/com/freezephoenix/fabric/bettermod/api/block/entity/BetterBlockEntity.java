@@ -15,15 +15,14 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class BetterBlockEntity<T extends BetterBlockEntity<T>> extends RandomizableContainerBlockEntity implements SidedStorageBlockEntity {
 	protected NonNullList<ItemStack> inventory;
 	public final SlottedStorage<ItemVariant> SELF;
 	private final int size;
 
-	public BetterBlockEntity(BlockEntityType<T> blockEntityType, @NotNull BlockPos blockPos, BlockState blockState, int size) {
+	public BetterBlockEntity(BlockEntityType<T> blockEntityType, BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState);
 		this.size = size;
 		this.inventory = NonNullList.withSize(size, ItemStack.EMPTY);
@@ -62,7 +61,7 @@ public abstract class BetterBlockEntity<T extends BetterBlockEntity<T>> extends 
 	}
 
 	@Override
-	public @Nullable Storage<ItemVariant> getItemStorage(@Nullable Direction side) {
+	public Storage<ItemVariant> getItemStorage(@Nullable Direction side) {
 		return SELF;
 	}
 }

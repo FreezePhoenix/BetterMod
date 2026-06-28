@@ -9,13 +9,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
-import org.jetbrains.annotations.NotNull;
 
 public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "bookshelf");
 	private static final int INVENTORY_SIZE = 16;
 
-	public BetterBookshelfScreenHandler(int syncId, @NotNull Inventory playerInventory, Container inventory) {
+	public BetterBookshelfScreenHandler(int syncId, Inventory playerInventory, Container inventory) {
 		super(
 				BetterMod.BOOKSHELF_SCREEN_HANDLER_TYPE,
 				syncId,
@@ -34,7 +33,7 @@ public final class BetterBookshelfScreenHandler extends SyncedGuiDescription {
 		root.validate(this);
 	}
 
-	public BetterBookshelfScreenHandler(int syncId, @NotNull Inventory playerInventory) {
+	public BetterBookshelfScreenHandler(int syncId, Inventory playerInventory) {
 		this(syncId, playerInventory, new SimpleContainer(INVENTORY_SIZE));
 	}
 }

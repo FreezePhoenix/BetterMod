@@ -11,13 +11,12 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.NotNull;
 
 public abstract class BetterBlock<E extends BetterBlockEntity<E>> extends BaseEntityBlock {
 
 	public BlockEntityType<E> blockEntityType;
 
-	public BetterBlock(@NotNull Properties settings) {
+	public BetterBlock(Properties settings) {
 		super(settings);
 	}
 
@@ -32,7 +31,7 @@ public abstract class BetterBlock<E extends BetterBlockEntity<E>> extends BaseEn
 	}
 
 	@Override
-	public @NotNull InteractionResult useWithoutItem(BlockState state, @NotNull Level world, BlockPos pos, @NotNull Player player, BlockHitResult hit) {
+	public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!world.isClientSide()) {
 			if (blockEntityType.getBlockEntity(world, pos) instanceof BetterBlockEntity<E> betterBlockEntity) {
 				player.openMenu(betterBlockEntity);

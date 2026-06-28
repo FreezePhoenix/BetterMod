@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
 public class BetterBookshelfBlockEntity extends BetterBlockEntity<BetterBookshelfBlockEntity> {
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("minecraft", "bookshelf");
@@ -22,7 +21,7 @@ public class BetterBookshelfBlockEntity extends BetterBlockEntity<BetterBookshel
 	}
 
 	@Override
-	public @NotNull AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {
+	public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {
 		return new BetterBookshelfScreenHandler(syncId, playerInventory, this);
 	}
 
@@ -32,7 +31,7 @@ public class BetterBookshelfBlockEntity extends BetterBlockEntity<BetterBookshel
 	}
 
 	@Override
-	public boolean canPlaceItem(int slot, @NotNull ItemStack stack) {
+	public boolean canPlaceItem(int slot, ItemStack stack) {
 		return stack.is(ItemTagKeys.SHELVABLE);
 	}
 }

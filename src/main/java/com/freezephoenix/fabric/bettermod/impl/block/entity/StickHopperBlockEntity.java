@@ -8,12 +8,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 
 public class StickHopperBlockEntity extends BetterExtractingHopperBlockEntity<StickHopperBlockEntity> {
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "stick_hopper");
 
-	public StickHopperBlockEntity(@NotNull BlockPos blockPos, BlockState blockState) {
+	public StickHopperBlockEntity(BlockPos blockPos, BlockState blockState) {
 		super(BetterMod.STICK_HOPPER_BLOCK_ENTITY_TYPE, blockPos, blockState);
 	}
 
@@ -23,10 +22,5 @@ public class StickHopperBlockEntity extends BetterExtractingHopperBlockEntity<St
 	@Override
 	protected TransferType getTransferType() {
 		return TransferType.STICKING;
-	}
-
-	@Override
-	public boolean canPlaceItem(int slot, ItemStack stack) {
-		return stack.isStackable() && super.canPlaceItem(slot, stack);
 	}
 }

@@ -14,14 +14,12 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEntity> {
 	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "stickhopper");
 	public static final BlockItemId BlockItemID = BlockItemId.create(ID, ID);
 	public static final MapCodec<StickHopperBlock> CODEC = StickHopperBlock.simpleCodec(StickHopperBlock::new);
 
-	@Contract(pure = true)
 	@Override
 	protected MapCodec<StickHopperBlock> codec() {
 		return CODEC;
@@ -130,12 +128,12 @@ public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEn
 			)
 	);
 
-	public StickHopperBlock(@NotNull Properties settings) {
+	public StickHopperBlock(Properties settings) {
 		super(settings);
 	}
 
 	@Override
-	public VoxelShape getShape(@NotNull BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		return switch (state.getValue(HopperBlock.FACING)) {
 			case NORTH -> NORTH_SHAPE;
 			case SOUTH -> SOUTH_SHAPE;
@@ -146,7 +144,7 @@ public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEn
 	}
 
 	@Override
-	public VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter world, BlockPos pos) {
+	public VoxelShape getInteractionShape(BlockState state, BlockGetter world, BlockPos pos) {
 		return switch (state.getValue(HopperBlock.FACING)) {
 			case NORTH -> NORTH_RAYCAST_SHAPE;
 			case SOUTH -> SOUTH_RAYCAST_SHAPE;

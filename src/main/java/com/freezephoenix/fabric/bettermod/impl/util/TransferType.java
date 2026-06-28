@@ -5,15 +5,14 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.function.Predicate;
 
 public enum TransferType {
 	STANDARD {
 		@Override
-		public TransferResult handle(@Nullable Storage<ItemVariant> from, @NotNull Storage<ItemVariant> middle, @Nullable Storage<ItemVariant> to) {
+		public TransferResult handle(@Nullable Storage<ItemVariant> from, Storage<ItemVariant> middle, @Nullable Storage<ItemVariant> to) {
 			boolean inserted = to != null && StorageUtil.move(middle, to, ALWAYS_TRUE, 1, null) == 1;
 			boolean extracted = from != null && StorageUtil.move(from, middle,ALWAYS_TRUE, 1, null) == 1;
 			return new TransferResult(extracted, inserted);
@@ -21,7 +20,7 @@ public enum TransferType {
 	},
 	STICKING {
 		@Override
-		public TransferResult handle(@Nullable Storage<ItemVariant> from, @NotNull Storage<ItemVariant> middle, @Nullable Storage<ItemVariant> to) {
+		public TransferResult handle(@Nullable Storage<ItemVariant> from, Storage<ItemVariant> middle, @Nullable Storage<ItemVariant> to) {
 			boolean inserted = to == null; // if the destination is null, we can just say we have already inserted
 			boolean extracted = from == null; // same for source
 
@@ -79,8 +78,7 @@ public enum TransferType {
 			return new TransferResult(from != null && extracted, to != null && inserted);
 		}
 	};
-	public record TransferResult(boolean extracted, boolean inserted) {};
-
+	public record TransferResult(boolean extracted, boolean inserted) {}
 	private static final Predicate<ItemVariant> ALWAYS_TRUE = _ -> true;
-	public abstract TransferResult handle(@Nullable Storage<ItemVariant> from, @NotNull Storage<ItemVariant> middle, @Nullable Storage<ItemVariant> to);
+	public abstract TransferResult handle(@Nullable Storage<ItemVariant> from, Storage<ItemVariant> middle, @Nullable Storage<ItemVariant> to);
 }

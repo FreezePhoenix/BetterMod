@@ -6,11 +6,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import org.jetbrains.annotations.NotNull;
 
 @Environment(EnvType.CLIENT)
 public final class BetterScreen<T extends SyncedGuiDescription> extends CottonInventoryScreen<T> {
-	public BetterScreen(@NotNull T description, @NotNull Inventory inventory, Component title) {
+	public BetterScreen(T description, Inventory inventory, Component title) {
 		super(description, inventory, title);
 	}
 }

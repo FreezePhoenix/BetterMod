@@ -13,8 +13,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> extends BetterTickingBlock<T> {
 	public BetterHopperBlock(Properties settings) {
@@ -22,7 +21,7 @@ public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> ex
 	}
 
 	@Override
-	protected boolean isCollisionShapeFullBlock(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
+	protected boolean isCollisionShapeFullBlock(BlockState state, BlockGetter world, BlockPos pos) {
 		return false;
 	}
 
@@ -43,12 +42,12 @@ public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> ex
 	}
 
 	@Override
-	protected boolean hasAnalogOutputSignal(@NotNull BlockState state) {
+	protected boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 
 	@Override
-	protected int getAnalogOutputSignal(@NotNull BlockState state, @NotNull Level world, @NotNull BlockPos pos, @NotNull Direction direction) {
+	protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
 		return StorageUtil.getRedstoneSignal(ItemStorage.SIDED.find(world, pos, direction));
 	}
 }
