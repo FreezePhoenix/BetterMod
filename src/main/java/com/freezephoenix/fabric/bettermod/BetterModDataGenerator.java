@@ -1,6 +1,9 @@
 package com.freezephoenix.fabric.bettermod;
 
 import com.freezephoenix.fabric.bettermod.impl.BetterMod;
+import com.freezephoenix.fabric.bettermod.impl.block.BitHopperBlock;
+import com.freezephoenix.fabric.bettermod.impl.block.PullHopperBlock;
+import com.freezephoenix.fabric.bettermod.impl.block.StickHopperBlock;
 import com.freezephoenix.fabric.bettermod.impl.util.ItemTagKeys;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -9,19 +12,25 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.tags.BlockItemTagAppender;
+import net.minecraft.references.BlockItemId;
 import net.minecraft.references.ItemIds;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.CompletableFuture;
@@ -31,13 +40,33 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 	@Override
 	public void onInitializeDataGenerator(FabricDataGenerator generator) {
 		FabricDataGenerator.Pack pack = generator.createPack();
-		pack.addProvider(TagGenerator::new);
+		pack.addProvider(ItemTagGenerator::new);
 		pack.addProvider(LootTableGenerator::new);
 		pack.addProvider(BetterModRecipeGenerator::new);
+		pack.addProvider(BlockTagGenerator::new);
+	}
+	private static class BlockTagGenerator extends FabricTagsProvider.BlockTagsProvider {
+		public BlockTagGenerator(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+			super(output, registriesFuture);
+		}
+
+		protected @NotNull BlockItemTagAppender<Block> tag(final @NotNull TagKey<Block> tag) {
+			return new BlockItemTagAppender<>(super.tag(tag)) {
+				protected @NotNull ResourceKey<Block> convertElement(final @NotNull BlockItemId element) {
+					return element.block();
+				}
+			};
+		}
+
+		@Override
+		protected void addTags(HolderLookup.@NonNull Provider arg) {
+			tag(BlockTags.MINEABLE_WITH_PICKAXE)
+					.add(StickHopperBlock.BlockItemID, PullHopperBlock.BlockItemID, BitHopperBlock.BlockItemID);
+		}
 	}
 
-	private static class TagGenerator extends FabricTagsProvider.ItemTagsProvider {
-		public TagGenerator(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+	private static class ItemTagGenerator extends FabricTagsProvider.ItemTagsProvider {
+		public ItemTagGenerator(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 			super(output, registriesFuture);
 		}
 
@@ -135,7 +164,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		}
 
 		@Override
-		public String getName() {
+		public @NotNull String getName() {
 			return "BetterMod";
 		}
 	}

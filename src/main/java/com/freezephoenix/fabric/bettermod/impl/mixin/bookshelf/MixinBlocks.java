@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 public abstract class MixinBlocks {
 
 	@Shadow
-	private static Block register(final BlockItemId id, final Function<BlockBehaviour.Properties, Block> factory, final BlockBehaviour.Properties properties) {
+	private static Block register(final BlockItemId ignoredid, final Function<BlockBehaviour.Properties, Block> ignoredfactory, final BlockBehaviour.Properties ignoredproperties) {
 		throw new UnsupportedOperationException();
 	}
 	@Definition(id = "register", method = "Lnet/minecraft/world/level/block/Blocks;register(Lnet/minecraft/references/BlockItemId;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;")

@@ -8,12 +8,14 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Predicate;
+
 public enum TransferType {
 	STANDARD {
 		@Override
 		public TransferResult handle(@Nullable Storage<ItemVariant> from, @NotNull Storage<ItemVariant> middle, @Nullable Storage<ItemVariant> to) {
-			boolean inserted = to != null && StorageUtil.move(middle, to, variant -> true, 1, null) == 1;
-			boolean extracted = from != null && StorageUtil.move(from, middle, variant -> true, 1, null) == 1;
+			boolean inserted = to != null && StorageUtil.move(middle, to, ALWAYS_TRUE, 1, null) == 1;
+			boolean extracted = from != null && StorageUtil.move(from, middle,ALWAYS_TRUE, 1, null) == 1;
 			return new TransferResult(extracted, inserted);
 		}
 	},
@@ -24,42 +26,29 @@ public enum TransferType {
 			boolean extracted = from == null; // same for source
 
 			for (StorageView<ItemVariant> view : middle.nonEmptyViews()) {
-
 				ItemVariant resource = view.getResource();
-				if (view.getCapacity() <= 1) {
-					// Non-stackable logic
-					if(!inserted && !extracted) {
+				if(!extracted && !inserted) {
+					// If we haven't inserted, and we haven't extracted, we can process items that can't be stacked.
+					// We also do this for normal items, as we would prefer to skip over the middle inventory if possible.
+					try (Transaction transferTransaction = Transaction.openOuter()) {
+						if (from.extract(resource, 1, transferTransaction) == 1 && to.insert(resource, 1, transferTransaction) == 1) {
+							transferTransaction.commit();
+							inserted = true;
+							extracted = true;
+							break;
+						}
+					}
+				} else if(view.getCapacity() > 1) {
+					boolean safe_to_extract = view.getAmount() < view.getCapacity();
+					if (safe_to_extract && !extracted) {
 						try (Transaction transferTransaction = Transaction.openOuter()) {
-							if (to.insert(resource, 1, transferTransaction) == 1 && from.extract(
+
+							if (StorageUtil.tryInsertStacking(
+									middle,
 									resource,
 									1,
 									transferTransaction
-							) == 1) {
-								transferTransaction.commit();
-								inserted = true;
-								extracted = true;
-								break;
-							}
-						}
-					}
-				} else {
-					// Stackable logic
-					if(!extracted && !inserted) {
-						// Prefer skipping the middle inventory completely.
-						try (Transaction transferTransaction = Transaction.openOuter()) {
-							if (to.insert(resource, 1, transferTransaction) == 1 && from.extract(resource, 1, transferTransaction) == 1) {
-								transferTransaction.commit();
-								inserted = true;
-								extracted = true;
-								break;
-							}
-						}
-					}
-					boolean safe_to_extract = view.getAmount() < view.getCapacity();
-					if(safe_to_extract && !extracted) {
-						try (Transaction transferTransaction = Transaction.openOuter()) {
-
-							if (StorageUtil.tryInsertStacking(middle, resource, 1, transferTransaction) == 1 && from.extract(
+							) == 1 && from.extract(
 									resource,
 									1,
 									transferTransaction
@@ -70,7 +59,7 @@ public enum TransferType {
 						}
 					}
 					boolean safe_to_insert = view.getAmount() > 1;
-					if(safe_to_insert && !inserted) {
+					if (safe_to_insert && !inserted) {
 						try (Transaction transferTransaction = Transaction.openOuter()) {
 							if (to.insert(resource, 1, transferTransaction) == 1 && view.extract(
 									resource,
@@ -92,6 +81,6 @@ public enum TransferType {
 	};
 	public record TransferResult(boolean extracted, boolean inserted) {};
 
-
+	private static final Predicate<ItemVariant> ALWAYS_TRUE = _ -> true;
 	public abstract TransferResult handle(@Nullable Storage<ItemVariant> from, @NotNull Storage<ItemVariant> middle, @Nullable Storage<ItemVariant> to);
 }

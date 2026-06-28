@@ -3,6 +3,7 @@ package com.freezephoenix.fabric.bettermod.impl.block;
 import com.mojang.serialization.MapCodec;
 import com.freezephoenix.fabric.bettermod.impl.block.entity.StickHopperBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.references.BlockItemId;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -16,7 +17,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEntity> {
-	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "stickhopper");
+	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "stickhopper");
+	public static final BlockItemId BlockItemID = BlockItemId.create(ID, ID);
 	public static final MapCodec<StickHopperBlock> CODEC = StickHopperBlock.simpleCodec(StickHopperBlock::new);
 
 	@Contract(pure = true)

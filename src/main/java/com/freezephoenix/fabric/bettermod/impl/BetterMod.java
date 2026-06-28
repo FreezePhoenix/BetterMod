@@ -24,6 +24,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.references.BlockItemId;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -56,7 +57,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 																				  ROOM_CONTROLLER_BLOCK.asItem()))
 																		  .title(Component.translatable(
 																				  "bettermod.item_group"))
-																		  .displayItems((context, entries) -> {
+																		  .displayItems((_, entries) -> {
 																			  for (ItemLike itemLike : ITEMS) {
 																				  entries.accept(itemLike);
 																			  }
@@ -72,8 +73,8 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 	public static MenuType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
 	public static Item SLING_MECHANISM;
 
-	public static <T extends Block> T registerBlock(Identifier ID, Function<BlockBehaviour.Properties, T> factory, Block template) {
-		ResourceKey<Block> blockRegistryKey = ResourceKey.create(Registries.BLOCK, ID);
+	public static <T extends Block> T registerBlock(BlockItemId ID, Function<BlockBehaviour.Properties, T> factory, Block template) {
+		ResourceKey<Block> blockRegistryKey = ID.block();
 		T block = Registry.register(
 				BuiltInRegistries.BLOCK,
 				blockRegistryKey,
@@ -94,8 +95,8 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		return new_item;
 	}
 
-	public static <T extends Item, A> T registerItem(Identifier ID, BiFunction<A, Item.Properties, T> factory, A arg) {
-		ResourceKey<Item> itemRegistryKey = ResourceKey.create(Registries.ITEM, ID);
+	public static <T extends Item, A> T registerItem(BlockItemId ID, BiFunction<A, Item.Properties, T> factory, A arg) {
+		ResourceKey<Item> itemRegistryKey = ID.item();
 		T new_item = Registry.register(
 				BuiltInRegistries.ITEM,
 				itemRegistryKey,
@@ -140,17 +141,18 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		} else {
 			LOGGER.error("BetterBookshelves was not successful! This is a bug!");
 		}
+		var room_id = Identifier.fromNamespaceAndPath("bettermod", "room_controller");
 		ROOM_CONTROLLER_BLOCK = registerBlock(
-				Identifier.fromNamespaceAndPath("bettermod", "room_controller"),
+				BlockItemId.create(room_id, room_id),
 				Block::new,
 				Blocks.GLASS
 		);
 
 		SLING_MECHANISM = registerItem(Identifier.fromNamespaceAndPath("bettermod", "sling_mechanism"), Item::new);
 
-		BIT_HOPPER_BLOCK = registerBlock(BitHopperBlock.ID, BitHopperBlock::new, Blocks.HOPPER);
-		PULL_HOPPER_BLOCK = registerBlock(PullHopperBlock.ID, PullHopperBlock::new, Blocks.HOPPER);
-		STICK_HOPPER_BLOCK = registerBlock(StickHopperBlock.ID, StickHopperBlock::new, Blocks.HOPPER);
+		BIT_HOPPER_BLOCK = registerBlock(BitHopperBlock.BlockItemID, BitHopperBlock::new, Blocks.HOPPER);
+		PULL_HOPPER_BLOCK = registerBlock(PullHopperBlock.BlockItemID, PullHopperBlock::new, Blocks.HOPPER);
+		STICK_HOPPER_BLOCK = registerBlock(StickHopperBlock.BlockItemID, StickHopperBlock::new, Blocks.HOPPER);
 
 		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
 				BitHopperBlockEntity.ID,

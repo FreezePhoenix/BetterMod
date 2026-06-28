@@ -3,6 +3,7 @@ package com.freezephoenix.fabric.bettermod.impl.block;
 import com.mojang.serialization.MapCodec;
 import com.freezephoenix.fabric.bettermod.impl.block.entity.BitHopperBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.references.BlockItemId;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +15,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 
 public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity> {
-	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "bithopper");
+	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "bithopper");
+	public static final BlockItemId BlockItemID = BlockItemId.create(ID, ID);
 	public static final MapCodec<BitHopperBlock> CODEC = BitHopperBlock.simpleCodec(BitHopperBlock::new);
 	private static final VoxelShape TOP_SHAPE = Shapes.or(Block.box(
 			0.0,
@@ -89,7 +91,7 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 	private static final VoxelShape WEST_RAYCAST_SHAPE = Block.box(0.0, 8.0, 6.0, 4.0, 10.0, 10.0);
 
 	@Override
-	protected MapCodec<BitHopperBlock> codec() {
+	protected @NotNull MapCodec<BitHopperBlock> codec() {
 		return CODEC;
 	}
 
@@ -98,7 +100,7 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 	}
 
 	@Override
-	public VoxelShape getShape(@NotNull BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+	public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
 		return switch (state.getValue(HopperBlock.FACING)) {
 			case NORTH -> NORTH_SHAPE;
 			case SOUTH -> SOUTH_SHAPE;
@@ -109,7 +111,7 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 	}
 
 	@Override
-	public VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter world, BlockPos pos) {
+	public @NotNull VoxelShape getInteractionShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
 		return switch (state.getValue(HopperBlock.FACING)) {
 			case NORTH -> NORTH_RAYCAST_SHAPE;
 			case SOUTH -> SOUTH_RAYCAST_SHAPE;
