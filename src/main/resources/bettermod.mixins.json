@@ -5,7 +5,9 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "bookshelf.MixinBlocks",
-    "MixinDFU"
+    "MixinDFU",
+    "MixinSpawnerBlock",
+    "BaseSpawnerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

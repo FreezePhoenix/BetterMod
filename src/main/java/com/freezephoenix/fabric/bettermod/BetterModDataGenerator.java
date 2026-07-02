@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -28,7 +29,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.concurrent.CompletableFuture;
@@ -43,6 +46,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		pack.addProvider(BetterModRecipeGenerator::new);
 		pack.addProvider(BlockTagGenerator::new);
 	}
+
 	private static class BlockTagGenerator extends FabricTagsProvider.BlockTagsProvider {
 		public BlockTagGenerator(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 			super(output, registriesFuture);
@@ -58,8 +62,11 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.Provider arg) {
-			tag(BlockTags.MINEABLE_WITH_PICKAXE)
-					.add(StickHopperBlock.BlockItemID, PullHopperBlock.BlockItemID, BitHopperBlock.BlockItemID);
+			tag(BlockTags.MINEABLE_WITH_PICKAXE).add(
+					StickHopperBlock.BlockItemID,
+					PullHopperBlock.BlockItemID,
+					BitHopperBlock.BlockItemID
+			);
 		}
 	}
 
@@ -70,11 +77,10 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.Provider arg) {
-			builder(ItemTagKeys.SHELVABLE)
-					.forceAddTag(ItemTags.BOOKSHELF_BOOKS)
-					.add(ItemIds.PAPER)
-					.add(ItemIds.FILLED_MAP)
-					.add(ItemIds.MAP);
+			builder(ItemTagKeys.SHELVABLE).forceAddTag(ItemTags.BOOKSHELF_BOOKS)
+										  .add(ItemIds.PAPER)
+										  .add(ItemIds.FILLED_MAP)
+										  .add(ItemIds.MAP);
 		}
 	}
 
@@ -88,20 +94,35 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 			add(BetterMod.BIT_HOPPER_BLOCK, this::createNameableBlockEntityTable);
 			add(BetterMod.PULL_HOPPER_BLOCK, this::createNameableBlockEntityTable);
 			add(BetterMod.STICK_HOPPER_BLOCK, this::createNameableBlockEntityTable);
-			add(Blocks.BOOKSHELF, this::createNameableBlockEntityTable);
-			add(BetterMod.ROOM_CONTROLLER_BLOCK, LootTable.lootTable().withPool(
-					LootPool.lootPool().add(
-							LootItem.lootTableItem(Items.GOLD_INGOT)
-									 .apply(SetItemCountFunction.setCount(new ConstantValue(4))))
-			).withPool(
-					LootPool.lootPool().add(
-							LootItem.lootTableItem(Items.REDSTONE)
-									 .apply(SetItemCountFunction.setCount(new ConstantValue(4))))
-			).withPool(
-					LootPool.lootPool().add(
+			add(
+					Blocks.BOOKSHELF, (original) -> {
+						return LootTable.lootTable()
+										.withPool(LootPool.lootPool()
+														  .setRolls(ConstantValue.exactly(1.0F))
+														  .add((LootItem.lootTableItem(original)
+																		.when(this.hasSilkTouch())
+																		.apply(CopyComponentsFunction.copyComponentsFromBlockEntity(
+																											 LootContextParams.BLOCK_ENTITY)
+																									 .include(
+																											 DataComponents.CUSTOM_NAME))).otherwise(
+																  LootItem.lootTableItem(Items.BOOK)
+																		  .apply(SetItemCountFunction.setCount(
+																				  ConstantValue.exactly(3.0F))))));
+					}
+			);
+			add(
+					BetterMod.ROOM_CONTROLLER_BLOCK,
+					LootTable.lootTable()
+							 .withPool(LootPool.lootPool()
+											   .add(LootItem.lootTableItem(Items.GOLD_INGOT)
+															.apply(SetItemCountFunction.setCount(new ConstantValue(4)))))
+							 .withPool(LootPool.lootPool()
+											   .add(LootItem.lootTableItem(Items.REDSTONE)
+															.apply(SetItemCountFunction.setCount(new ConstantValue(4)))))
+							 .withPool(LootPool.lootPool().add(
 
-							LootItem.lootTableItem(Items.ENDER_PEARL))
-			));
+									 LootItem.lootTableItem(Items.ENDER_PEARL)))
+			);
 		}
 	}
 
@@ -115,49 +136,59 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 			return new RecipeProvider(registryLookup, exporter) {
 				@Override
 				public void buildRecipes() {
-					shaped(RecipeCategory.REDSTONE, BetterMod.SLING_MECHANISM)
-							.pattern("IRI")
-							.pattern(" I ")
-							.pattern(" I ")
-							.define('I', Items.STICK)
-							.define('R', Items.STRING)
-							.unlockedBy(getHasName(Items.STRING), has(Items.STRING))
-							.save(output);
-					shaped(RecipeCategory.REDSTONE, Blocks.DISPENSER)
-							.pattern("###")
-							.pattern("#X#")
-							.pattern("#R#")
-							.define('R', Items.REDSTONE)
-							.define('#', Blocks.COBBLESTONE)
-							.define('X', BetterMod.SLING_MECHANISM)
-							.unlockedBy(getHasName(BetterMod.SLING_MECHANISM), has(BetterMod.SLING_MECHANISM))
-							.save(this.output);
-					shaped(RecipeCategory.REDSTONE, BetterMod.BIT_HOPPER_BLOCK)
-							.pattern("   ")
-							.pattern("ICI")
-							.pattern(" I ")
-							.define('I', Items.IRON_INGOT)
-							.define('C', Items.CHEST)
-							.unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
-							.save(output);
-					shaped(RecipeCategory.REDSTONE, BetterMod.PULL_HOPPER_BLOCK)
-							.pattern("ICI")
-							.pattern("I I")
-							.pattern(" I ")
-							.define('I', Items.IRON_INGOT)
-							.define('C', Items.CHEST)
-							.unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
-							.save(output);
-					shaped(RecipeCategory.REDSTONE, BetterMod.STICK_HOPPER_BLOCK)
-							.pattern("IRI")
-							.pattern("ICI")
-							.pattern("SIS")
-							.define('I', Items.IRON_INGOT)
-							.define('R', Items.COMPARATOR)
-							.define('C', Items.CHEST)
-							.define('S', Items.SLIME_BALL)
-							.unlockedBy(getHasName(Items.SLIME_BALL), has(Items.SLIME_BALL))
-							.save(output);
+					shaped(RecipeCategory.REDSTONE, BetterMod.SLING_MECHANISM).pattern("IRI")
+																			  .pattern(" I ")
+																			  .pattern(" I ")
+																			  .define('I', Items.STICK)
+																			  .define('R', Items.STRING)
+																			  .unlockedBy(
+																					  getHasName(Items.STRING),
+																					  has(Items.STRING)
+																			  )
+																			  .save(output);
+					shaped(RecipeCategory.REDSTONE, Blocks.DISPENSER).pattern("###")
+																	 .pattern("#X#")
+																	 .pattern("#R#")
+																	 .define('R', Items.REDSTONE)
+																	 .define('#', Blocks.COBBLESTONE)
+																	 .define('X', BetterMod.SLING_MECHANISM)
+																	 .unlockedBy(
+																			 getHasName(BetterMod.SLING_MECHANISM),
+																			 has(BetterMod.SLING_MECHANISM)
+																	 )
+																	 .save(this.output);
+					shaped(RecipeCategory.REDSTONE, BetterMod.BIT_HOPPER_BLOCK).pattern("   ")
+																			   .pattern("ICI")
+																			   .pattern(" I ")
+																			   .define('I', Items.IRON_INGOT)
+																			   .define('C', Items.CHEST)
+																			   .unlockedBy(
+																					   getHasName(Items.IRON_INGOT),
+																					   has(Items.IRON_INGOT)
+																			   )
+																			   .save(output);
+					shaped(RecipeCategory.REDSTONE, BetterMod.PULL_HOPPER_BLOCK).pattern("ICI")
+																				.pattern("I I")
+																				.pattern(" I ")
+																				.define('I', Items.IRON_INGOT)
+																				.define('C', Items.CHEST)
+																				.unlockedBy(
+																						getHasName(Items.IRON_INGOT),
+																						has(Items.IRON_INGOT)
+																				)
+																				.save(output);
+					shaped(RecipeCategory.REDSTONE, BetterMod.STICK_HOPPER_BLOCK).pattern("IRI")
+																				 .pattern("ICI")
+																				 .pattern("SIS")
+																				 .define('I', Items.IRON_INGOT)
+																				 .define('R', Items.COMPARATOR)
+																				 .define('C', Items.CHEST)
+																				 .define('S', Items.SLIME_BALL)
+																				 .unlockedBy(
+																						 getHasName(Items.SLIME_BALL),
+																						 has(Items.SLIME_BALL)
+																				 )
+																				 .save(output);
 				}
 			};
 		}
