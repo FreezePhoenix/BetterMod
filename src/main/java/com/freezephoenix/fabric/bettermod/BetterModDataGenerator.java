@@ -5,12 +5,14 @@ import com.freezephoenix.fabric.bettermod.impl.block.BitHopperBlock;
 import com.freezephoenix.fabric.bettermod.impl.block.PullHopperBlock;
 import com.freezephoenix.fabric.bettermod.impl.block.StickHopperBlock;
 import com.freezephoenix.fabric.bettermod.impl.util.ItemTagKeys;
+import com.freezephoenix.fabric.bettermod.impl.util.LootTableIdentifiers;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
+import net.minecraft.advancements.predicates.StatePropertiesPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -19,6 +21,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.tags.BlockItemTagAppender;
 import net.minecraft.references.BlockItemId;
 import net.minecraft.references.ItemIds;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -26,15 +29,20 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DecoratedPotBlock;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
 import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 
@@ -89,8 +97,14 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 			super(dataOutput, registriesFuture);
 		}
 
+		private static Function<Block, LootTable.Builder> dynamic(final Identifier key) {
+			return (block) -> LootTable.lootTable().withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).add(
+					DynamicLoot.dynamicEntry(key)));
+		}
+
 		@Override
 		public void generate() {
+			add(Blocks.SPAWNER, dynamic(LootTableIdentifiers.SPAWNER_DYNAMIC_DROP_ID));
 			add(BetterMod.BIT_HOPPER_BLOCK, this::createNameableBlockEntityTable);
 			add(BetterMod.PULL_HOPPER_BLOCK, this::createNameableBlockEntityTable);
 			add(BetterMod.STICK_HOPPER_BLOCK, this::createNameableBlockEntityTable);
