@@ -1,6 +1,5 @@
 package com.freezephoenix.fabric.bettermod.impl.block;
 
-import com.freezephoenix.fabric.bettermod.api.block.BetterTickingBlock;
 import com.freezephoenix.fabric.bettermod.impl.block.entity.BetterHopperBlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil;
@@ -15,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.jspecify.annotations.Nullable;
 
-public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> extends BetterTickingBlock<T> {
+public abstract class BetterHopperBlock<T extends BetterHopperBlockEntity<T>> extends com.freezephoenix.fabric.bettermod.api.block.InventoryBetterBlock<T> implements com.freezephoenix.fabric.bettermod.api.block.TickingBetterBlock<T> {
 	public BetterHopperBlock(Properties settings) {
 		super(settings);
 	}

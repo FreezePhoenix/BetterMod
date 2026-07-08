@@ -1,0 +1,44 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "conditions": [
+            {
+              "condition": "minecraft:location_check",
+              "predicate": {
+                "block": {
+                  "nbt": "{SpawnData:{entity:{id:\"minecraft:silverfish\"}}}"
+                },
+                "structures": "minecraft:stronghold"
+              }
+            }
+          ],
+          "functions": [
+            {
+              "components": {
+                "minecraft:written_book_content": {
+                  "author": "FreezePhoenix",
+                  "pages": [
+                    {
+                      "raw": "Authors\n - FreezePhoenix\n\nBug Reporters\n - MasterGamerReg\n"
+                    }
+                  ],
+                  "resolved": true,
+                  "title": {
+                    "raw": "Better Mod v2.0.3 credits"
+                  }
+                }
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "minecraft:written_book"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

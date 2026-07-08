@@ -17,12 +17,12 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
-public abstract class BetterBlockEntity<T extends BetterBlockEntity<T>> extends RandomizableContainerBlockEntity implements SidedStorageBlockEntity {
+public abstract class InventoryBetterBlockEntity<T extends InventoryBetterBlockEntity<T>> extends RandomizableContainerBlockEntity implements SidedStorageBlockEntity {
 	protected NonNullList<ItemStack> inventory;
-	public final SlottedStorage<ItemVariant> SELF;
+	protected final SlottedStorage<ItemVariant> SELF;
 	private final int size;
 
-	public BetterBlockEntity(BlockEntityType<T> blockEntityType, BlockPos blockPos, BlockState blockState, int size) {
+	public InventoryBetterBlockEntity(BlockEntityType<T> blockEntityType, BlockPos blockPos, BlockState blockState, int size) {
 		super(blockEntityType, blockPos, blockState);
 		this.size = size;
 		this.inventory = NonNullList.withSize(size, ItemStack.EMPTY);

@@ -19,14 +19,14 @@ import org.jspecify.annotations.Nullable;
 
 public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<T>> extends TickOnInterval<T> {
 	public static final int MAX_COOLDOWN = 8;
-	protected BlockPos insertionPos;
+	protected BlockPos.MutableBlockPos insertionPos = new BlockPos.MutableBlockPos();
 	protected Direction facing;
 	protected @Nullable BlockApiCache<Storage<ItemVariant>, Direction> PUSH_TARGET_CACHE;
 
 	public BetterHopperBlockEntity(BlockEntityType<T> blockEntityType, BlockPos blockPos, BlockState blockState) {
 		super(blockEntityType, blockPos, blockState, 5);
 		facing = blockState.getValue(BlockStateProperties.FACING_HOPPER);
-		insertionPos = worldPosition.relative(facing);
+		insertionPos.setWithOffset(getBlockPos(),facing);
 	}
 
 	protected abstract TransferType getTransferType();
@@ -42,6 +42,7 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 		}
 		return PUSH_TARGET_CACHE.find(facing.getOpposite());
 	}
+
 	protected @Nullable Storage<ItemVariant> getPullTarget(ServerLevel world) {
 		return null;
 	}
@@ -51,10 +52,10 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 	public void setBlockState(BlockState state) {
 		super.setBlockState(state);
 		facing = state.getValue(BlockStateProperties.FACING_HOPPER);
-		insertionPos = worldPosition.relative(facing);
+		insertionPos.setWithOffset(getBlockPos(), facing);
 	}
 
-	protected final boolean insert(ServerLevel world) {
+	protected final boolean transfer(ServerLevel world) {
 		final var PUSH_TARGET = getPushTarget(world);
 		final var PULL_TARGET = getPullTarget(world);
 		TransferType.TransferResult result = getTransferType().handle(PULL_TARGET, SELF, PUSH_TARGET);
@@ -77,7 +78,7 @@ public abstract class BetterHopperBlockEntity<T extends BetterHopperBlockEntity<
 
 	@Override
 	public void onCooldown(ServerLevel world, BlockPos pos, BlockState blockState) {
-		if (this.insert(world)) {
+		if (this.transfer(world)) {
 			setCooldown(BetterHopperBlockEntity.MAX_COOLDOWN);
 		}
 	}

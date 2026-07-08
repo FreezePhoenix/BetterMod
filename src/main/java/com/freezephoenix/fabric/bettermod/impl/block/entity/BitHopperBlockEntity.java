@@ -9,10 +9,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BitHopperBlockEntity extends BetterHopperBlockEntity<BitHopperBlockEntity> {
+
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "bit_hopper");
 
 	public BitHopperBlockEntity(BlockPos blockPos, BlockState blockState) {
-		super(BetterMod.BIT_HOPPER_BLOCK_ENTITY_TYPE, blockPos, blockState);
+		super(BetterMod.BIT_HOPPER.entity(), blockPos, blockState);
 	}
 
 	@Override

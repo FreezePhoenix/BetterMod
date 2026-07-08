@@ -1,6 +1,6 @@
 package com.freezephoenix.fabric.bettermod.impl.block.entity;
 
-import com.freezephoenix.fabric.bettermod.api.block.entity.BetterBlockEntity;
+import com.freezephoenix.fabric.bettermod.api.block.entity.InventoryBetterBlockEntity;
 import com.freezephoenix.fabric.bettermod.impl.BetterMod;
 import com.freezephoenix.fabric.bettermod.impl.client.gui.BetterBookshelfScreenHandler;
 import com.freezephoenix.fabric.bettermod.impl.util.ItemTagKeys;
@@ -13,11 +13,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class BetterBookshelfBlockEntity extends BetterBlockEntity<BetterBookshelfBlockEntity> {
+public class BetterBookshelfBlockEntity extends InventoryBetterBlockEntity<BetterBookshelfBlockEntity> {
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("minecraft", "bookshelf");
 
 	public BetterBookshelfBlockEntity(BlockPos pos, BlockState state) {
-		super(BetterMod.BOOKSHELF_BLOCK_ENTITY_TYPE, pos, state, 16);
+		super(BetterMod.BOOKSHELF.entity(), pos, state, 16);
 	}
 
 	@Override

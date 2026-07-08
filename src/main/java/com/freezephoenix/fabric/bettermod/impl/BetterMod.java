@@ -1,15 +1,8 @@
 package com.freezephoenix.fabric.bettermod.impl;
 
 import com.freezephoenix.fabric.bettermod.api.block.BetterBlock;
-import com.freezephoenix.fabric.bettermod.api.block.entity.BetterBlockEntity;
-import com.freezephoenix.fabric.bettermod.impl.block.BetterBookshelfBlock;
-import com.freezephoenix.fabric.bettermod.impl.block.BitHopperBlock;
-import com.freezephoenix.fabric.bettermod.impl.block.PullHopperBlock;
-import com.freezephoenix.fabric.bettermod.impl.block.StickHopperBlock;
-import com.freezephoenix.fabric.bettermod.impl.block.entity.BetterBookshelfBlockEntity;
-import com.freezephoenix.fabric.bettermod.impl.block.entity.BitHopperBlockEntity;
-import com.freezephoenix.fabric.bettermod.impl.block.entity.PullHopperBlockEntity;
-import com.freezephoenix.fabric.bettermod.impl.block.entity.StickHopperBlockEntity;
+import com.freezephoenix.fabric.bettermod.impl.block.*;
+import com.freezephoenix.fabric.bettermod.impl.block.entity.*;
 import com.freezephoenix.fabric.bettermod.impl.client.gui.BetterBookshelfScreenHandler;
 import com.freezephoenix.fabric.bettermod.impl.client.gui.BetterScreen;
 import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
@@ -37,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.apache.logging.log4j.LogManager;
@@ -49,9 +43,18 @@ import java.util.function.Function;
 
 
 public class BetterMod implements ModInitializer, ClientModInitializer {
+	public record BetterBlockEntity<B extends Block & BetterBlock<E>, E extends BlockEntity>(B block, BlockEntityType<E> entity) {}
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static final Collection<ItemLike> ITEMS = new ArrayList<>();
 	public static Block ROOM_CONTROLLER_BLOCK;
+
+	public static BetterBlockEntity<ResonantSculkSensorBlock, ResonantSculkSensorBlockEntity> RESONANT_SCULK_SENSOR;
+	public static BetterBlockEntity<BitHopperBlock, BitHopperBlockEntity> BIT_HOPPER;
+	public static BetterBlockEntity<PullHopperBlock, PullHopperBlockEntity> PULL_HOPPER;
+	public static BetterBlockEntity<StickHopperBlock, StickHopperBlockEntity> STICK_HOPPER;
+	public static BetterBlockEntity<BetterBookshelfBlock, BetterBookshelfBlockEntity> BOOKSHELF;
+	public static MenuType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
+
 	public static final CreativeModeTab ITEM_GROUP = FabricCreativeModeTab.builder()
 																		  .icon(() -> new ItemStack(
 																				  ROOM_CONTROLLER_BLOCK.asItem()))
@@ -63,25 +66,30 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 																			  }
 																		  })
 																		  .build();
-	public static BetterBlock<BitHopperBlockEntity> BIT_HOPPER_BLOCK;
-	public static BetterBlock<PullHopperBlockEntity> PULL_HOPPER_BLOCK;
-	public static BetterBlock<StickHopperBlockEntity> STICK_HOPPER_BLOCK;
-	public static BlockEntityType<BitHopperBlockEntity> BIT_HOPPER_BLOCK_ENTITY_TYPE;
-	public static BlockEntityType<PullHopperBlockEntity> PULL_HOPPER_BLOCK_ENTITY_TYPE;
-	public static BlockEntityType<StickHopperBlockEntity> STICK_HOPPER_BLOCK_ENTITY_TYPE;
-	public static BlockEntityType<BetterBookshelfBlockEntity> BOOKSHELF_BLOCK_ENTITY_TYPE;
-	public static MenuType<BetterBookshelfScreenHandler> BOOKSHELF_SCREEN_HANDLER_TYPE;
 	public static Item SLING_MECHANISM;
 
-	public static <T extends Block> T registerBlock(BlockItemId ID, Function<BlockBehaviour.Properties, T> factory, Block template) {
+	public static <B extends Block> B registerBlock(final BlockItemId ID, final Function<BlockBehaviour.Properties, B> factory, final Block template) {
 		ResourceKey<Block> blockRegistryKey = ID.block();
-		T block = Registry.register(
+		B block = Registry.register(
 				BuiltInRegistries.BLOCK,
 				blockRegistryKey,
 				factory.apply(BlockBehaviour.Properties.ofFullCopy(template).setId(blockRegistryKey))
 		);
 		registerItem(ID, BlockItem::new, block);
 		return block;
+	}
+
+	public static <B extends Block & BetterBlock<E>, E extends BlockEntity> BetterBlockEntity<B, E> registerBlockEntity(BlockItemId ID, Function<BlockBehaviour.Properties, B> bFactory, Block template, Identifier eID, FabricBlockEntityTypeBuilder.Factory<E> eFactory) {
+		ResourceKey<Block> blockRegistryKey = ID.block();
+		B block = Registry.register(
+				BuiltInRegistries.BLOCK,
+				blockRegistryKey,
+				bFactory.apply(BlockBehaviour.Properties.ofFullCopy(template).setId(blockRegistryKey))
+		);
+
+		registerItem(ID, BlockItem::new, block);
+
+		return registerBlockEntity(block, eID,eFactory);
 	}
 
 	public static <T extends Item> T registerItem(Identifier ID, Function<Item.Properties, T> factory) {
@@ -95,6 +103,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		return new_item;
 	}
 
+	@SuppressWarnings("UnusedReturnValue")
 	public static <T extends Item, A> T registerItem(BlockItemId ID, BiFunction<A, Item.Properties, T> factory, A arg) {
 		ResourceKey<Item> itemRegistryKey = ID.item();
 		T new_item = Registry.register(
@@ -106,12 +115,12 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 		return new_item;
 	}
 
-	public static <E extends BetterBlockEntity<E>> BlockEntityType<E> registerBlockEntityType(Identifier ID, BetterBlock<E> block, FabricBlockEntityTypeBuilder.Factory<E> factory) {
-		return block.blockEntityType = Registry.register(
+	public static <B extends Block & BetterBlock<E>, E extends BlockEntity> BetterBlockEntity<B, E> registerBlockEntity(B block, Identifier ID, FabricBlockEntityTypeBuilder.Factory<E> factory) {
+		return new BetterBlockEntity<>(block, Registry.register(
 				BuiltInRegistries.BLOCK_ENTITY_TYPE,
 				ID,
 				FabricBlockEntityTypeBuilder.create(factory, block).build()
-		);
+		));
 	}
 
 	public static <T extends AbstractContainerMenu> MenuType<T> registerScreenHandler(Identifier ID, MenuType.MenuSupplier<T> factory) {
@@ -120,6 +129,8 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 	@Environment(EnvType.CLIENT)
 	private static <T extends SyncedGuiDescription> void registerScreen(MenuType<T> screenHandlerType) {
+		// Technically we could just do this:
+		// MenuScreens.register(screenHandlerType, CottonInventoryScreen<T>::new);
 		MenuScreens.register(screenHandlerType, BetterScreen<T>::new);
 	}
 
@@ -133,11 +144,7 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 		if (Blocks.BOOKSHELF instanceof BetterBookshelfBlock betterBookshelfBlock) {
 			LOGGER.info("BetterBookshelves was successful!");
-			BOOKSHELF_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-					BetterBookshelfBlockEntity.ID,
-					betterBookshelfBlock,
-					BetterBookshelfBlockEntity::new
-			);
+			BOOKSHELF = registerBlockEntity(betterBookshelfBlock, BetterBookshelfBlockEntity.ID, BetterBookshelfBlockEntity::new);
 		} else {
 			LOGGER.error("BetterBookshelves was not successful! This is a bug!");
 		}
@@ -150,32 +157,16 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 		SLING_MECHANISM = registerItem(Identifier.fromNamespaceAndPath("bettermod", "sling_mechanism"), Item::new);
 
-		BIT_HOPPER_BLOCK = registerBlock(BitHopperBlock.BlockItemID, BitHopperBlock::new, Blocks.HOPPER);
-		PULL_HOPPER_BLOCK = registerBlock(PullHopperBlock.BlockItemID, PullHopperBlock::new, Blocks.HOPPER);
-		STICK_HOPPER_BLOCK = registerBlock(StickHopperBlock.BlockItemID, StickHopperBlock::new, Blocks.HOPPER);
-
-		BIT_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-				BitHopperBlockEntity.ID,
-				BIT_HOPPER_BLOCK,
-				BitHopperBlockEntity::new
-		);
-		PULL_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-				PullHopperBlockEntity.ID,
-				PULL_HOPPER_BLOCK,
-				PullHopperBlockEntity::new
-		);
-		STICK_HOPPER_BLOCK_ENTITY_TYPE = registerBlockEntityType(
-				StickHopperBlockEntity.ID,
-				STICK_HOPPER_BLOCK,
-				StickHopperBlockEntity::new
-		);
+		BIT_HOPPER				= registerBlockEntity(BitHopperBlock.BlockItemID,BitHopperBlock::new,Blocks.HOPPER, BitHopperBlockEntity.ID, BitHopperBlockEntity::new);
+		PULL_HOPPER				= registerBlockEntity(PullHopperBlock.BlockItemID,PullHopperBlock::new,Blocks.HOPPER, PullHopperBlockEntity.ID, PullHopperBlockEntity::new);
+		STICK_HOPPER			= registerBlockEntity(StickHopperBlock.BlockItemID,StickHopperBlock::new,Blocks.HOPPER, StickHopperBlockEntity.ID, StickHopperBlockEntity::new);
+		RESONANT_SCULK_SENSOR	= registerBlockEntity(ResonantSculkSensorBlock.BlockItemID,	ResonantSculkSensorBlock::new,	Blocks.SCULK_SENSOR, ResonantSculkSensorBlockEntity.ID, ResonantSculkSensorBlockEntity::new);
 
 		BOOKSHELF_SCREEN_HANDLER_TYPE = registerScreenHandler(
 				BetterBookshelfScreenHandler.ID,
 				BetterBookshelfScreenHandler::new
 		);
 	}
-
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void onInitializeClient() {

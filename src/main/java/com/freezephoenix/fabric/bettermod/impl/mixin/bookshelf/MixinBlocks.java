@@ -13,7 +13,7 @@ import java.util.function.Function;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-
+@SuppressWarnings("unused")
 @Mixin(Blocks.class)
 public abstract class MixinBlocks {
 

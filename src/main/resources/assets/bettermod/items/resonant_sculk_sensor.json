@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "bettermod:block/resonant_sculk_sensor_inactive"
+  }
+}

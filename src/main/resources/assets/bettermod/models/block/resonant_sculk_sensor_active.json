@@ -1,0 +1,6 @@
+{
+    "parent": "bettermod:block/resonant_sculk_sensor",
+    "textures": {
+        "tendrils": "block/sculk_sensor_tendril_active"
+    }
+}

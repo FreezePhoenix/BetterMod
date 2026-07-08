@@ -6,14 +6,13 @@ import com.freezephoenix.fabric.bettermod.impl.util.TransferType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class StickHopperBlockEntity extends BetterExtractingHopperBlockEntity<StickHopperBlockEntity> {
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "stick_hopper");
 
 	public StickHopperBlockEntity(BlockPos blockPos, BlockState blockState) {
-		super(BetterMod.STICK_HOPPER_BLOCK_ENTITY_TYPE, blockPos, blockState);
+		super(BetterMod.STICK_HOPPER.entity(), blockPos, blockState);
 	}
 
 	@Override

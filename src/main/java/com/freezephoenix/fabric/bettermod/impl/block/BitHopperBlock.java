@@ -1,5 +1,6 @@
 package com.freezephoenix.fabric.bettermod.impl.block;
 
+import com.freezephoenix.fabric.bettermod.impl.BetterMod;
 import com.mojang.serialization.MapCodec;
 import com.freezephoenix.fabric.bettermod.impl.block.entity.BitHopperBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -8,6 +9,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -118,5 +120,10 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 			case EAST -> EAST_RAYCAST_SHAPE;
 			default -> DOWN_RAYCAST_SHAPE;
 		};
+	}
+
+	@Override
+	public BlockEntityType<BitHopperBlockEntity> getBlockEntityType() {
+		return BetterMod.BIT_HOPPER.entity();
 	}
 }

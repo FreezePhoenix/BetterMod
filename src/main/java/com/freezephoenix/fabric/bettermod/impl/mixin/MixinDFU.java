@@ -3,6 +3,10 @@ package com.freezephoenix.fabric.bettermod.impl.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.datafixers.types.templates.TypeTemplate;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,6 +15,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import net.minecraft.util.datafix.schemas.V1460;
 
+@SuppressWarnings("unused")
 @Mixin(V1460.class)
 public abstract class MixinDFU extends Schema {
 	public MixinDFU(int versionKey, Schema parent) {
@@ -25,7 +30,6 @@ public abstract class MixinDFU extends Schema {
 	@ModifyReturnValue(method = "registerBlockEntities",
 					   at = @At("RETURN"))
 	private Map<String, Supplier<TypeTemplate>> onRegisterBlockEntities(Map<String, Supplier<TypeTemplate>> map, Schema schema) {
-
 		registerInventory(schema, map, "bettermod:bit_hopper");
 		registerInventory(schema, map, "bettermod:pull_hopper");
 		registerInventory(schema, map, "bettermod:stick_hopper");

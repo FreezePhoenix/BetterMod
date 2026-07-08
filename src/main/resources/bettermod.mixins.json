@@ -6,8 +6,8 @@
   "mixins": [
     "bookshelf.MixinBlocks",
     "MixinDFU",
-    "MixinSpawnerBlock",
-    "BaseSpawnerAccessor"
+    "BaseEntityBlockAccessor",
+    "MixinGameEvent"
   ],
   "injectors": {
     "defaultRequire": 1

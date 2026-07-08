@@ -1,5 +1,6 @@
 package com.freezephoenix.fabric.bettermod.impl.block;
 
+import com.freezephoenix.fabric.bettermod.impl.BetterMod;
 import com.mojang.serialization.MapCodec;
 import com.freezephoenix.fabric.bettermod.impl.block.entity.StickHopperBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -8,12 +9,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Contract;
 
 public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEntity> {
 	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "stickhopper");
@@ -152,5 +153,10 @@ public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEn
 			case EAST -> EAST_RAYCAST_SHAPE;
 			default -> DOWN_RAYCAST_SHAPE;
 		};
+	}
+
+	@Override
+	public BlockEntityType<StickHopperBlockEntity> getBlockEntityType() {
+		return BetterMod.STICK_HOPPER.entity();
 	}
 }

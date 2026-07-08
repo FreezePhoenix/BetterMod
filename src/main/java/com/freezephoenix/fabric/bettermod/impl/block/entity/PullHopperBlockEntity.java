@@ -12,7 +12,7 @@ public class PullHopperBlockEntity extends BetterExtractingHopperBlockEntity<Pul
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "pull_hopper");
 
 	public PullHopperBlockEntity(BlockPos blockPos, BlockState blockState) {
-		super(BetterMod.PULL_HOPPER_BLOCK_ENTITY_TYPE, blockPos, blockState);
+		super(BetterMod.PULL_HOPPER.entity(), blockPos, blockState);
 	}
 
 	@Override
