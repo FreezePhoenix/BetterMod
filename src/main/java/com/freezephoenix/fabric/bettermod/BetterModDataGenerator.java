@@ -133,7 +133,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 																								 DataComponents.WRITTEN_BOOK_CONTENT,
 																								 new WrittenBookContent(
 																										 new Filterable<>(
-																												 "Better Mod v2.0.3 credits",
+																												 "Better Mod v2.1.0 credits",
 																												 Optional.empty()
 																										 ),
 																										 "FreezePhoenix",
