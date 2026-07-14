@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "#": "minecraft:echo_shard",
+    "X": "minecraft:calibrated_sculk_sensor"
+  },
+  "pattern": [
+    " # ",
+    "#X#"
+  ],
+  "result": {
+    "id": "bettermod:resonant_sculk_sensor"
+  }
+}

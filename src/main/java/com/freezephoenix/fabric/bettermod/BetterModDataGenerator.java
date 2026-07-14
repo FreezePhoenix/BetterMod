@@ -112,7 +112,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		public void generate() {
 			HolderLookup.RegistryLookup<Structure> structures = this.registries.lookupOrThrow(Registries.STRUCTURE);
 			dropWhenSilkTouch(BetterMod.RESONANT_SCULK_SENSOR.block());
-			var title = "Better Mod v2.1.0 credits";
+			var title = "Better Mod v3.0.1 credits";
 			var content = """
 					Authors
 					 - FreezePhoenix
@@ -201,22 +201,22 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 			return new RecipeProvider(registryLookup, exporter) {
 				@Override
 				public void buildRecipes() {
-//					shaped(RecipeCategory.REDSTONE, BetterMod.RESONANT_SCULK_SENSOR_BLOCK.block())
-//							.pattern(" # ")
-//							.pattern("#X#")
-//							.define(
-//									'#',
-//									Items.ECHO_SHARD
-//							)
-//							.define(
-//									'X',
-//									Items.CALIBRATED_SCULK_SENSOR
-//							)
-//							.unlockedBy(
-//									getHasName(Items.ECHO_SHARD),
-//									has(Items.ECHO_SHARD)
-//							)
-//							.save(output);
+					shaped(RecipeCategory.REDSTONE, BetterMod.RESONANT_SCULK_SENSOR.block())
+							.pattern(" # ")
+							.pattern("#X#")
+							.define(
+									'#',
+									Items.ECHO_SHARD
+							)
+							.define(
+									'X',
+									Items.CALIBRATED_SCULK_SENSOR
+							)
+							.unlockedBy(
+									getHasName(Items.ECHO_SHARD),
+									has(Items.ECHO_SHARD)
+							)
+							.save(output);
 					shaped(RecipeCategory.REDSTONE, BetterMod.SLING_MECHANISM)
 							.pattern("IRI")
 							.pattern(" I ")
