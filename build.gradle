@@ -23,8 +23,8 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	// https://github.com/CottonMC/LibGui/wiki/Setup
-	implementation include ("io.github.cottonmc:LibGui:17.0.0+26.2")
 
+	api "com.freezephoenix:freezelib:1.0.0"
 	// When these things change, we want to recompile our mod, and others that depend on it.
 
 	// https://linkie.shedaniel.dev/?loader=fabric&version=1.21.4
@@ -48,7 +48,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 jar {
-	from "LICENSE"
 }
 
 java {

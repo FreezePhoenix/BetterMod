@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "bettermod",
-	"version": "2.1.0",
+	"version": "3.0.0",
 
 	"name": "Better Mod",
 	"description": "Improve your MC world! Put items in Bookshelves!",
@@ -9,7 +9,7 @@
 		"FreezePhoenix"
 	],
 	"contact": {},
-	"license": "ARR",
+	"license": "CC0-1.0",
 	"icon": "assets/bettermod/icon.png",
 
 	"environment": "*",
@@ -18,10 +18,10 @@
 			"com.freezephoenix.fabric.bettermod.BetterModDataGenerator"
 		],
 		"main": [
-			"com.freezephoenix.fabric.bettermod.impl.BetterMod"
+			"com.freezephoenix.fabric.bettermod.BetterMod"
 		],
 		"client": [
-			"com.freezephoenix.fabric.bettermod.impl.BetterMod"
+			"com.freezephoenix.fabric.bettermod.BetterMod"
 		]
 	},
 	"mixins": [
@@ -29,7 +29,8 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
 		"fabric-api": "*",
-		"minecraft": "26.2"
+		"freezelib": ">=1.0.0"
 	}
 }

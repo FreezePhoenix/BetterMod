@@ -1,10 +1,10 @@
 package com.freezephoenix.fabric.bettermod;
 
-import com.freezephoenix.fabric.bettermod.impl.BetterMod;
-import com.freezephoenix.fabric.bettermod.impl.block.BitHopperBlock;
-import com.freezephoenix.fabric.bettermod.impl.block.PullHopperBlock;
-import com.freezephoenix.fabric.bettermod.impl.block.StickHopperBlock;
-import com.freezephoenix.fabric.bettermod.impl.util.ItemTagKeys;
+import com.freezephoenix.fabric.bettermod.block.BitHopperBlock;
+import com.freezephoenix.fabric.bettermod.block.PullHopperBlock;
+import com.freezephoenix.fabric.bettermod.block.ResonantSculkSensorBlock;
+import com.freezephoenix.fabric.bettermod.block.StickHopperBlock;
+import com.freezephoenix.fabric.bettermod.util.ItemTagKeys;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
@@ -85,7 +85,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 					PullHopperBlock.BlockItemID,
 					BitHopperBlock.BlockItemID
 			);
-//			tag(BlockTags.MINEABLE_WITH_HOE).add(ResonantSculkSensorBlock.BlockItemID);
+			tag(BlockTags.MINEABLE_WITH_HOE).add(ResonantSculkSensorBlock.BlockItemID);
 		}
 	}
 
@@ -112,6 +112,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		public void generate() {
 			HolderLookup.RegistryLookup<Structure> structures = this.registries.lookupOrThrow(Registries.STRUCTURE);
 			dropWhenSilkTouch(BetterMod.RESONANT_SCULK_SENSOR.block());
+			var title = "Better Mod v2.1.0 credits";
 			var content = """
 					Authors
 					 - FreezePhoenix
@@ -133,7 +134,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 																								 DataComponents.WRITTEN_BOOK_CONTENT,
 																								 new WrittenBookContent(
 																										 new Filterable<>(
-																												 "Better Mod v2.1.0 credits",
+																												 title,
 																												 Optional.empty()
 																										 ),
 																										 "FreezePhoenix",

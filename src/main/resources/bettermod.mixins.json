@@ -1,12 +1,11 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.freezephoenix.fabric.bettermod.impl.mixin",
+  "package": "com.freezephoenix.fabric.bettermod.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "bookshelf.MixinBlocks",
     "MixinDFU",
-    "BaseEntityBlockAccessor",
     "MixinGameEvent"
   ],
   "injectors": {
