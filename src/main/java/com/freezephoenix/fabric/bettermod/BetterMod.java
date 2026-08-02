@@ -4,13 +4,7 @@ import com.freezephoenix.fabric.FreezeLib;
 import com.freezephoenix.fabric.bettermod.block.*;
 import com.freezephoenix.fabric.bettermod.block.entity.*;
 import com.freezephoenix.fabric.bettermod.gui.BetterBookshelfScreenHandler;
-import com.freezephoenix.fabric.gui.BetterScreen;
-import io.github.cottonmc.cotton.gui.SyncedGuiDescription;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.references.BlockItemId;
@@ -25,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class BetterMod implements ModInitializer, ClientModInitializer {
+public class BetterMod implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static Block ROOM_CONTROLLER_BLOCK;
 
@@ -42,13 +36,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 
 	public static <T extends AbstractContainerMenu> MenuType<T> registerScreenHandler(Identifier ID, MenuType.MenuSupplier<T> factory) {
 		return Registry.register(BuiltInRegistries.MENU, ID, new MenuType<>(factory, FeatureFlagSet.of()));
-	}
-
-	@Environment(EnvType.CLIENT)
-	private static <T extends SyncedGuiDescription> void registerScreen(MenuType<T> screenHandlerType) {
-		// Technically we could just do this:
-		// MenuScreens.register(screenHandlerType, CottonInventoryScreen<T>::new);
-		MenuScreens.register(screenHandlerType, BetterScreen<T>::new);
 	}
 
 	@Override
@@ -78,10 +65,6 @@ public class BetterMod implements ModInitializer, ClientModInitializer {
 				BetterBookshelfScreenHandler.ID,
 				BetterBookshelfScreenHandler::new
 		);
-	}
-	@Override
-	@Environment(EnvType.CLIENT)
-	public void onInitializeClient() {
-		registerScreen(BOOKSHELF_SCREEN_HANDLER_TYPE);
+		ITEM_GROUP.register();
 	}
 }
