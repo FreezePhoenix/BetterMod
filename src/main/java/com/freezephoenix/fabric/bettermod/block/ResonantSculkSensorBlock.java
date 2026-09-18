@@ -30,7 +30,6 @@ public class ResonantSculkSensorBlock extends SculkSensorBlock implements Better
 	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "resonant_sculk_sensor");
 	public static final BlockItemId BlockItemID = BlockItemId.create(ID, ID);
 	public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
-	public static final MapCodec<ResonantSculkSensorBlock> CODEC = simpleCodec(ResonantSculkSensorBlock::new);
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos worldPosition, BlockState blockState) {
@@ -40,10 +39,6 @@ public class ResonantSculkSensorBlock extends SculkSensorBlock implements Better
 	public ResonantSculkSensorBlock(final BlockBehaviour.Properties properties) {
 		super(properties);
 		this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
-	}
-
-	public MapCodec<ResonantSculkSensorBlock> codec() {
-		return CODEC;
 	}
 
 	@Override

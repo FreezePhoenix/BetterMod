@@ -19,7 +19,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public final class PullHopperBlock extends BetterHopperBlock<PullHopperBlockEntity> {
 	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "pullhopper");
 	public static final BlockItemId BlockItemID = BlockItemId.create(ID, ID);
-	public static final MapCodec<PullHopperBlock> CODEC = PullHopperBlock.simpleCodec(PullHopperBlock::new);
 	private static final VoxelShape TOP_SHAPE = Shapes.or(Block.box(
 			2.0,
 			10.0,
@@ -143,11 +142,6 @@ public final class PullHopperBlock extends BetterHopperBlock<PullHopperBlockEnti
 					10.0
 			)
 	);
-
-	@Override
-	protected MapCodec<PullHopperBlock> codec() {
-		return CODEC;
-	}
 
 	public PullHopperBlock(Properties settings) {
 		super(settings);

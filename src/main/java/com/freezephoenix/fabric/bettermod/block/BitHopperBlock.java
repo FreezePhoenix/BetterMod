@@ -18,7 +18,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity> {
 	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "bithopper");
 	public static final BlockItemId BlockItemID = BlockItemId.create(ID, ID);
-	public static final MapCodec<BitHopperBlock> CODEC = BitHopperBlock.simpleCodec(BitHopperBlock::new);
 	private static final VoxelShape TOP_SHAPE = Shapes.or(Block.box(
 			0.0,
 			10.0,
@@ -90,11 +89,6 @@ public final class BitHopperBlock extends BetterHopperBlock<BitHopperBlockEntity
 	private static final VoxelShape NORTH_RAYCAST_SHAPE = Block.box(6.0, 8.0, 0.0, 10.0, 10.0, 4.0);
 	private static final VoxelShape SOUTH_RAYCAST_SHAPE = Block.box(6.0, 8.0, 12.0, 10.0, 10.0, 16.0);
 	private static final VoxelShape WEST_RAYCAST_SHAPE = Block.box(0.0, 8.0, 6.0, 4.0, 10.0, 10.0);
-
-	@Override
-	protected MapCodec<BitHopperBlock> codec() {
-		return CODEC;
-	}
 
 	public BitHopperBlock(Properties settings) {
 		super(settings);

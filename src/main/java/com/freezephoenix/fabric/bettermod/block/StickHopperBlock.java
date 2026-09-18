@@ -19,12 +19,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public final class StickHopperBlock extends BetterHopperBlock<StickHopperBlockEntity> {
 	private static final Identifier ID = Identifier.fromNamespaceAndPath("bettermod", "stickhopper");
 	public static final BlockItemId BlockItemID = BlockItemId.create(ID, ID);
-	public static final MapCodec<StickHopperBlock> CODEC = StickHopperBlock.simpleCodec(StickHopperBlock::new);
-
-	@Override
-	protected MapCodec<StickHopperBlock> codec() {
-		return CODEC;
-	}
 
 	private static final VoxelShape TOP_SHAPE = Block.column(16.0, 10.0, 16.0);
 	private static final VoxelShape MIDDLE_SHAPE = Block.column(8.0, 4.0, 10.0);

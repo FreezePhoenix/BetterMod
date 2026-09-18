@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "bettermod:stickhopper"
+        "recipes": "bettermod:stickhopper"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

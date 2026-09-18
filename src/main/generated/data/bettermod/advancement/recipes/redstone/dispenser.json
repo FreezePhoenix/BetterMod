@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "bettermod:dispenser"
+        "recipes": "bettermod:dispenser"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

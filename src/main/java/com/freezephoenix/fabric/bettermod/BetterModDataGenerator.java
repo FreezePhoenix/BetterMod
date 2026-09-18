@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.predicates.BlockPredicate;
 import net.minecraft.advancements.predicates.LocationPredicate;
 import net.minecraft.core.HolderLookup;
@@ -20,6 +21,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.tags.BlockItemTagAppender;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.PlainTextContents;
@@ -34,6 +36,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityTypeIds;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.WrittenBookContent;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -47,7 +50,9 @@ import net.minecraft.world.level.storage.loot.functions.SetComponentsFunction;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.List;
 import java.util.Optional;
@@ -104,15 +109,16 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 	}
 
 	private static class LootTableGenerator extends FabricBlockLootSubProvider {
+		private final HolderLookup.RegistryLookup<Structure> structures;
 		protected LootTableGenerator(FabricPackOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 			super(dataOutput, registriesFuture);
+			structures = registriesFuture.join().lookupOrThrow(Registries.STRUCTURE);
 		}
 
 		@Override
 		public void generate() {
-			HolderLookup.RegistryLookup<Structure> structures = this.registries.lookupOrThrow(Registries.STRUCTURE);
 			dropWhenSilkTouch(BetterMod.RESONANT_SCULK_SENSOR.block());
-			var title = "Better Mod v3.0.1 credits";
+			var title = "Better Mod v3.2.0 credits";
 			var content = """
 					Authors
 					 - FreezePhoenix
@@ -127,7 +133,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 			nbt.storeNullable("SpawnData", SpawnData.CODEC, nextSpawnData);
 			add(
 					Blocks.SPAWNER, _ -> LootTable.lootTable()
-												  .withPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
+												  .withPool(LootPool.lootPool().setRolls(ContextIntProviders.exactly(1))
 																	.add(LootItem.lootTableItem(Items.WRITTEN_BOOK)
 																				 .apply(
 																						 SetComponentsFunction.setComponent(
@@ -163,7 +169,7 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 			add(BetterMod.STICK_HOPPER.block(), this::createNameableBlockEntityTable);
 			add(BetterMod.BOOKSHELF.block(), original -> LootTable.lootTable()
 														   .withPool(LootPool.lootPool()
-																			 .setRolls(ConstantValue.exactly(1.0F))
+																			 .setRolls(ContextIntProviders.exactly(1))
 																			 .add((LootItem.lootTableItem(original)
 																						   .when(this.hasSilkTouch())
 																						   .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(
@@ -171,19 +177,17 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 																														.include(
 																																DataComponents.CUSTOM_NAME))).otherwise(
 																					 LootItem.lootTableItem(Items.BOOK)
-																							 .apply(SetItemCountFunction.setCount(
-																									 ConstantValue.exactly(
-																											 3.0F))))))
+																							 .apply(SetItemCountFunction.setCount(ContextIntProviders.exactly(3))))))
 			);
 			add(
 					BetterMod.ROOM_CONTROLLER_BLOCK,
 					LootTable.lootTable()
 							 .withPool(LootPool.lootPool()
 											   .add(LootItem.lootTableItem(Items.GOLD_INGOT)
-															.apply(SetItemCountFunction.setCount(new ConstantValue(4)))))
+															.apply(SetItemCountFunction.setCount(ContextIntProviders.exactly(4)))))
 							 .withPool(LootPool.lootPool()
 											   .add(LootItem.lootTableItem(Items.REDSTONE)
-															.apply(SetItemCountFunction.setCount(new ConstantValue(4)))))
+															.apply(SetItemCountFunction.setCount(ContextIntProviders.exactly(4)))))
 							 .withPool(LootPool.lootPool().add(
 
 									 LootItem.lootTableItem(Items.ENDER_PEARL)))
@@ -197,8 +201,8 @@ public class BetterModDataGenerator implements DataGeneratorEntrypoint {
 		}
 
 		@Override
-		protected RecipeProvider createRecipeProvider(HolderLookup.Provider registryLookup, RecipeOutput exporter) {
-			return new RecipeProvider(registryLookup, exporter) {
+		protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, BootstrapContext<Recipe<?>> recipes, BootstrapContext<Advancement> advancements) {
+			return new RecipeProvider(recipes, advancements) {
 				@Override
 				public void buildRecipes() {
 					shaped(RecipeCategory.REDSTONE, BetterMod.RESONANT_SCULK_SENSOR.block())
